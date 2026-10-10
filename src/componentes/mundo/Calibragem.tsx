@@ -28,7 +28,7 @@ import { useProgresso } from "@/componentes/estado/useProgresso";
 import { Bancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
-import { Visor } from "@/componentes/maquinas/Visor";
+import { TiraMensagem } from "@/componentes/maquinas/Tira";
 import { mensagemDoEvento } from "@/componentes/maquinas/mensagens";
 import { EntradaResposta } from "@/componentes/missao/Respostas";
 import { Nonio } from "@/componentes/nonio/Nonio";
@@ -89,19 +89,21 @@ export function Calibragem() {
 
   if (fase === "convite") {
     return (
-      <main data-pronto="sim" data-tela="calibragem" data-fase="convite" className="area-segura flex min-h-dvh flex-col items-center justify-center gap-5 py-8 text-center">
-        <Nonio expressao="atento" tamanho={96} />
-        <h1 className="fonte-sinal m-0 text-[2.1rem] font-extrabold uppercase text-latao-claro">Calibragem</h1>
-        <p className="m-0 max-w-sm text-[1.1rem]">Antes de tudo, preciso saber em que marca você está.</p>
-        <p className="m-0 max-w-sm text-texto-mundo-suave">Não é prova e não dá nota. São até seis medidas curtas, sem relógio. &ldquo;Não sei ainda&rdquo; é uma resposta que vale.</p>
-        <div className="flex w-full max-w-sm flex-col gap-2">
-          <button type="button" className="placa placa-cheia w-full" onClick={() => setFase("medindo")} data-acao="comecar-calibragem">
-            Começar a calibragem
-          </button>
-          <button type="button" className="placa placa-discreta w-full" onClick={comecarDoComeco} data-acao="comecar-do-comeco">
-            Começar do começo
-          </button>
-        </div>
+      <main data-pronto="sim" data-tela="calibragem" data-fase="convite" className="area-segura flex min-h-dvh flex-col items-center justify-center py-8">
+        <section className="ficha flex w-full max-w-[420px] flex-col items-center gap-4 px-5 pb-6 pt-6 text-center">
+          <Nonio expressao="atento" tamanho={110} />
+          <h1 className="m-0 text-[26px] font-extrabold leading-tight">Calibragem</h1>
+          <p className="m-0 text-[17px] font-semibold">Antes de tudo, preciso saber em que marca você está.</p>
+          <p className="m-0 text-[15px] font-medium text-tinta-suave">Não é prova e não dá nota. São até seis medidas curtas, sem relógio. &ldquo;Não sei ainda&rdquo; é uma resposta que vale.</p>
+          <div className="mt-1 flex w-full flex-col gap-2.5">
+            <button type="button" className="botao-principal w-full" onClick={() => setFase("medindo")} data-acao="comecar-calibragem">
+              Começar a calibragem
+            </button>
+            <button type="button" className="botao-secundario w-full" onClick={comecarDoComeco} data-acao="comecar-do-comeco">
+              Começar do começo
+            </button>
+          </div>
+        </section>
       </main>
     );
   }
@@ -110,27 +112,27 @@ export function Calibragem() {
 
   const atributos = { "data-pronto": "sim", "data-tela": "calibragem", "data-fase": "medindo", "data-degrau": String(estado.atual) };
   const cabecalho = (
-    <header className="area-segura flex flex-col gap-2 pb-2">
-      <div className="flex items-center gap-3">
-        <Nonio expressao="medindo" tamanho={36} />
-        <div className="flex-1">
-          <p className="rotulo-chapa m-0 text-[0.78rem]">Calibragem · medida {estado.respostas.length + 1}</p>
-          <Regua atual={estado.atual} />
-        </div>
-        <button type="button" className="placa placa-pequena placa-discreta" onClick={comecarDoComeco} data-acao="comecar-do-comeco">
-          Do começo
-        </button>
+    <header className="cabecalho area-segura">
+      <Nonio expressao="medindo" tamanho={44} rotulo="" pes={false} />
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <p className="m-0 text-[12px] font-semibold text-tinta-suave">Calibragem · medida {estado.respostas.length + 1}</p>
+        <Regua atual={estado.atual} />
       </div>
-      <p className="m-0 rounded-md border border-noite-borda bg-noite-funda px-2.5 py-1.5 text-[0.98rem]" data-pedido="">
-        {item.pedido}
-      </p>
+      <button type="button" className="botao-discreto shrink-0" onClick={comecarDoComeco} data-acao="comecar-do-comeco">
+        Do começo
+      </button>
     </header>
+  );
+  const pedido = (
+    <p className="m-0 min-w-0 flex-1 text-[15px] font-semibold leading-snug" data-pedido="">
+      {item.pedido}
+    </p>
   );
 
   const controlesAnotado = anotado !== null && (
     <div className="flex flex-col gap-3" role="status" data-anotado={anotado}>
-      <p className="m-0 text-[1.05rem]">{anotado === "sucesso" ? "Marcado." : anotado === "nao_sei" ? "Anotado: ainda não. Vale." : "Anotado."}</p>
-      <button type="button" className="placa placa-cheia w-full" onClick={seguir} data-acao="seguir">
+      <p className="m-0 text-[17px] font-bold">{anotado === "sucesso" ? <span className="grifo">Marcado.</span> : anotado === "nao_sei" ? "Anotado: ainda não. Vale." : "Anotado."}</p>
+      <button type="button" className="botao-principal w-full" onClick={seguir} data-acao="seguir">
         Seguir
       </button>
     </div>
@@ -138,18 +140,19 @@ export function Calibragem() {
 
   if (item.tipo === "resposta" && !item.maquina) {
     return (
-      <main {...atributos} className="flex min-h-dvh flex-col area-segura-topo">
+      <main {...atributos} className="flex min-h-dvh flex-col">
         {cabecalho}
-        <div className="area-segura mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-5 py-4 area-segura-base">
-          <p className="m-0 text-[1.05rem]">{item.fala}</p>
-          {item.figura && <FiguraMedidas {...item.figura} />}
-          {controlesAnotado || (
-            <EntradaResposta
-              tipo={item.resposta}
-              onResponder={(v) => responder(resultadoResposta(item, v))}
-              rotuloConferir="Pronto"
-            />
-          )}
+        <div className="palco-pedido">{pedido}</div>
+        <div className="area-segura area-segura-base mx-auto flex w-full max-w-[600px] flex-1 flex-col justify-center gap-5 py-6">
+          <section className="ficha flex flex-col gap-4 p-4">
+            <p className="m-0 text-[16px] font-medium">{item.fala}</p>
+            {item.figura && (
+              <div className="ficha-quadriculada p-2 shadow-none">
+                <FiguraMedidas {...item.figura} />
+              </div>
+            )}
+            {controlesAnotado || <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Pronto" />}
+          </section>
         </div>
       </main>
     );
@@ -163,9 +166,10 @@ export function Calibragem() {
   return (
     <Palco
       atributos={atributos}
-      topo={cabecalho}
+      cabecalho={cabecalho}
+      pedido={pedido}
       maquina={<Bancada estado={b.atual} pele={pele} onAcao={item.tipo === "maquina" && anotado === null ? (a) => setBancada(operar(b, a)) : undefined} />}
-      visor={<Visor texto={msg?.texto ?? item.fala} tom={msg?.tom} />}
+      tira={<TiraMensagem texto={msg?.texto ?? item.fala} tom={msg?.tom} />}
       controles={
         controlesAnotado ||
         (item.tipo === "maquina" ? (
@@ -176,14 +180,14 @@ export function Calibragem() {
             onFechar={() => responder(validarBancada(item.objetivo.validador, item.objetivo.params ?? {}, b.atual).ok ? "sucesso" : "falha")}
             rotuloFechar="Pronto"
             extra={
-              <button type="button" className="placa placa-pequena placa-discreta ml-auto" onClick={() => responder("nao_sei")} data-acao="nao-sei">
+              <button type="button" className="botao-secundario w-full" onClick={() => responder("nao_sei")} data-acao="nao-sei">
                 Não sei ainda
               </button>
             }
           />
         ) : (
           <div className="flex flex-col gap-3">
-            <p className="m-0">{item.fala}</p>
+            <p className="m-0 text-[16px] font-medium">{item.fala}</p>
             <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Pronto" />
           </div>
         ))
@@ -202,43 +206,36 @@ function resultadoResposta(item: Extract<ItemCalibragem, { tipo: "resposta" }>, 
   return c.naoSei ? "nao_sei" : c.certa ? "sucesso" : "falha";
 }
 
-/** Régua de seis marcas; o cursor do Nônio mostra o degrau medido agora. */
+/** Seis degraus: os já medidos a tinta, o atual a caneta, os de depois a lápis. */
 function Regua({ atual }: { atual: number }) {
   return (
-    <svg viewBox="0 0 160 22" className="block h-6 w-full max-w-[220px]" role="img" aria-label={`Marca ${atual} de 6`}>
-      <rect x="2" y="12" width="156" height="6" rx="1.5" fill="var(--latao)" />
-      {Array.from({ length: 6 }, (_, i) => (
-        <line key={i} x1={14 + i * 26.4} x2={14 + i * 26.4} y1="12" y2="16" stroke="var(--latao-sombra)" strokeWidth="1.4" />
-      ))}
-      <g style={{ transform: `translateX(${(atual - 1) * 26.4}px)`, transition: "transform var(--t-assentar) var(--curva-mecanica)" }}>
-        <path d="M 8 2 L 20 2 L 20 11 L 14 16 L 8 11 Z" fill="var(--turquesa)" />
-        <circle cx="14" cy="7" r="2.2" fill="var(--noite-funda)" />
-      </g>
-    </svg>
+    <div className="flex items-center gap-1.5" role="img" aria-label={`Marca ${atual} de 6`}>
+      {Array.from({ length: 6 }, (_, i) => {
+        const d = i + 1;
+        const cor = d === atual ? "border-tinta bg-caneta" : d < atual ? "border-tinta bg-tinta" : "border-grafite border-dashed bg-folha";
+        return <span key={d} className={`block h-2.5 w-6 rounded-full border-2 ${cor}`} />;
+      })}
+    </div>
   );
 }
 
 /** Desenho simples das medidas: 2 de farinha para 3 de água; com 6 de farinha, quantas de água? */
 function FiguraMedidas({ a, b, rotuloA, rotuloB, dadoA }: { a: number; b: number; rotuloA: string; rotuloB: string; dadoA: number }) {
   const copo = (x: number, y: number, cor: string, chave: string) => (
-    <g key={chave}>
-      <path d={`M ${x} ${y} L ${x + 16} ${y} L ${x + 14} ${y + 20} L ${x + 2} ${y + 20} Z`} fill={cor} stroke="var(--latao-sombra)" strokeWidth="1" />
-    </g>
+    <path key={chave} d={`M ${x} ${y} L ${x + 16} ${y} L ${x + 14} ${y + 20} L ${x + 2} ${y + 20} Z`} fill={cor} stroke="var(--tinta)" strokeWidth={2} strokeLinejoin="round" />
   );
   return (
-    <svg viewBox="0 0 300 150" className="w-full max-w-md" role="img" aria-label={`Receita: ${a} medidas de ${rotuloA} para ${b} de ${rotuloB}. Agora, ${dadoA} de ${rotuloA}.`}>
-      <text x="8" y="16" fontSize="11" fill="var(--texto-mundo-suave)">receita</text>
-      {Array.from({ length: a }, (_, i) => copo(10 + i * 20, 24, "var(--miolo)", `a${i}`))}
+    <svg viewBox="0 0 300 150" className="block w-full max-w-md" role="img" aria-label={`Receita: ${a} medidas de ${rotuloA} para ${b} de ${rotuloB}. Agora, ${dadoA} de ${rotuloA}.`}>
+      <text x="8" y="16" fontSize="12" fontWeight={600} fill="var(--tinta-suave)">receita</text>
+      {Array.from({ length: a }, (_, i) => copo(10 + i * 20, 24, "var(--pao-miolo)", `a${i}`))}
       {Array.from({ length: b }, (_, i) => copo(70 + i * 20, 24, "var(--agua)", `b${i}`))}
-      <text x="10" y="60" fontSize="10" fill="var(--texto-mundo-suave)">{rotuloA}</text>
-      <text x="70" y="60" fontSize="10" fill="var(--texto-mundo-suave)">{rotuloB}</text>
-      <line x1="8" x2="292" y1="72" y2="72" stroke="var(--noite-borda)" />
-      <text x="8" y="90" fontSize="11" fill="var(--texto-mundo-suave)">hoje</text>
-      {Array.from({ length: dadoA }, (_, i) => copo(10 + i * 20, 98, "var(--miolo)", `c${i}`))}
-      <g>
-        <rect x="140" y="98" width="150" height="22" rx="4" fill="none" stroke="var(--turquesa)" strokeDasharray="4 3" />
-        <text x="215" y="113" textAnchor="middle" fontSize="11" fill="var(--turquesa-clara)">{`quantas de ${rotuloB}?`}</text>
-      </g>
+      <text x="10" y="62" fontSize="12" fontWeight={600} fill="var(--tinta)">{rotuloA}</text>
+      <text x="70" y="62" fontSize="12" fontWeight={600} fill="var(--tinta)">{rotuloB}</text>
+      <line x1="8" x2="292" y1="74" y2="74" stroke="var(--tinta)" strokeWidth={1.6} />
+      <text x="8" y="92" fontSize="12" fontWeight={600} fill="var(--tinta-suave)">hoje</text>
+      {Array.from({ length: dadoA }, (_, i) => copo(10 + i * 20, 100, "var(--pao-miolo)", `c${i}`))}
+      <rect x="140" y="99" width="152" height="24" rx="6" fill="var(--folha)" stroke="var(--caneta)" strokeWidth={2} strokeDasharray="5 4" />
+      <text x="216" y="115" textAnchor="middle" fontSize="12.5" fontWeight={700} fill="var(--caneta)">{`quantas de ${rotuloB}?`}</text>
     </svg>
   );
 }
@@ -248,36 +245,44 @@ function ResultadoCalibragem({ estado }: { estado: EstadoCalibragem }) {
   const rec = r.recomendacao ? atividadePorId(r.recomendacao) : null;
   const primeira = atividadePorId(REGRAS_CALIBRAGEM.recomendacoes[0].atividade);
   return (
-    <main data-pronto="sim" data-tela="calibragem" data-fase="resultado" data-maior-degrau={r.maiorDegrau} className="area-segura flex min-h-dvh flex-col items-center justify-center gap-4 py-8 text-center">
-      <Nonio expressao="satisfeito" tamanho={84} />
-      <h1 className="fonte-sinal m-0 text-[1.9rem] font-extrabold uppercase text-latao-claro">Marca anotada</h1>
-      {rec && rec.numero !== undefined && rec.numero > 1 ? (
-        <p className="m-0 max-w-sm text-[1.1rem]">
-          Você pode começar pela missão {rec.numero}: {rec.titulo}. As anteriores ficam com prova direta, para atravessar rápido.
-        </p>
-      ) : (
-        <p className="m-0 max-w-sm text-[1.1rem]">O melhor ponto de partida é a missão 1: {primeira?.titulo}.</p>
-      )}
-      {r.alemDoArco && (
-        <p className="m-0 max-w-sm text-texto-mundo-suave">
-          Você mostrou mais do que este trecho cobre. O arco tem provas diretas para atravessar rápido; os distritos seguintes ainda estão em projeto.
-        </p>
-      )}
-      <div className="flex w-full max-w-sm flex-col gap-2">
-        {rec && (
-          <Link href={rotaDe(rec)} className="placa placa-cheia w-full" data-acao="comecar-recomendado">
-            {rec.numero === 1 ? "Começar a missão 1" : `Começar pela missão ${rec.numero}`}
-          </Link>
+    <main data-pronto="sim" data-tela="calibragem" data-fase="resultado" data-maior-degrau={r.maiorDegrau} className="area-segura flex min-h-dvh flex-col items-center justify-center py-8">
+      <section className="ficha flex w-full max-w-[420px] flex-col items-center gap-4 px-5 pb-6 pt-6 text-center">
+        <Nonio expressao="satisfeito" tamanho={110} />
+        <h1 className="m-0 text-[26px] font-extrabold leading-tight">Marca anotada</h1>
+        {rec && rec.numero !== undefined && rec.numero > 1 ? (
+          <p className="m-0 text-[17px] font-medium leading-[1.5]">
+            Você pode começar pela{" "}
+            <span className="grifo font-bold">
+              missão {rec.numero}: {rec.titulo}
+            </span>
+            . As anteriores ficam com prova direta, para atravessar rápido.
+          </p>
+        ) : (
+          <p className="m-0 text-[17px] font-medium leading-[1.5]">
+            O melhor ponto de partida é a <span className="grifo font-bold">missão 1: {primeira?.titulo}</span>.
+          </p>
         )}
-        {primeira && rec?.id !== primeira.id && (
-          <Link href={rotaDe(primeira)} className="placa w-full" data-acao="comecar-do-comeco">
-            Começar do começo
-          </Link>
+        {r.alemDoArco && (
+          <p className="m-0 text-[15px] font-medium text-tinta-suave">
+            Você mostrou mais do que este trecho cobre. O arco tem provas diretas para atravessar rápido; os distritos seguintes ainda estão a lápis.
+          </p>
         )}
-        <Link href="/mapa" className="placa placa-discreta w-full" data-acao="ver-mapa">
-          Ver o mapa do Engenho
-        </Link>
-      </div>
+        <div className="mt-1 flex w-full flex-col gap-2.5">
+          {rec && (
+            <Link href={rotaDe(rec)} className="botao-principal w-full" data-acao="comecar-recomendado">
+              {rec.numero === 1 ? "Começar a missão 1" : `Começar pela missão ${rec.numero}`}
+            </Link>
+          )}
+          {primeira && rec?.id !== primeira.id && (
+            <Link href={rotaDe(primeira)} className="botao-secundario w-full" data-acao="comecar-do-comeco">
+              Começar do começo
+            </Link>
+          )}
+          <Link href="/mapa" className="botao-secundario w-full" data-acao="ver-mapa">
+            Ver o mapa do Engenho
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

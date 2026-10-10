@@ -1,16 +1,18 @@
 "use client";
 
 /**
- * Abertura: até 30 segundos, pulável, não se repete sozinha.
- * Uma luz-piloto; as luzes do corte se apagam; a placa do título; a Dália entrega o Caderno;
- * o Nônio se desdobra e começa a calibragem.
+ * Abertura: até 30 segundos, pulável, não se repete sozinha. Uma página quadriculada; o Engenho
+ * aparece a caneta e colorido; a tinta desbota para lápis, distrito por distrito; o título com
+ * marca-texto; a Dália entrega o Caderno, com a nota à mão numa folha pautada; o Nônio aparece.
  */
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { marcarAberturaVista } from "@/nucleo/progresso";
 import { useProgresso } from "@/componentes/estado/useProgresso";
+import { FolhaPautada, NotaDalia } from "@/componentes/missao/Papel";
 import { Nonio } from "@/componentes/nonio/Nonio";
-import { Rebite } from "./kit";
+import { Marca } from "@/componentes/ui/Marca";
+import { DesenhoContrapeso, DesenhoPartilha, DesenhoPatio } from "./Distritos";
 
 const DURACOES = [4200, 6400, 4600, 6200];
 
@@ -33,11 +35,11 @@ export function Abertura() {
   const avancar = () => setCena((c) => Math.min(c + 1, DURACOES.length));
 
   return (
-    <main data-pronto="sim" data-tela="abertura" data-cena={cena} className="relative flex min-h-dvh flex-col overflow-hidden bg-noite-funda" onClick={cena < DURACOES.length ? avancar : undefined}>
-      <div className="area-segura area-segura-topo absolute right-0 top-0 z-10">
+    <main data-pronto="sim" data-tela="abertura" data-cena={cena} className="relative flex min-h-dvh flex-col overflow-hidden" onClick={cena < DURACOES.length ? avancar : undefined}>
+      <div className="area-segura area-segura-topo absolute right-0 top-0 z-10 pt-3">
         <button
           type="button"
-          className="placa placa-pequena placa-discreta mt-2"
+          className="botao-secundario"
           onClick={(e) => {
             e.stopPropagation();
             terminar(rever ? "/menu" : "/calibragem");
@@ -48,61 +50,44 @@ export function Abertura() {
         </button>
       </div>
 
-      <div className="area-segura flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
-        {cena === 0 && (
-          <Cena key="c0">
-            <svg viewBox="0 0 60 60" width="72" height="72" aria-hidden="true">
-              <circle cx="30" cy="30" r="24" fill="var(--ambar-halo)" className="piloto" />
-              <circle cx="30" cy="30" r="7" fill="var(--ambar)" />
-            </svg>
-            <Fala>O Engenho fazia a cidade funcionar.</Fala>
-          </Cena>
-        )}
-        {cena === 1 && (
-          <Cena key="c1">
-            <CorteApagando />
-            <Fala>Ninguém esqueceu como ligar. Esqueceram por que funcionava.</Fala>
+      <div className="area-segura mx-auto flex w-full max-w-[520px] flex-1 flex-col items-center justify-center gap-6 py-20 text-center">
+        {(cena === 0 || cena === 1) && (
+          <Cena key="engenho">
+            <Engenho desbotando={cena === 1} />
+            {cena === 0 ? <Fala>O Engenho fazia a cidade funcionar.</Fala> : <Fala>Ninguém esqueceu como ligar. Esqueceram por que funcionava.</Fala>}
           </Cena>
         )}
         {cena === 2 && (
-          <Cena key="c2">
-            <svg viewBox="0 0 320 120" className="w-full max-w-[340px]" role="img" aria-label="interativMaths: uma aventura de matemática">
-              <rect x="6" y="10" width="308" height="100" rx="10" fill="var(--esmalte-sombra)" />
-              <rect x="6" y="6" width="308" height="100" rx="10" fill="var(--esmalte)" stroke="var(--latao)" strokeWidth="3" />
-              <Rebite x={22} y={22} r={3.4} />
-              <Rebite x={298} y={22} r={3.4} />
-              <Rebite x={22} y={90} r={3.4} />
-              <Rebite x={298} y={90} r={3.4} />
-              <text x="160" y="58" textAnchor="middle" className="fonte-sinal" fontSize="42" fontWeight="800" fill="var(--latao-claro)" style={{ letterSpacing: 1 }}>
-                interativMaths
-              </text>
-              <text x="160" y="86" textAnchor="middle" fontSize="15" fill="var(--texto-mundo)">
-                uma aventura de matemática
-              </text>
-            </svg>
-            <Fala>Faça o Engenho voltar a funcionar descobrindo por que ele funciona.</Fala>
+          <Cena key="titulo">
+            <div className="flex flex-col items-center gap-3" role="img" aria-label="interativMaths: uma aventura de matemática">
+              <Marca tamanho={44} />
+              <p className="m-0 font-mao text-[28px] font-bold leading-none text-caneta">uma aventura de matemática</p>
+            </div>
+            <Fala>Passe o Engenho a caneta de novo, descobrindo por que ele funciona.</Fala>
           </Cena>
         )}
         {cena === 3 && (
-          <Cena key="c3">
-            <CadernoFechado />
-            <figure className="m-0 max-w-sm text-left">
-              <figcaption className="fonte-mao text-[1.4rem] text-latao-claro">Dália</figcaption>
-              <blockquote className="m-0 text-[1.15rem]">Sigo o manual há trinta anos e nunca entendi metade. Fica com o Caderno. Escreve o porquê.</blockquote>
-            </figure>
+          <Cena key="caderno">
+            <FolhaPautada titulo="Caderno" className="w-full max-w-[360px] rotate-[-1.5deg] rounded-[16px] text-left shadow-[0_4px_0_var(--tinta)]">
+              <div className="pt-[14px]">
+                <NotaDalia>Sigo o manual há trinta anos e nunca entendi metade.</NotaDalia>
+                <NotaDalia>Fica com o Caderno. Escreve o porquê.</NotaDalia>
+              </div>
+            </FolhaPautada>
+            <p className="m-0 text-[15px] font-semibold text-tinta-suave">A Dália entrega o Caderno.</p>
           </Cena>
         )}
         {cena >= 4 && (
-          <Cena key="c4">
-            <NonioDesdobrando />
+          <Cena key="nonio">
+            <NonioChegando />
             <Fala>Antes de tudo, preciso saber em que marca você está.</Fala>
             <div className="flex w-full max-w-sm flex-col gap-2">
               {rever ? (
-                <button type="button" className="placa placa-cheia w-full" onClick={() => terminar("/menu")} data-acao="fim-abertura">
+                <button type="button" className="botao-principal w-full" onClick={() => terminar("/menu")} data-acao="fim-abertura">
                   Voltar ao menu
                 </button>
               ) : (
-                <button type="button" className="placa placa-cheia w-full" onClick={() => terminar("/calibragem")} data-acao="fim-abertura">
+                <button type="button" className="botao-principal w-full" onClick={() => terminar("/calibragem")} data-acao="fim-abertura">
                   Começar
                 </button>
               )}
@@ -111,64 +96,57 @@ export function Abertura() {
         )}
       </div>
 
-      {cena < DURACOES.length && <p className="area-segura-base m-0 pb-4 text-center text-[0.85rem] text-texto-mundo-apagado">toque para seguir</p>}
+      {cena < DURACOES.length && <p className="area-segura-base m-0 pb-5 text-center text-[14px] font-semibold text-tinta-suave">toque para seguir</p>}
     </main>
   );
 }
 
-function Cena({ children }: { children: React.ReactNode }) {
-  return <div className="flex w-full flex-col items-center gap-6 anima-cena">{children}</div>;
+function Cena({ children }: { children: ReactNode }) {
+  return <div className="flex w-full flex-col items-center gap-6 anima-subir">{children}</div>;
 }
 
-function Fala({ children }: { children: React.ReactNode }) {
-  return <p className="m-0 max-w-sm text-[1.3rem] leading-snug text-texto-mundo">{children}</p>;
+function Fala({ children }: { children: ReactNode }) {
+  return <p className="m-0 max-w-sm text-[21px] font-bold leading-snug">{children}</p>;
 }
 
-function CorteApagando() {
-  const janelas = Array.from({ length: 18 }, (_, i) => ({ c: i % 3, l: Math.floor(i / 3) }));
-  const ordem = [5, 12, 0, 16, 8, 3, 14, 10, 1, 17, 6, 11, 2, 15, 9, 4, 13, 7];
+/** Uma camada a tinta por cima da mesma a lápis; desbotar é a de tinta esmaecer. */
+function Desbota({ desbotando, atraso, lapis, tinta }: { desbotando: boolean; atraso: number; lapis: ReactNode; tinta: ReactNode }) {
   return (
-    <svg viewBox="0 0 160 200" width="160" height="200" aria-hidden="true">
-      <path d="M 80 8 L 140 40 L 140 196 L 20 196 L 20 40 Z" fill="var(--noite-clara)" stroke="var(--latao-sombra)" strokeWidth="2" />
-      {janelas.map(({ c, l }, i) => (
-        <rect
-          key={i}
-          x={34 + c * 34}
-          y={50 + l * 24}
-          width={22}
-          height={14}
-          rx={2}
-          fill="var(--janela)"
-          className="anima-apagar"
-          style={{ animationDelay: `${600 + ordem.indexOf(i) * 260}ms` }}
-        />
-      ))}
+    <g>
+      {lapis}
+      <g className="camada" style={{ opacity: desbotando ? 0 : 1, transitionDelay: `${atraso}ms`, transitionDuration: "900ms" }}>
+        {tinta}
+      </g>
+    </g>
+  );
+}
+
+/** O Engenho desenhado a caneta, que desbota para lápis, distrito por distrito. */
+function Engenho({ desbotando }: { desbotando: boolean }) {
+  return (
+    <svg viewBox="20 30 360 540" className="block w-full max-w-[340px]" aria-label={desbotando ? "O Engenho desbota para lápis, distrito por distrito." : "O Engenho, desenhado a caneta e colorido."} role="img">
+      <path d="M178 390 C 196 360, 200 318, 176 280 M170 250 C 200 232, 214 170, 236 120" fill="none" stroke="var(--grafite)" strokeWidth={2.4} strokeDasharray="7 7" strokeLinecap="round" />
+      <Desbota desbotando={desbotando} atraso={300} lapis={<DesenhoPatio lapis />} tinta={<DesenhoPatio lapis={false} />} />
+      <Desbota desbotando={desbotando} atraso={1500} lapis={<DesenhoContrapeso lapis />} tinta={<DesenhoContrapeso lapis={false} />} />
+      <Desbota
+        desbotando={desbotando}
+        atraso={2700}
+        lapis={
+          <g className="a-lapis">
+            <DesenhoPartilha girando={false} comNonio={false} />
+          </g>
+        }
+        tinta={<DesenhoPartilha girando={false} comNonio={false} />}
+      />
     </svg>
   );
 }
 
-function CadernoFechado() {
-  return (
-    <svg viewBox="0 0 120 150" width="110" height="138" aria-hidden="true" className="-rotate-3">
-      <rect x="10" y="8" width="100" height="134" rx="6" fill="var(--papel-sombra)" />
-      <rect x="6" y="4" width="100" height="134" rx="6" fill="var(--papel)" stroke="var(--papel-linha)" />
-      <rect x="6" y="4" width="14" height="134" fill="var(--latao-sombra)" />
-      <text x="62" y="60" textAnchor="middle" className="fonte-sinal" fontSize="16" fontWeight="800" fill="var(--tinta)">
-        CADERNO
-      </text>
-      <line x1="34" x2="92" y1="70" y2="70" stroke="var(--tinta-suave)" />
-      <text x="62" y="96" textAnchor="middle" className="fonte-mao" fontSize="15" fill="var(--tinta-dalia)">
-        o porquê
-      </text>
-    </svg>
-  );
-}
-
-function NonioDesdobrando() {
-  const [aberto, setAberto] = useState(false);
+function NonioChegando() {
+  const [chegou, setChegou] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setAberto(true), 500);
+    const t = setTimeout(() => setChegou(true), 500);
     return () => clearTimeout(t);
   }, []);
-  return <Nonio expressao={aberto ? "atento" : "quieto"} tamanho={110} />;
+  return <Nonio expressao={chegou ? "atento" : "quieto"} tamanho={130} />;
 }

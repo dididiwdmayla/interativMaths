@@ -1,12 +1,13 @@
 /**
- * O que o visor da máquina diz depois de cada evento. Frases curtas, fatos da máquina.
+ * O que a tira de mensagem da máquina diz depois de cada evento. Frases curtas, fatos da máquina.
  * Nunca "errado": a máquina engasga, a bandeja apara.
  */
 import { comoRacional, formatar } from "@/nucleo/racional/racional";
 import type { EstadoBancada, Evento } from "@/nucleo/maquinas/bancada/tipos";
 import type { Pele } from "@/conteudo/peles";
 
-export type TomVisor = "normal" | "atencao" | "ambar";
+/** normal; atenção (sobra, engasgo: ganha um ponto vermelho); feito (ganha marca-texto). */
+export type TomTira = "normal" | "atencao" | "feito";
 
 function nomePeca(pele: Pele, tamanho: string, k: number): string {
   const t = comoRacional(tamanho);
@@ -28,7 +29,7 @@ const RECUSAS: Record<Extract<Evento, { tipo: "recusa" }>["motivo"], string> = {
   "fora-do-limite": "Esse valor não cabe no seletor.",
 };
 
-export function mensagemDoEvento(e: EstadoBancada, pele: Pele): { texto: string; tom: TomVisor } | null {
+export function mensagemDoEvento(e: EstadoBancada, pele: Pele): { texto: string; tom: TomTira } | null {
   const ev = e.evento;
   if (!ev) return null;
   switch (ev.tipo) {
@@ -47,7 +48,7 @@ export function mensagemDoEvento(e: EstadoBancada, pele: Pele): { texto: string;
         tom: "normal",
       };
     case "fechou":
-      return { texto: "Partilha fechada.", tom: "ambar" };
+      return { texto: "Partilha fechada.", tom: "feito" };
     case "bica":
       return { texto: `Bica ${ev.indice + 1} ${ev.aberta ? "aberta" : "fechada"}.`, tom: "normal" };
     case "carga":

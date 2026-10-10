@@ -15,7 +15,8 @@ uma solução. A sensação procurada é a de montar um mecanismo, não a de res
 Jovens e adultos recuperando base, gente que acredita "não ter base".
 
 - Sem nota, sem a palavra "errado", sem série escolar, sem cronômetro, sem estrelas, sem ranking.
-- Erro é um evento da máquina (ela engasga, a bandeja apara) e tudo pode ser desfeito.
+- Erro é um evento da máquina (ela engasga, a bandeja apara) e tudo pode ser desfeito. O vermelho
+  só chama o olhar, nunca corrige.
 - "Não sei ainda" é resposta legítima em qualquer pergunta.
 - Texto adulto, seco e caloroso, em frases curtas. Nada infantilizado, nada de exclamação.
 
@@ -46,16 +47,18 @@ Jovens e adultos recuperando base, gente que acredita "não ter base".
 ## O universo: o Engenho
 
 *Engenho* é a máquina e é a capacidade de inventar. O Engenho é uma máquina do tamanho de uma cidade
-que fazia o vale funcionar. Não quebrou: está parando, distrito por distrito, porque quem entendia
-foi embora e quem ficou só segue o manual, de páginas rasgadas. O jogador chega como aprendiz e faz
-cada distrito voltar a funcionar descobrindo por que ele funciona.
+que fazia o vale funcionar, desenhada num caderno de matemática. Não quebrou: está desbotando para
+lápis, distrito por distrito, porque quem o entendia foi embora e quem ficou só segue o manual, de
+páginas rasgadas. O jogador chega como aprendiz e passa cada distrito a caneta de novo descobrindo
+por que ele funciona. O quadriculado é o rascunho, onde se experimenta na máquina; a folha pautada
+do Caderno é o passado a limpo, onde a matemática formal fica registrada.
 
 **Personagens** (só estes dois):
 
-- **Nônio**, o tutor: um pequeno paquímetro de latão que anda. A expressão vem da abertura das
-  hastes e da lente. Ele não julga: mostra uma medida.
+- **Nônio**, o tutor: um pequeno medidor em forma de cúpula, com rosto e uma antena que é o
+  ponteiro. Tem seis expressões. Ele não julga: mostra uma medida.
 - **Dália**, a última ajustadora. Sabe fazer funcionar, nunca soube por quê. Dá os problemas e
-  escreve à mão nas margens do Caderno. Não é desenhada: existe pela voz e pela letra.
+  escreve à mão, em azul, nas margens do Caderno. Não é desenhada: existe pela voz e pela letra.
 
 **Lugares nesta versão:** A Partilha (Arco 1 jogável); O Contrapeso, Pátio dos Sinais,
 Observatório, Estaleiro das Formas e Feira do Acaso (em projeto); a Planta; o Caderno; o Relicário

@@ -3,73 +3,83 @@
 @import "../tema/componentes.css";
 
 @theme inline {
-  --color-noite: var(--noite);
-  --color-noite-clara: var(--noite-clara);
-  --color-noite-funda: var(--noite-funda);
-  --color-noite-borda: var(--noite-borda);
-  --color-texto-mundo: var(--texto-mundo);
-  --color-texto-mundo-suave: var(--texto-mundo-suave);
-  --color-texto-mundo-apagado: var(--texto-mundo-apagado);
-  --color-turquesa: var(--turquesa);
-  --color-turquesa-clara: var(--turquesa-clara);
-  --color-turquesa-sombra: var(--turquesa-sombra);
-  --color-turquesa-tinta: var(--turquesa-tinta);
-  --color-ambar: var(--ambar);
-  --color-ambar-sombra: var(--ambar-sombra);
-  --color-vermelhao: var(--vermelhao);
-  --color-vermelhao-claro: var(--vermelhao-claro);
-  --color-latao: var(--latao);
-  --color-latao-claro: var(--latao-claro);
-  --color-latao-sombra: var(--latao-sombra);
-  --color-mostarda: var(--mostarda);
-  --color-esmalte: var(--esmalte);
   --color-papel: var(--papel);
-  --color-papel-sombra: var(--papel-sombra);
-  --color-papel-linha: var(--papel-linha);
+  --color-grade: var(--grade);
+  --color-grade-suave: var(--grade-suave);
+  --color-folha: var(--folha);
+  --color-pauta: var(--pauta);
+  --color-margem: var(--margem);
   --color-tinta: var(--tinta);
   --color-tinta-suave: var(--tinta-suave);
-  --color-tinta-dalia: var(--tinta-dalia);
-  --color-tinta-vermelha: var(--tinta-vermelha);
+  --color-grafite: var(--grafite);
+  --color-grafite-claro: var(--grafite-claro);
+  --color-caneta: var(--caneta);
+  --color-caneta-escura: var(--caneta-escura);
+  --color-caneta-clara: var(--caneta-clara);
+  --color-caneta-palida: var(--caneta-palida);
+  --color-marca-texto: var(--marca-texto);
+  --color-marca-texto-palido: var(--marca-texto-palido);
+  --color-vermelho: var(--vermelho);
+  --color-verde-escuro: var(--verde-escuro);
+  --color-verde-palido: var(--verde-palido);
 
-  --font-sinal: var(--fonte-sinal);
-  --font-texto: var(--fonte-texto);
+  --font-interface: var(--fonte-interface);
   --font-mao: var(--fonte-mao);
 }
 
 /* ---------- Base (o preflight do Tailwind já zera botões e fontes) ---------- */
 
-html {
-  background: var(--noite-funda);
-  color: var(--texto-mundo);
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
-}
+@layer base {
+  html {
+    background: var(--papel);
+    color: var(--tinta);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-body {
-  margin: 0;
-  min-height: 100dvh;
-  background: var(--noite);
-  color: var(--texto-mundo);
-  font-family: var(--fonte-texto), system-ui, sans-serif;
-  font-size: 1.0625rem;
-  line-height: 1.45;
-  font-variant-numeric: tabular-nums;
-  overscroll-behavior-y: none;
-}
+  /* O fundo é o rascunho: papel quadriculado em quadros de 20 px. */
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--papel);
+    background-image:
+      linear-gradient(var(--grade) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grade) 1px, transparent 1px);
+    background-size: 20px 20px;
+    color: var(--tinta);
+    font-family: var(--fonte-interface), system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+    overscroll-behavior-y: none;
+  }
 
-button {
-  cursor: pointer;
-  touch-action: manipulation;
-}
+  h1,
+  h2,
+  h3 {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
 
-button:disabled {
-  cursor: default;
-}
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
 
-:focus-visible {
-  outline: 3px solid var(--turquesa-clara);
-  outline-offset: 3px;
-  border-radius: 6px;
+  button:disabled {
+    cursor: default;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--caneta);
+    outline-offset: 2px;
+  }
 }
 
 svg :focus-visible {
@@ -83,8 +93,8 @@ svg [data-focavel]:focus-visible .anel-foco {
 .anel-foco {
   opacity: 0;
   fill: none;
-  stroke: var(--turquesa-clara);
-  stroke-width: 2.5;
+  stroke: var(--caneta);
+  stroke-width: 3;
 }
 
 .so-leitor {
@@ -99,81 +109,25 @@ svg [data-focavel]:focus-visible .anel-foco {
   border: 0;
 }
 
-.fonte-sinal {
-  font-family: var(--fonte-sinal), system-ui, sans-serif;
-  letter-spacing: 0.02em;
-}
-
-.fonte-mao {
-  font-family: var(--fonte-mao), cursive;
-}
-
 .algarismos {
   font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* Área segura do aparelho */
 .area-segura {
-  padding-left: max(16px, env(safe-area-inset-left));
-  padding-right: max(16px, env(safe-area-inset-right));
+  padding-left: max(14px, env(safe-area-inset-left));
+  padding-right: max(14px, env(safe-area-inset-right));
 }
 
 .area-segura-base {
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
 }
 
 .area-segura-topo {
-  padding-top: max(8px, env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
 }
 
-/* ---------- Movimento ---------- */
-
-@keyframes acender {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes pulso-piloto {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes oscilar-luz {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  45% {
-    opacity: 0.35;
-  }
-  55% {
-    opacity: 0.9;
-  }
-}
-
-@keyframes esteira-anda {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-16px);
-  }
-}
-
-@keyframes girar {
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* ---------- Movimento: passar a limpo ---------- */
 
 @keyframes esmaecer-entrar {
   from {
@@ -184,49 +138,119 @@ svg [data-focavel]:focus-visible .anel-foco {
   }
 }
 
-.piloto {
-  animation: pulso-piloto 2.6s ease-in-out infinite;
+@keyframes subir-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.luz-oscilante {
-  animation: oscilar-luz 1.8s steps(6, end) infinite;
+@keyframes crescer-marca {
+  from {
+    transform: rotate(-1.5deg) scaleX(0);
+  }
+  to {
+    transform: rotate(-1.5deg) scaleX(1);
+  }
+}
+
+@keyframes crescer-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes esteira-anda {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes realce {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes oferta {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.anima-esmaecer {
+  animation: esmaecer-entrar 320ms var(--curva-firme);
+}
+
+.anima-subir {
+  animation: subir-entrar 360ms var(--curva-saida) both;
+}
+
+.anima-realce {
+  animation: realce 1.4s ease-in-out 3;
+}
+
+.anima-oferta {
+  animation: oferta 2.4s ease-in-out infinite;
+}
+
+/* A faixa amarela cresce da esquerda para a direita. */
+.anima-marca-texto {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  animation: crescer-x 420ms var(--curva-saida) both;
+}
+
+/* Passar a caneta: a camada a lápis esmaece e a de tinta aparece por cima. */
+.camada {
+  transition: opacity var(--t-caneta) var(--curva-firme);
 }
 
 .ambiente-esteira {
-  animation: esteira-anda 1.2s linear infinite;
+  animation: esteira-anda 1.4s linear infinite;
 }
 
 .ambiente-girar {
   transform-box: fill-box;
   transform-origin: center;
-  animation: girar 9s linear infinite;
+  animation: girar 12s linear infinite;
 }
 
 /* Animação ambiente parada fora da tela, durante a rolagem e no modo leve */
-[data-ambiente="pausado"] .piloto,
 [data-ambiente="pausado"] .ambiente-esteira,
 [data-ambiente="pausado"] .ambiente-girar,
-[data-ambiente="pausado"] .luz-oscilante,
+[data-ambiente="pausado"] .anima-oferta,
 html[data-animacoes="leves"] .ambiente-esteira,
 html[data-animacoes="leves"] .ambiente-girar {
   animation-play-state: paused;
 }
 
-html[data-animacoes="leves"] .piloto {
+html[data-animacoes="leves"] .anima-oferta {
   animation: none;
-  opacity: 0.85;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ambiente-esteira,
-  .ambiente-girar {
-    animation: none;
-  }
-  .piloto,
-  .luz-oscilante {
-    animation: none;
-    opacity: 0.85;
-  }
 }
 
 /* ---------- Animações da bancada (transições de evento) ---------- */
@@ -254,24 +278,22 @@ html[data-animacoes="leves"] .piloto {
   }
 }
 
+/* Engasgo: um tremor curto na horizontal. */
 @keyframes engasgo {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateX(0);
   }
-  25% {
-    transform: translateY(5px);
+  18% {
+    transform: translateX(-5px);
   }
-  40% {
-    transform: translateY(1px);
+  36% {
+    transform: translateX(5px);
   }
-  55% {
-    transform: translateY(5px);
+  54% {
+    transform: translateX(-3px);
   }
-  75% {
-    transform: translateY(0) translateX(-2px);
-  }
-  85% {
+  72% {
     transform: translateX(2px);
   }
 }
@@ -282,17 +304,7 @@ html[data-animacoes="leves"] .piloto {
     transform: translateY(0);
   }
   45% {
-    transform: translateY(26px);
-  }
-}
-
-@keyframes realce {
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 1;
+    transform: translateY(22px);
   }
 }
 
@@ -301,19 +313,11 @@ html[data-animacoes="leves"] .piloto {
 }
 
 .anima-engasgo {
-  animation: engasgo 640ms var(--curva-firme);
+  animation: engasgo 460ms var(--curva-firme);
 }
 
 .anima-lamina {
-  animation: lamina 420ms var(--curva-mecanica);
-}
-
-.anima-esmaecer {
-  animation: esmaecer-entrar 320ms var(--curva-firme);
-}
-
-.anima-realce {
-  animation: realce 1.4s ease-in-out 3;
+  animation: lamina 420ms var(--curva-firme);
 }
 
 html[data-animacoes="leves"] .anima-engasgo,
@@ -326,47 +330,20 @@ html[data-animacoes="leves"] .anima-lamina {
     animation: voo-leve 400ms linear forwards;
   }
   .anima-engasgo,
-  .anima-lamina {
+  .anima-lamina,
+  .ambiente-esteira,
+  .ambiente-girar,
+  .anima-oferta {
     animation: none;
+  }
+  .anima-subir {
+    animation: esmaecer-entrar 320ms linear both;
   }
   .anima-realce {
     animation: none;
     opacity: 1;
   }
-}
-
-@keyframes alavanca {
-  0%,
-  100% {
-    transform: rotate(-24deg);
+  .anima-marca-texto {
+    animation: esmaecer-entrar 320ms linear both;
   }
-  45% {
-    transform: rotate(28deg);
-  }
-}
-
-.anima-alavanca {
-  animation: alavanca 420ms var(--curva-mecanica);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .anima-alavanca {
-    animation: none;
-  }
-}
-
-/* ---------- Abertura ---------- */
-
-@keyframes apagar {
-  to {
-    opacity: 0.08;
-  }
-}
-
-.anima-apagar {
-  animation: apagar 420ms var(--curva-firme) forwards;
-}
-
-.anima-cena {
-  animation: esmaecer-entrar 700ms var(--curva-firme);
 }

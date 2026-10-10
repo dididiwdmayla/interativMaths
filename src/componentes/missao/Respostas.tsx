@@ -1,7 +1,8 @@
 "use client";
 
 /**
- * Entradas de resposta: número (seletor), fração (fichas) e opções. "Não sei ainda" sempre vale.
+ * Entradas de resposta: número (passo a passo de valor), fração (fichas) e opções.
+ * "Não sei ainda" sempre vale: é um botão secundário do mesmo tamanho do principal.
  */
 import { useState } from "react";
 import type { TipoResposta } from "@/nucleo/missoes/tipos";
@@ -26,11 +27,38 @@ export function EntradaResposta({
   return (
     <div className="flex flex-col gap-2" role="group" aria-label="Escolha uma resposta">
       {tipo.opcoes.map((o) => (
-        <button key={o.id} type="button" className="placa w-full normal-case" style={{ fontFamily: "var(--fonte-texto)", letterSpacing: 0, fontWeight: 600 }} disabled={desabilitado} onClick={() => onResponder(o.id)} data-opcao={o.id}>
+        <button key={o.id} type="button" className="opcao opcao-texto" disabled={desabilitado} onClick={() => onResponder(o.id)} data-opcao={o.id}>
           {o.texto}
         </button>
       ))}
-      <button type="button" className="placa placa-discreta w-full" disabled={desabilitado} onClick={() => onResponder(null)} data-acao="nao-sei">
+      <button type="button" className="botao-secundario mt-1 w-full" disabled={desabilitado} onClick={() => onResponder(null)} data-acao="nao-sei">
+        {rotuloNaoSei}
+      </button>
+    </div>
+  );
+}
+
+function Botoes({
+  rotuloConferir,
+  rotuloNaoSei,
+  desabilitado,
+  podeConferir = true,
+  onConferir,
+  onNaoSei,
+}: {
+  rotuloConferir: string;
+  rotuloNaoSei: string;
+  desabilitado: boolean;
+  podeConferir?: boolean;
+  onConferir: () => void;
+  onNaoSei: () => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <button type="button" className="botao-principal px-2" disabled={desabilitado || !podeConferir} onClick={onConferir} data-acao="responder">
+        {rotuloConferir}
+      </button>
+      <button type="button" className="botao-secundario min-h-[50px] px-2" disabled={desabilitado} onClick={onNaoSei} data-acao="nao-sei">
         {rotuloNaoSei}
       </button>
     </div>
@@ -52,19 +80,18 @@ function RespostaNumero({
 }) {
   const [valor, setValor] = useState(Math.max(tipo.minimo, Math.min(tipo.maximo, 1)));
   return (
-    <div className="flex flex-col gap-2.5">
-      <div className="flex items-center justify-center gap-2">
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-center gap-3">
         <Seletor rotulo={tipo.unidade ? `Resposta, em ${tipo.unidade}` : "Resposta"} valor={valor} minimo={tipo.minimo} maximo={tipo.maximo} onMudar={setValor} desabilitado={desabilitado} idTeste="resposta" />
-        {tipo.unidade && <span className="text-texto-mundo-suave">{tipo.unidade}</span>}
+        {tipo.unidade && <span className="text-[15px] font-semibold text-tinta-suave">{tipo.unidade}</span>}
       </div>
-      <div className="flex gap-2">
-        <button type="button" className="placa placa-cheia flex-1" disabled={desabilitado} onClick={() => onResponder(String(valor))} data-acao="responder">
-          {rotuloConferir}
-        </button>
-        <button type="button" className="placa placa-discreta" disabled={desabilitado} onClick={() => onResponder(null)} data-acao="nao-sei">
-          {rotuloNaoSei}
-        </button>
-      </div>
+      <Botoes
+        rotuloConferir={rotuloConferir}
+        rotuloNaoSei={rotuloNaoSei}
+        desabilitado={desabilitado}
+        onConferir={() => onResponder(String(valor))}
+        onNaoSei={() => onResponder(null)}
+      />
     </div>
   );
 }
@@ -94,56 +121,61 @@ function RespostaFracao({
     }
   };
   const valor = n === null ? null : d === null || d === 1 ? String(n) : `${n}/${d}`;
-  const ficha = (k: number) => (
-    <button key={k} type="button" className="placa placa-pequena min-w-[44px] px-0 text-[1.25rem]" disabled={desabilitado} onClick={() => colocar(k)} data-ficha={k}>
-      {k}
+  const casa = (qual: "n" | "d", v: number | null, rotulo: string) => (
+    <button
+      type="button"
+      className={`passo-valor-quadro h-12 w-14 ${ativa === qual ? "outline outline-[3px] outline-offset-2 outline-caneta" : ""}`}
+      onClick={() => setAtiva(qual)}
+      aria-label={`${rotulo}: ${v ?? "vazio"}`}
+      aria-pressed={ativa === qual}
+      data-casa={qual}
+    >
+      {v ?? ""}
     </button>
   );
   return (
     <div className="flex flex-col gap-3" data-fichas="">
-      <div className="flex items-center justify-center gap-4">
-        <div className="flex flex-col items-center" role="group" aria-label="Fração montada">
-          <button type="button" className={`h-12 w-14 rounded-md border-2 text-2xl font-bold ${ativa === "n" ? "border-turquesa" : "border-noite-borda"}`} onClick={() => setAtiva("n")} aria-label={`Numerador: ${n ?? "vazio"}`} data-casa="n">
-            {n ?? ""}
-          </button>
-          <span className="my-1 block h-[3px] w-16 rounded bg-texto-mundo" aria-hidden="true" />
-          <button type="button" className={`h-12 w-14 rounded-md border-2 text-2xl font-bold ${ativa === "d" ? "border-turquesa" : "border-noite-borda"}`} onClick={() => setAtiva("d")} aria-label={`Denominador: ${d ?? "vazio"}`} data-casa="d">
-            {d ?? ""}
-          </button>
+      <div className="flex items-center justify-center gap-5">
+        <div className="flex flex-col items-center gap-1.5" role="group" aria-label="Fração montada">
+          {casa("n", n, "Numerador")}
+          <span className="block h-[3px] w-16 rounded bg-tinta" aria-hidden="true" />
+          {casa("d", d, "Denominador")}
         </div>
-        <div className="text-texto-mundo-suave">
+        <div className="min-w-[96px] text-tinta">
           {valor ? (
-            <span className="text-3xl">
-              {d && d !== 1 && n !== null ? <Fracao n={n} d={d} /> : valor}
-            </span>
+            <span className="text-[30px] font-extrabold">{d && d !== 1 && n !== null ? <Fracao n={n} d={d} /> : valor}</span>
           ) : (
-            <span className="text-sm">Toque numa ficha para a casa marcada.</span>
+            <span className="text-[14px] font-semibold text-tinta-suave">Toque numa ficha para a casa marcada.</span>
           )}
         </div>
       </div>
-      <div className="flex flex-wrap justify-center gap-1.5" role="group" aria-label="Fichas">
-        {Array.from({ length: maximo }, (_, i) => ficha(i + 1))}
+      <div className="opcoes" role="group" aria-label="Fichas" style={{ gridTemplateColumns: `repeat(${Math.min(maximo, 6)}, minmax(0, 1fr))` }}>
+        {Array.from({ length: maximo }, (_, i) => i + 1).map((k) => (
+          <button key={k} type="button" className="opcao" disabled={desabilitado} onClick={() => colocar(k)} data-ficha={k}>
+            {k}
+          </button>
+        ))}
       </div>
-      <div className="flex gap-2">
-        <button type="button" className="placa placa-cheia flex-1" disabled={desabilitado || valor === null} onClick={() => onResponder(valor)} data-acao="responder">
-          {rotuloConferir}
-        </button>
-        <button
-          type="button"
-          className="placa placa-discreta"
-          disabled={desabilitado}
-          onClick={() => {
-            setN(null);
-            setD(null);
-            setAtiva("n");
-          }}
-        >
-          Limpar
-        </button>
-        <button type="button" className="placa placa-discreta" disabled={desabilitado} onClick={() => onResponder(null)} data-acao="nao-sei">
-          {rotuloNaoSei}
-        </button>
-      </div>
+      <Botoes
+        rotuloConferir={rotuloConferir}
+        rotuloNaoSei={rotuloNaoSei}
+        desabilitado={desabilitado}
+        podeConferir={valor !== null}
+        onConferir={() => onResponder(valor)}
+        onNaoSei={() => onResponder(null)}
+      />
+      <button
+        type="button"
+        className="botao-discreto self-center"
+        disabled={desabilitado || (n === null && d === null)}
+        onClick={() => {
+          setN(null);
+          setD(null);
+          setAtiva("n");
+        }}
+      >
+        Limpar a fração
+      </button>
     </div>
   );
 }

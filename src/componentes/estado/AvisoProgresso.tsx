@@ -16,9 +16,9 @@ export function AvisoProgresso() {
   const { pronto, aviso } = useProgresso();
   if (!pronto || aviso === null) return null;
   return (
-    <div role="alert" className="fixed inset-x-2 top-2 z-50 flex items-start gap-3 rounded-lg border-2 border-vermelhao bg-noite-funda p-3 text-[0.95rem] shadow-lg area-segura-topo" data-aviso={aviso}>
-      <p className="m-0 flex-1">{TEXTOS[aviso]}</p>
-      <button type="button" className="placa placa-pequena" onClick={dispensarAviso}>
+    <div role="alert" className="ficha fixed inset-x-[14px] top-3 z-50 flex items-start gap-3 p-3 area-segura-topo lg:left-auto lg:right-7 lg:w-[440px]" data-aviso={aviso}>
+      <p className="m-0 flex-1 text-[15px] font-medium">{TEXTOS[aviso]}</p>
+      <button type="button" className="botao-secundario shrink-0" onClick={dispensarAviso}>
         Entendi
       </button>
     </div>

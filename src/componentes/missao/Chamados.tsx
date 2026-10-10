@@ -19,20 +19,18 @@ import { MISSOES_ARCO_1 } from "@/conteudo/missoes";
 import { atividadePorId, rotaDe } from "@/componentes/estado/catalogo";
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
-import { Nonio } from "@/componentes/nonio/Nonio";
+import { FichaEstado } from "@/componentes/ui/FichaEstado";
 import { Carregando } from "@/componentes/ui/Carregando";
 import { ExecutorAtividade } from "./Executor";
 
 function Aviso({ titulo, texto, tela }: { titulo: string; texto: string; tela: string }) {
   return (
-    <main data-pronto="sim" data-tela={tela} className="area-segura flex min-h-dvh flex-col items-center justify-center gap-4 text-center">
-      <Nonio expressao="quieto" tamanho={80} />
-      <h1 className="fonte-sinal m-0 text-[1.8rem] font-extrabold uppercase text-latao-claro">{titulo}</h1>
-      <p className="m-0 max-w-sm text-texto-mundo-suave">{texto}</p>
-      <Link href="/partilha" className="placa placa-cheia">
+    <FichaEstado tela={tela} expressao="quieto" titulo={titulo}>
+      <p className="m-0 text-[16px] font-medium text-tinta-suave">{texto}</p>
+      <Link href="/partilha" className="botao-principal w-full">
         Voltar à Partilha
       </Link>
-    </main>
+    </FichaEstado>
   );
 }
 
@@ -47,14 +45,12 @@ export function Revisita() {
       return <Aviso tela="revisita" titulo="Nenhuma revisita agora" texto="A revisita aparece no mapa, como um chamado do Nônio, no mínimo vinte horas depois do primeiro acerto." />;
     }
     return (
-      <main data-pronto="sim" data-tela="revisita" data-fase="convite" className="area-segura flex min-h-dvh flex-col items-center justify-center gap-4 text-center">
-        <Nonio expressao="atento" tamanho={88} />
-        <h1 className="fonte-sinal m-0 text-[1.9rem] font-extrabold uppercase text-latao-claro">Revisita</h1>
-        <p className="m-0 max-w-sm">Passou um dia. Três perguntas rápidas, com números novos.</p>
-        <button type="button" className="placa placa-cheia" onClick={() => atualizar((p, t) => iniciarRevisita(p, conceitos, t))} data-acao="comecar-revisita">
+      <FichaEstado tela="revisita" fase="convite" expressao="atento" titulo="Revisita">
+        <p className="m-0 text-[16px] font-medium">Passou um dia. Três perguntas rápidas, com números novos.</p>
+        <button type="button" className="botao-principal w-full" onClick={() => atualizar((p, t) => iniciarRevisita(p, conceitos, t))} data-acao="comecar-revisita">
           Começar
         </button>
-      </main>
+      </FichaEstado>
     );
   }
   const a = atividadeRevisita(atual.conceitos, atual.semente, TEXTOS_REVISITA);
@@ -94,35 +90,33 @@ function FimSondagem({ conceito, origem }: { conceito: string; origem: string | 
   };
   const ajuste = s.estado === "pede_ajuste";
   return (
-    <main data-pronto="sim" data-tela="fim-sondagem" data-estado={s.estado} className="area-segura flex min-h-dvh flex-col items-center justify-center gap-4 text-center">
-      <Nonio expressao={ajuste ? "medindo" : "satisfeito"} tamanho={84} />
-      <h1 className="fonte-sinal m-0 text-[1.8rem] font-extrabold uppercase text-latao-claro">{ajuste ? "Achei a folga" : "Está firme"}</h1>
-      <p className="m-0 max-w-sm">
+    <FichaEstado tela="fim-sondagem" expressao={ajuste ? "medindo" : "satisfeito"} titulo={ajuste ? "Achei a folga" : "Está firme"} atributos={{ "data-estado": s.estado }}>
+      <p className="m-0 text-[16px] font-medium">
         {ajuste
           ? `A peça "${nome.toLowerCase()}" pede ajuste. Não é defeito seu: é uma peça de baixo que merece outra volta.`
           : "A medida bateu. As duas escapadas foram acaso; sigo sem mexer em nada."}
       </p>
-      <div className="flex w-full max-w-sm flex-col gap-2">
+      <div className="flex w-full flex-col gap-2.5">
         {ajuste && missao && a && ehPreRequisito && (
-          <button type="button" className="placa placa-cheia w-full" onClick={desviar} data-acao="desvio">
+          <button type="button" className="botao-principal w-full" onClick={desviar} data-acao="desvio">
             Desvio: missão {missao.numero}, depois volto
           </button>
         )}
         {ajuste && missao && !a && (
-          <Link href={rotaDe(missao)} className="placa placa-cheia w-full" data-acao="rever-missao">
+          <Link href={rotaDe(missao)} className="botao-principal w-full" data-acao="rever-missao">
             Rever a missão {missao.numero}: {missao.titulo}
           </Link>
         )}
         {a ? (
-          <Link href={rotaDe(a)} className={`placa w-full ${ajuste && missao && ehPreRequisito ? "" : "placa-cheia"}`} data-acao="voltar-origem">
+          <Link href={rotaDe(a)} className={`${ajuste && missao && ehPreRequisito ? "botao-secundario" : "botao-principal"} w-full`} data-acao="voltar-origem">
             Voltar para {a.titulo}
           </Link>
         ) : (
-          <Link href="/partilha" className="placa placa-cheia w-full">
+          <Link href="/partilha" className={`${ajuste && missao ? "botao-secundario" : "botao-principal"} w-full`}>
             Voltar à Partilha
           </Link>
         )}
       </div>
-    </main>
+    </FichaEstado>
   );
 }

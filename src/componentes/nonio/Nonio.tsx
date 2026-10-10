@@ -1,91 +1,134 @@
 /**
- * Nônio, o tutor: um pequeno paquímetro de latão que anda. Corpo de latão, duas hastes que abrem
- * e fecham, uma lente no lugar do olho. A expressão vem da abertura das hastes e da lente.
- * Sem rosto, sem emoji.
+ * Nônio, o tutor: um medidor em forma de cúpula. Semicírculo azul com contorno de tinta, uma
+ * janela branca com o rosto, base azul-clara, dois pezinhos e uma antena com bolinha amarela,
+ * que é o ponteiro. As seis expressões mudam o rosto e a postura; toda transição é só
+ * transform e opacity (os rostos se cruzam por opacidade).
  */
 import type { ExpressaoTutor } from "@/nucleo/tutor/expressoes";
 
 export type ExpressaoNonio = ExpressaoTutor;
 
-const ABERTURA: Record<ExpressaoNonio, number> = {
-  neutro: 7,
-  atento: 11,
-  medindo: 18,
-  duvida: 3,
-  satisfeito: 9,
-  quieto: 0,
+const EXPRESSOES: readonly ExpressaoNonio[] = ["neutro", "atento", "medindo", "duvida", "satisfeito", "quieto"];
+
+/** Inclinação da antena, em graus, a partir da vertical. */
+const ANTENA: Record<ExpressaoNonio, number> = {
+  neutro: 33,
+  atento: 0,
+  medindo: -43,
+  duvida: 33,
+  satisfeito: 33,
+  quieto: 33,
 };
+
+function Rosto({ expressao, traco }: { expressao: ExpressaoNonio; traco: number }) {
+  switch (expressao) {
+    case "neutro":
+      return (
+        <>
+          <circle cx={22} cy={-8} r={1.6} fill="var(--tinta)" stroke="none" />
+          <circle cx={34} cy={-8} r={1.6} fill="var(--tinta)" stroke="none" />
+          <path d="M25 -4.5 Q28 -2 31 -4.5" fill="none" strokeWidth={traco * 0.75} />
+        </>
+      );
+    case "atento":
+      return (
+        <>
+          <circle cx={22} cy={-8.5} r={2.3} fill="var(--tinta)" stroke="none" />
+          <circle cx={34} cy={-8.5} r={2.3} fill="var(--tinta)" stroke="none" />
+        </>
+      );
+    case "medindo":
+      return (
+        <>
+          <circle cx={19.5} cy={-8} r={1.6} fill="var(--tinta)" stroke="none" />
+          <circle cx={31.5} cy={-8} r={1.6} fill="var(--tinta)" stroke="none" />
+          <circle cx={25.5} cy={-4} r={1.3} fill="var(--tinta)" stroke="none" />
+        </>
+      );
+    case "duvida":
+      return (
+        <>
+          <circle cx={24} cy={-10.5} r={1.6} fill="var(--tinta)" stroke="none" />
+          <circle cx={36} cy={-10.5} r={1.6} fill="var(--tinta)" stroke="none" />
+          <path d="M26.5 -4.5 H32.5" fill="none" strokeWidth={traco * 0.8} />
+        </>
+      );
+    case "satisfeito":
+      return (
+        <>
+          <path d="M19 -8 q2.5 -3.2 5 0" fill="none" strokeWidth={traco * 0.7} />
+          <path d="M32 -8 q2.5 -3.2 5 0" fill="none" strokeWidth={traco * 0.7} />
+          <path d="M24.5 -5.5 Q28 -1 31.5 -5.5 Z" fill="var(--tinta)" strokeWidth={traco * 0.5} />
+        </>
+      );
+    case "quieto":
+      return (
+        <>
+          <path d="M19.5 -8.5 q2.5 2.4 5 0" fill="none" strokeWidth={traco * 0.8} />
+          <path d="M31.5 -8.5 q2.5 2.4 5 0" fill="none" strokeWidth={traco * 0.8} />
+        </>
+      );
+  }
+}
 
 export function Nonio({
   expressao = "neutro",
   tamanho = 64,
   rotulo = "Nônio",
+  pes = true,
 }: {
   expressao?: ExpressaoNonio;
+  /** Largura em px. */
   tamanho?: number;
   rotulo?: string;
+  /** Sem os pezinhos (o Nônio do cabeçalho). */
+  pes?: boolean;
 }) {
-  const abertura = ABERTURA[expressao];
-  const inclinacao = expressao === "duvida" ? -9 : expressao === "satisfeito" ? 4 : 0;
-  const lente =
-    expressao === "satisfeito" || expressao === "medindo"
-      ? "var(--ambar)"
-      : expressao === "quieto"
-        ? "var(--janela-apagada)"
-        : "var(--turquesa-clara)";
+  // Desenho pequeno pede traço mais grosso para continuar legível.
+  const traco = tamanho <= 40 ? 2.8 : tamanho <= 80 ? 2.4 : 2.1;
+  const altura = (tamanho * 66) / 80;
+  const transicao = "transform var(--t-assentar) var(--curva-firme)";
   return (
-    <svg viewBox="0 0 64 80" width={tamanho} height={(tamanho * 80) / 64} role="img" aria-label={rotulo} data-expressao={expressao}>
-      <g
-        style={{
-          transform: `rotate(${inclinacao}deg)`,
-          transformOrigin: "34px 74px",
-          transition: "transform var(--t-assentar) var(--curva-mecanica)",
-        }}
-      >
-        {/* pés */}
-        <path d="M 31 66 L 26 76 L 22 76" stroke="var(--latao-sombra)" strokeWidth={3} fill="none" strokeLinecap="round" />
-        <path d="M 37 66 L 42 76 L 46 76" stroke="var(--latao-sombra)" strokeWidth={3} fill="none" strokeLinecap="round" />
-        {/* régua (corpo) */}
-        <rect x={30} y={6} width={9} height={62} rx={2} fill="var(--latao)" />
-        <rect x={35.5} y={6} width={3.5} height={62} rx={1.5} fill="var(--latao-sombra)" />
-        {Array.from({ length: 10 }, (_, i) => (
-          <line key={i} x1={30} x2={i % 2 === 0 ? 34 : 32.5} y1={30 + i * 3.4} y2={30 + i * 3.4} stroke="var(--latao-sombra)" strokeWidth={0.8} />
-        ))}
-        {/* haste fixa (no topo) */}
-        <path d="M 30 6 L 12 6 L 9 12 L 30 12 Z" fill="var(--latao)" />
-        <path d="M 30 10 L 10.5 10 L 9 12 L 30 12 Z" fill="var(--latao-sombra)" />
-        {/* cursor com a haste móvel e a lente: desce conforme abre */}
-        <g
-          style={{
-            transform: `translateY(${abertura}px)`,
-            transition: "transform var(--t-assentar) var(--curva-mecanica)",
-          }}
-        >
-          <path d="M 28 13 L 12 13 L 9 18 L 28 18 Z" fill="var(--latao)" />
-          <path d="M 28 16.5 L 10 16.5 L 9 18 L 28 18 Z" fill="var(--latao-sombra)" />
-          <rect x={27} y={12} width={16} height={18} rx={3} fill="var(--latao-claro)" />
-          <rect x={27} y={24} width={16} height={6} rx={2} fill="var(--latao)" />
-          <circle cx={35} cy={20} r={6.4} fill="var(--latao-sombra)" />
-          <circle cx={35} cy={20} r={5} fill="var(--noite-funda)" />
-          <circle
-            cx={35}
-            cy={20}
-            r={3.4}
-            fill={lente}
-            style={{ transition: "fill var(--t-luz) var(--curva-firme)" }}
-            opacity={expressao === "quieto" ? 0.6 : 1}
-          />
-          <circle cx={33.6} cy={18.6} r={1.2} fill="var(--texto-mundo)" opacity={expressao === "quieto" ? 0.2 : 0.85} />
-          {expressao === "quieto" && <rect x={29.5} y={14} width={11} height={6} fill="var(--latao-claro)" />}
+    <svg
+      viewBox="-12 -50 80 66"
+      width={tamanho}
+      height={altura}
+      role={rotulo ? "img" : undefined}
+      aria-label={rotulo || undefined}
+      aria-hidden={rotulo ? undefined : true}
+      data-expressao={expressao}
+      stroke="var(--tinta)"
+      strokeWidth={traco}
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      className="shrink-0"
+    >
+      {/* Dois sinais de mais, quando satisfeito */}
+      <g fill="none" stroke="var(--caneta)" strokeWidth={traco * 0.85} className="camada" style={{ opacity: expressao === "satisfeito" ? 1 : 0 }}>
+        <path d="M-6 -36 v8 M-10 -32 h8" />
+        <path d="M60 -24 v7 M56.5 -20.5 h7" />
+      </g>
+      <g style={{ transform: `rotate(${expressao === "duvida" ? -6 : 0}deg)`, transformOrigin: "28px 8px", transition: transicao }}>
+        {/* Antena com a bolinha-ponteiro */}
+        <g style={{ transform: `rotate(${ANTENA[expressao]}deg)`, transformOrigin: "28px -28px", transition: transicao }}>
+          <line x1={28} y1={-28} x2={28} y2={-38.5} />
+          <circle cx={28} cy={-41} r={4} fill="var(--marca-texto)" />
+          <circle cx={28} cy={-41} r={4} fill="var(--folha)" className="camada" style={{ opacity: expressao === "quieto" ? 1 : 0 }} />
         </g>
-        {/* cota entre as hastes quando mede */}
-        {expressao === "medindo" && (
-          <g stroke="var(--ambar)" strokeWidth={0.9}>
-            <line x1={6} x2={6} y1={12} y2={13 + abertura} />
-            <line x1={4} x2={8} y1={12} y2={12} />
-            <line x1={4} x2={8} y1={13 + abertura} y2={13 + abertura} />
-          </g>
+        {pes && (
+          <>
+            <rect x={15} y={6} width={5} height={9} rx={2.5} fill="var(--caneta-clara)" />
+            <rect x={36} y={6} width={5} height={9} rx={2.5} fill="var(--caneta-clara)" />
+          </>
         )}
+        <path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--caneta)" />
+        <path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--folha)" />
+        <rect x={-3} y={0} width={62} height={8} rx={4} fill="var(--caneta-clara)" />
+        {EXPRESSOES.map((e) => (
+          <g key={e} className="camada" style={{ opacity: e === expressao ? 1 : 0 }} data-rosto={e === expressao ? e : undefined}>
+            <Rosto expressao={e} traco={traco} />
+          </g>
+        ))}
       </g>
     </svg>
   );

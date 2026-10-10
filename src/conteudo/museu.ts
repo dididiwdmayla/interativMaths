@@ -131,7 +131,7 @@ export const EXPOSICAO_AHMES: Atividade = {
       id: "placa",
       tipo: "narrativa",
       fase: "retencao",
-      pedido: "A placa da exposição.",
+      pedido: "A legenda da exposição.",
       faixas: {
         sabe: [
           "O Papiro de Rhind foi copiado por volta de 1550 a.C. pelo escriba Ahmes, a partir de um texto mais antigo. As datas variam um pouco conforme a fonte.",

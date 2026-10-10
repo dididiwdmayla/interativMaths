@@ -81,14 +81,14 @@ function PainelAberto({
   const conversa = useTutorDisponivel();
   const mostradas = dicas ? dicas.slice(0, Math.min(ajuda, 3)) : [];
   return (
-    <div className="fixed inset-0 z-40 flex flex-col justify-end" role="dialog" aria-modal="true" aria-label="Nônio">
+    <div className="fixed inset-0 z-40 flex flex-col justify-end lg:items-center lg:justify-center" role="dialog" aria-modal="true" aria-label="Nônio">
       <button type="button" className="absolute inset-0 bg-[var(--veu)]" aria-label="Fechar o Nônio" onClick={onFechar} />
-      <div className="chapa relative mx-2 mb-2 max-h-[72dvh] overflow-y-auto p-4 area-segura-base anima-esmaecer" data-painel="nonio">
-        <div className="flex items-start gap-3">
-          <Nonio expressao={ajuda >= 2 ? "medindo" : "atento"} tamanho={52} />
-          <div className="flex-1">
-            <p className="rotulo-chapa m-0">Nônio</p>
-            <p className="m-0 text-texto-mundo-suave">
+      <div className="painel-sobe relative max-h-[78dvh] w-full overflow-y-auto px-4 pb-5 pt-4 area-segura-base anima-subir lg:max-w-[520px]" data-painel="nonio">
+        <div className="flex items-end gap-3">
+          <Nonio expressao={ajuda >= 2 ? "medindo" : "atento"} tamanho={64} />
+          <div className="balao-nonio min-w-0 flex-1">
+            <p className="balao-nonio-nome m-0">Nônio</p>
+            <p className="m-0 text-[15px] font-medium leading-[1.35]">
               {ajuda === 0
                 ? aplicacao
                   ? "Nesta encomenda eu fico quieto, a não ser que você peça. Peço uma coisa por vez."
@@ -98,41 +98,47 @@ function PainelAberto({
           </div>
         </div>
 
-        <ol className="mt-3 flex flex-col gap-3 p-0" aria-label="Escada de dicas">
+        <ol className="mt-4 flex flex-col gap-3 p-0" aria-label="Escada de dicas">
           {mostradas.map((d, i) => (
             <li key={i} className="list-none" data-degrau={i + 1}>
-              <p className="rotulo-chapa m-0 text-[0.78rem]">{DEGRAUS[i]}</p>
-              <p className="m-0 text-texto-mundo">{preencher(d.texto, medidas)}</p>
+              <p className="m-0 flex items-center gap-2 text-[13px] font-bold text-tinta-suave">
+                <span className="contador-passo">{i + 1}</span>
+                {DEGRAUS[i]}
+              </p>
+              <p className="m-0 mt-1 text-[16px] font-medium leading-[1.4]">{preencher(d.texto, medidas)}</p>
               {i === 2 && d.caso && <CasoParecido dica={d} />}
             </li>
           ))}
           {ajuda >= 4 && (
             <li className="list-none" data-degrau={4}>
-              <p className="rotulo-chapa m-0 text-[0.78rem]">Resolver junto</p>
-              <p className="m-0 text-texto-mundo">Vamos passo a passo. Esta não entra na conta; a próxima parecida entra.</p>
+              <p className="m-0 flex items-center gap-2 text-[13px] font-bold text-tinta-suave">
+                <span className="contador-passo">4</span>
+                Resolver junto
+              </p>
+              <p className="m-0 mt-1 text-[16px] font-medium">Vamos passo a passo. Esta não entra na conta; a próxima parecida entra.</p>
             </li>
           )}
         </ol>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-2">
           {dicas && ajuda < 3 && (
-            <button type="button" className="placa placa-cheia" onClick={onPedir} data-acao="pedir-dica">
+            <button type="button" className="botao-principal flex-1" onClick={onPedir} data-acao="pedir-dica">
               {ajuda === 0 ? "Pedir uma medida" : "Mais uma"}
             </button>
           )}
           {ajuda === 3 && podeJunto && (
-            <button type="button" className="placa" onClick={onJunto} data-acao="junto">
+            <button type="button" className="botao-principal flex-1" onClick={onJunto} data-acao="junto">
               Resolver junto
             </button>
           )}
-          <button type="button" className="placa placa-discreta" onClick={onFechar}>
+          <button type="button" className="botao-secundario flex-1" onClick={onFechar}>
             Voltar à máquina
           </button>
         </div>
         {conversa && (
-          <label className="mt-4 flex flex-col gap-1 text-[0.92rem] text-texto-mundo-suave" data-conversa="">
+          <label className="mt-4 flex flex-col gap-1 text-[14px] font-semibold text-tinta-suave" data-conversa="">
             Pergunte com suas palavras
-            <input className="rounded-md border border-turquesa bg-noite-funda p-2 text-texto-mundo" maxLength={500} />
+            <input className="caixa min-h-[44px] p-2 text-tinta" maxLength={500} />
           </label>
         )}
       </div>
@@ -164,7 +170,7 @@ function CasoParecido({ dica }: { dica: Dica }) {
   }, [caso]);
   if (!caso || !b) return null;
   return (
-    <div className="mt-2 h-[190px] rounded-lg border border-noite-borda" aria-label="Caso parecido, com outros números" role="img">
+    <div className="ficha-quadriculada mt-2 h-[210px] p-1 shadow-none" aria-label="Caso parecido, com outros números" role="img">
       <Bancada estado={b.atual} pele={PELES[caso.maquina.pele]} cotas proporcao={0.62} rotulo="Caso parecido" />
     </div>
   );

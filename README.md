@@ -1,8 +1,8 @@
 # interativMaths
 
 Jogo web, em português do Brasil, que ensina matemática por experimentação. O jogador chega ao
-Engenho, uma máquina do tamanho de uma cidade que está parando, e faz cada distrito voltar a
-funcionar descobrindo por que ele funciona. Esta versão traz o Arco 1 de A Partilha (repartir e o
+Engenho, uma máquina do tamanho de uma cidade desenhada num caderno, que está desbotando para lápis,
+e passa cada distrito a caneta de novo descobrindo por que ele funciona. Esta versão traz o Arco 1 de A Partilha (repartir e o
 que fazer com o que sobra), o Caderno, a Planta, o Relicário, o Museu e a Rua.
 
 ## Rodar
@@ -33,7 +33,8 @@ fazer só o registro), `/partilha/revisita`, `/museu/paes-de-ahmes`, `/rua/tres-
 - `/lab/maquinas`: a bancada solta, com qualquer configuração e pele, e qualquer validador.
 - `/lab/progresso`: zerar, saltar para pontos do arco (montados rodando as soluções de teste no
   motor), **adiantar o relógio um dia** (a revisita aparece no mapa), ver evidências e estados.
-- `/lab/vitrine`: tokens, kit de peças, expressões do Nônio, estágios das joias, notação.
+- `/lab/vitrine`: a identidade Quadriculado inteira (materiais, tokens, letra, receitas, kit de
+  desenho, Nônio, joias, notação). A referência aprovada está em `docs/referencia-visual/`.
 
 ## Documentos
 

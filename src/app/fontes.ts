@@ -1,26 +1,19 @@
-import { Atkinson_Hyperlegible_Next, Big_Shoulders, Caveat } from "next/font/google";
+import { Caveat, Rubik } from "next/font/google";
 
-/** Placas e números grandes: condensada de sinalização industrial. */
-export const fonteSinal = Big_Shoulders({
+/** A letra da interface inteira: arredondada e pesada, em caixa normal, algarismos tabulares. */
+export const fonteInterface = Rubik({
   subsets: ["latin", "latin-ext"],
-  variable: "--fonte-sinal",
+  weight: ["500", "600", "700", "800"],
+  variable: "--fonte-interface",
   display: "swap",
-  adjustFontFallback: false,
-  fallback: ["Arial Narrow", "system-ui", "sans-serif"],
-});
-
-/** Texto e algarismos: caracteres parecidos não se confundem. */
-export const fonteTexto = Atkinson_Hyperlegible_Next({
-  subsets: ["latin", "latin-ext"],
-  variable: "--fonte-texto",
-  display: "swap",
-  adjustFontFallback: false,
   fallback: ["system-ui", "sans-serif"],
 });
 
-/** Manuscrita: só nas margens do Caderno (a letra da Dália). */
+/** A letra de mão: anotações curtas, títulos à mão, nunca número que precisa ser lido com precisão. */
 export const fonteMao = Caveat({
   subsets: ["latin", "latin-ext"],
+  weight: ["700"],
   variable: "--fonte-mao",
   display: "swap",
+  fallback: ["cursive"],
 });

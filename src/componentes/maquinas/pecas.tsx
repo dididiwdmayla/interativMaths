@@ -1,35 +1,72 @@
 /**
- * Desenho das peças por forma. Inteira mostra a casca; pedaço cortado mostra o miolo.
- * Duas tonalidades por forma, sem degradê.
+ * Desenho das peças por forma, a traço de tinta e cor chapada. Inteira mostra as marcas da casca;
+ * pedaço cortado é um setor do tamanho exato. O lugar vazio de uma unidade fica a lápis.
  */
 import type { FormaPeca } from "@/conteudo/peles";
 import { setor, type UnidadeDesenho } from "./geometria";
 
-export type Tom = "normal" | "sobra" | "fantasma";
+export type Tom = "normal" | "fantasma";
 
-const CORES: Record<Exclude<FormaPeca, "saco" | "tonel">, { casca: string; sombra: string; miolo: string }> = {
-  broa: { casca: "var(--broa)", sombra: "var(--broa-sombra)", miolo: "var(--miolo)" },
-  pizza: { casca: "var(--pizza)", sombra: "var(--pizza-sombra)", miolo: "var(--molho)" },
-  pao: { casca: "var(--pao)", sombra: "var(--pao-sombra)", miolo: "var(--miolo)" },
-};
+/** Traço proporcional ao tamanho da peça: peça miúda não vira só contorno. */
+export function tracoDaPeca(r: number): number {
+  return Math.min(2.4, Math.max(1.4, r * 0.24));
+}
 
 export function Saco({ x, y, r, tom = "normal" }: { x: number; y: number; r: number; tom?: Tom }) {
   const w = r * 1.7;
   const h = r * 1.9;
   const topo = y - h / 2;
-  const corpo = `M ${x - w * 0.42} ${topo + h * 0.28}
-    Q ${x - w * 0.55} ${y + h * 0.42} ${x - w * 0.2} ${y + h * 0.5}
-    L ${x + w * 0.2} ${y + h * 0.5}
-    Q ${x + w * 0.55} ${y + h * 0.42} ${x + w * 0.42} ${topo + h * 0.28}
-    Q ${x} ${topo + h * 0.12} ${x - w * 0.42} ${topo + h * 0.28} Z`;
-  if (tom === "fantasma") return <path d={corpo} fill="none" stroke="var(--texto-mundo-apagado)" strokeDasharray="2 2" strokeWidth={0.8} />;
+  const corpo = `M ${x - w * 0.4} ${topo + h * 0.3}
+    Q ${x - w * 0.56} ${y + h * 0.44} ${x - w * 0.18} ${y + h * 0.5}
+    L ${x + w * 0.18} ${y + h * 0.5}
+    Q ${x + w * 0.56} ${y + h * 0.44} ${x + w * 0.4} ${topo + h * 0.3}
+    Q ${x} ${topo + h * 0.18} ${x - w * 0.4} ${topo + h * 0.3} Z`;
+  const t = tracoDaPeca(r);
+  if (tom === "fantasma") return <path d={corpo} fill="var(--folha)" stroke="var(--grafite)" strokeWidth={t} strokeLinejoin="round" />;
   return (
-    <g>
-      <path d={corpo} fill="var(--saca)" stroke={tom === "sobra" ? "var(--vermelhao)" : "var(--saca-sombra)"} strokeWidth={tom === "sobra" ? 1.6 : 0.8} />
-      <path d={`M ${x + w * 0.05} ${topo + h * 0.3} Q ${x + w * 0.45} ${y + h * 0.3} ${x + w * 0.16} ${y + h * 0.48} L ${x + w * 0.2} ${y + h * 0.5} Q ${x + w * 0.55} ${y + h * 0.42} ${x + w * 0.42} ${topo + h * 0.28} Z`} fill="var(--saca-sombra)" opacity={0.55} />
-      <path d={`M ${x - w * 0.16} ${topo + h * 0.22} L ${x} ${topo} L ${x + w * 0.16} ${topo + h * 0.22}`} fill="var(--saca)" stroke="var(--saca-sombra)" strokeWidth={0.8} />
-      <rect x={x - w * 0.2} y={topo + h * 0.18} width={w * 0.4} height={h * 0.07} rx={1} fill="var(--madeira)" />
+    <g strokeLinejoin="round" strokeLinecap="round">
+      <path d={`M ${x - w * 0.18} ${topo + h * 0.26} L ${x - w * 0.08} ${topo} L ${x + w * 0.08} ${topo} L ${x + w * 0.18} ${topo + h * 0.26} Z`} fill="var(--saca)" stroke="var(--tinta)" strokeWidth={t} />
+      <path d={corpo} fill="var(--saca)" stroke="var(--tinta)" strokeWidth={t} />
+      <path d={`M ${x - w * 0.22} ${topo + h * 0.27} L ${x + w * 0.22} ${topo + h * 0.27}`} fill="none" stroke="var(--tinta)" strokeWidth={t} />
     </g>
+  );
+}
+
+/** Marcas da casca de uma peça inteira. */
+function Casca({ forma, x, y, r, t }: { forma: "broa" | "pao" | "pizza"; x: number; y: number; r: number; t: number }) {
+  if (forma === "pizza") {
+    return (
+      <g>
+        <circle cx={x} cy={y} r={r * 0.72} fill="var(--vermelho-claro)" stroke="var(--tinta)" strokeWidth={t * 0.75} />
+        {[
+          [-0.3, -0.25],
+          [0.28, -0.1],
+          [-0.05, 0.32],
+        ].map(([a, b], i) => (
+          <circle key={i} cx={x + a * r} cy={y + b * r} r={r * 0.1} fill="var(--pao-miolo)" stroke="none" />
+        ))}
+      </g>
+    );
+  }
+  if (forma === "pao") {
+    return (
+      <path
+        d={`M ${x - r * 0.45} ${y + r * 0.1} l ${r * 0.3} ${-r * 0.4} M ${x - r * 0.12} ${y + r * 0.32} l ${r * 0.34} ${-r * 0.46} M ${x + r * 0.2} ${y + r * 0.48} l ${r * 0.28} ${-r * 0.38}`}
+        fill="none"
+        stroke="var(--tinta)"
+        strokeWidth={t * 0.75}
+        strokeLinecap="round"
+      />
+    );
+  }
+  return (
+    <path
+      d={`M ${x - r * 0.42} ${y - r * 0.12} Q ${x} ${y - r * 0.42} ${x + r * 0.42} ${y - r * 0.12} M ${x - r * 0.36} ${y + r * 0.22} Q ${x} ${y - r * 0.02} ${x + r * 0.36} ${y + r * 0.22}`}
+      fill="none"
+      stroke="var(--tinta)"
+      strokeWidth={t * 0.75}
+      strokeLinecap="round"
+    />
   );
 }
 
@@ -53,38 +90,26 @@ export function Unidade({
 }) {
   if (forma === "saco") return <Saco x={x} y={y} r={r} tom={tom} />;
   if (forma === "tonel") return <Tonel x={x} y={y} r={r} unidade={unidade} tom={tom} contorno={contorno} />;
-  const c = CORES[forma];
-  const traco = tom === "sobra" ? "var(--vermelhao)" : c.sombra;
+  const t = tracoDaPeca(r);
   return (
-    <g>
-      {contorno && !unidade.inteira && (
-        <circle cx={x} cy={y} r={r} fill="none" stroke="var(--texto-mundo-apagado)" strokeWidth={0.7} strokeDasharray="1.6 1.6" />
-      )}
+    <g strokeLinejoin="round">
+      {contorno && !unidade.inteira && <circle cx={x} cy={y} r={r} fill="var(--folha)" stroke="var(--grafite)" strokeWidth={Math.max(1.4, t - 0.4)} />}
       {unidade.fatias.map((f) => {
         if (tom === "fantasma") {
-          return <path key={f.chave} d={setor(x, y, r, f.inicio, f.fim)} fill="none" stroke="var(--texto-mundo-apagado)" strokeWidth={0.8} />;
+          return <path key={f.chave} d={setor(x, y, r, f.inicio, f.fim)} fill="var(--folha)" stroke="var(--grafite)" strokeWidth={t} />;
         }
         if (unidade.inteira) {
           return (
             <g key={f.chave}>
-              <circle cx={x} cy={y} r={r} fill={c.casca} stroke={traco} strokeWidth={tom === "sobra" ? 1.6 : 0.9} />
-              {forma === "pizza" ? (
-                <circle cx={x} cy={y} r={r * 0.78} fill={c.miolo} />
-              ) : (
-                <path
-                  d={`M ${x - r * 0.45} ${y - r * 0.2} Q ${x} ${y - r * 0.45} ${x + r * 0.45} ${y - r * 0.2} M ${x - r * 0.4} ${y + r * 0.18} Q ${x} ${y - r * 0.05} ${x + r * 0.4} ${y + r * 0.18}`}
-                  stroke={c.sombra}
-                  strokeWidth={0.9}
-                  fill="none"
-                />
-              )}
+              <circle cx={x} cy={y} r={r} fill="var(--pao)" stroke="var(--tinta)" strokeWidth={t} />
+              <Casca forma={forma} x={x} y={y} r={r} t={t} />
             </g>
           );
         }
         return (
           <g key={f.chave}>
-            <path d={setor(x, y, r, f.inicio, f.fim)} fill={c.casca} stroke={traco} strokeWidth={tom === "sobra" ? 1.4 : 0.8} strokeLinejoin="round" />
-            <path d={setor(x, y, r * 0.74, f.inicio, f.fim)} fill={c.miolo} opacity={forma === "pizza" ? 1 : 0.9} />
+            <path d={setor(x, y, r, f.inicio, f.fim)} fill="var(--pao)" stroke="var(--tinta)" strokeWidth={t} />
+            {forma === "pizza" && <path d={setor(x, y, r * 0.72, f.inicio, f.fim)} fill="var(--vermelho-claro)" stroke="none" />}
           </g>
         );
       })}
@@ -111,26 +136,20 @@ function Tonel({
   const h = r * 1.9;
   const base = y + h / 2;
   const topo = y - h / 2;
+  const t = tracoDaPeca(r);
+  const raio = w * 0.22;
   return (
-    <g>
-      {(contorno || unidade.inteira) && (
-        <rect x={x - w / 2} y={topo} width={w} height={h} rx={w * 0.22} fill="none" stroke={tom === "sobra" ? "var(--vermelhao)" : "var(--madeira-sombra)"} strokeWidth={1} strokeDasharray={unidade.inteira ? undefined : "1.6 1.6"} />
-      )}
+    <g strokeLinejoin="round">
+      {(contorno || unidade.inteira) && <rect x={x - w / 2} y={topo} width={w} height={h} rx={raio} fill="var(--folha)" stroke={unidade.inteira ? "var(--tinta)" : "var(--grafite)"} strokeWidth={t} />}
       {tom !== "fantasma" &&
-        unidade.fatias.map((f) => (
-          <rect
-            key={f.chave}
-            x={x - w / 2 + 1}
-            y={base - h * f.fim}
-            width={w - 2}
-            height={h * (f.fim - f.inicio)}
-            fill="var(--agua)"
-            stroke="var(--agua-sombra)"
-            strokeWidth={0.7}
-          />
-        ))}
-      <rect x={x - w / 2} y={topo + h * 0.22} width={w} height={1.4} fill="var(--madeira)" opacity={0.9} />
-      <rect x={x - w / 2} y={topo + h * 0.74} width={w} height={1.4} fill="var(--madeira)" opacity={0.9} />
+        unidade.fatias.map((f) => {
+          const y1 = base - h * f.fim;
+          const alt = h * (f.fim - f.inicio);
+          return <rect key={f.chave} x={x - w / 2} y={y1} width={w} height={alt} rx={Math.min(raio, alt / 2)} fill="var(--agua)" stroke="var(--tinta)" strokeWidth={t} />;
+        })}
+      {unidade.inteira && (
+        <path d={`M ${x - w / 2} ${topo + h * 0.25} H ${x + w / 2} M ${x - w / 2} ${topo + h * 0.75} H ${x + w / 2}`} fill="none" stroke="var(--tinta)" strokeWidth={t * 0.8} />
+      )}
     </g>
   );
 }

@@ -7,6 +7,7 @@ import { chave, maximo, paraNumero, racional, type Racional } from "@/nucleo/rac
 import { cargaInicial, quantidadeNaBica } from "@/nucleo/maquinas/bancada/bancada";
 import type { EstadoBancada, Pilha } from "@/nucleo/maquinas/bancada/tipos";
 import type { FormaPeca } from "@/conteudo/peles";
+import { ALTURA_RECEPTOR } from "./receptores";
 
 export const LARGURA = 400;
 const MARGEM = 12;
@@ -32,19 +33,18 @@ export interface LayoutBica {
   indice: number;
   linha: number;
   cx: number;
-  canoY1: number;
-  canoY2: number;
-  volanteY: number;
+  /** Topo da caixa da bica, presa ao trilho. */
+  bicaY: number;
   conteudo: Caixa;
   medidor: Caixa;
   receptorY: number;
   largura: number;
+  /** Onde começam os números da cota, abaixo do receptor. */
   rotuloY: number;
 }
 
 export interface LayoutBancada {
   altura: number;
-  chassi: Caixa;
   esteira: { x0: number; x1: number; y: number; pilhasY: number };
   fatiador: Caixa | null;
   trilhos: { y: number; x0: number; x1: number }[];
@@ -78,16 +78,18 @@ export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0
 
   // Orçamento vertical: o que é fixo e o que cresce com a altura disponível.
   const H = LARGURA * Math.min(1.7, Math.max(0.5, proporcao));
-  const fixo = 18 + 14 + 14 + 34 + linhas * (22 + 28) + 44 + 10;
+  const alturaRotulo = forma === "saco" ? 30 : 58;
+  const pilhasY = 56;
+  const fixoLinha = 34 + 2 + ALTURA_RECEPTOR + 6 + alturaRotulo;
+  const fixo = pilhasY + 14 + 30 + linhas * fixoLinha + 58 + 8;
   const sobra = Math.max(0, H - fixo);
-  const zonaPilhas = Math.min(120, Math.max(46, sobra * 0.36));
+  const zonaPilhas = Math.min(116, Math.max(44, sobra * 0.36));
   const zonaConteudo = Math.min(150, Math.max(44, (sobra - zonaPilhas) / linhas));
 
   const temFatiador = e.config.fatiador !== undefined;
-  const pilhasY = 22;
   const esteiraY = pilhasY + zonaPilhas;
   const fatiador: Caixa | null = temFatiador
-    ? { x: MARGEM + 6, y: pilhasY - 4, largura: 52, altura: Math.max(46, zonaPilhas - 4) }
+    ? { x: MARGEM + 2, y: Math.max(8, esteiraY - 74), largura: 54, altura: 74 }
     : null;
   const x0 = temFatiador ? MARGEM + 66 : MARGEM + 4;
   const x1 = LARGURA - MARGEM - 4;
@@ -126,8 +128,8 @@ export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0
   });
 
   // Trilhos e bicas.
-  const trilhoY = esteiraY + 26;
-  const alturaLinha = 34 + zonaConteudo + 22 + 28;
+  const trilhoY = esteiraY + 14 + 30;
+  const alturaLinha = fixoLinha + zonaConteudo;
   const trilhos: LayoutBancada["trilhos"] = [];
   const bicas: LayoutBica[] = [];
   for (let l = 0; l < linhas; l++) {
@@ -138,25 +140,26 @@ export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0
       if (indice >= vagas) break;
       const cx = MARGEM + 4 + larguraSlot * (k + 0.5);
       const topo = tY + 34;
-      const medidorL = Math.max(4, Math.min(7, larguraSlot * 0.1));
+      // Com poucas bicas, o lugar de cada uma não se espalha: o medidor fica junto do conteúdo.
+      const ls = Math.min(larguraSlot, 128);
+      const medidorL = Math.max(6, Math.min(10, ls * 0.12));
+      const medidorX = cx + ls / 2 - 7 - medidorL;
       bicas.push({
         indice,
         linha: l,
         cx,
-        canoY1: tY + 7,
-        canoY2: tY + 27,
-        volanteY: tY + 16,
-        conteudo: { x: cx - larguraSlot / 2 + 4, y: topo, largura: larguraSlot - 12 - medidorL, altura: zonaConteudo },
-        medidor: { x: cx + larguraSlot / 2 - 5 - medidorL, y: topo + 4, largura: medidorL, altura: zonaConteudo + 14 },
-        receptorY: topo + zonaConteudo,
-        largura: larguraSlot,
-        rotuloY: topo + zonaConteudo + 22,
+        bicaY: tY + 5,
+        conteudo: { x: cx - ls / 2 + 5, y: topo, largura: medidorX - (cx - ls / 2 + 5) - 4, altura: zonaConteudo },
+        medidor: { x: medidorX, y: topo - 4, largura: medidorL, altura: zonaConteudo + 4 },
+        receptorY: topo + zonaConteudo + 2,
+        largura: ls,
+        rotuloY: topo + zonaConteudo + 2 + ALTURA_RECEPTOR + 6,
       });
     }
   }
   const fimBicas = trilhoY + linhas * alturaLinha;
-  const bandeja = { x: LARGURA - MARGEM - 168, y: fimBicas - 4, largura: 160, altura: 38 };
-  const altura = Math.max(H, bandeja.y + bandeja.altura + 12);
+  const bandeja = { x: LARGURA - MARGEM - 170, y: fimBicas + 4, largura: 166, altura: 46 };
+  const altura = Math.max(H, bandeja.y + bandeja.altura + 8);
 
   // Escala do medidor: o que caberia em cada bica aberta no começo, ou o teto, ou o maior atual.
   const abertasNoInicio = Math.max(1, e.config.bicas.quantidade);
@@ -183,7 +186,6 @@ export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0
 
   return {
     altura,
-    chassi: { x: 4, y: 4, largura: LARGURA - 8, altura: altura - 8 },
     esteira: { x0, x1, y: esteiraY, pilhasY },
     fatiador,
     trilhos,
