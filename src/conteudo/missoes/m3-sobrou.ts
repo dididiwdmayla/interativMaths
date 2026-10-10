@@ -1,0 +1,381 @@
+/**
+ * Missão 3 — Sobrou (resto, e o que fazer com ele). SÓ DADOS.
+ */
+import type { ConfigBancada } from "@/nucleo/maquinas/bancada/tipos";
+import type { Atividade, Entrada } from "@/nucleo/missoes/tipos";
+import { CONFERIR, FECHAR, LOTE_2, LOTE_3, LOTE_4, LOTE_5, LOTE_6, LOTE_7, MAQUINA_MONTAR_SACAS, REPARTIR, SEGUIR } from "./comum";
+
+const PARTILHA: ConfigBancada = {
+  pele: "sacas-carrocas",
+  pecas: { quantidade: 26 },
+  bicas: { quantidade: 4, ajustavel: false },
+};
+
+const TRANSPORTE: ConfigBancada = {
+  pele: "sacas-carrocas",
+  pecas: { quantidade: 26 },
+  bicas: { quantidade: 4, ajustavel: true, vagas: 7 },
+  teto: 6,
+};
+
+const ABERTURA: Entrada[] = [SEGUIR, { tipo: "responder", valor: "6" }];
+
+const DESCOBERTA: Entrada[] = [{ tipo: "responder", valor: "3" }, SEGUIR, { tipo: "responder", valor: "nao" }, SEGUIR, SEGUIR];
+
+const TRANSPORTE_OK: Entrada[] = [
+  LOTE_6,
+  REPARTIR,
+  { tipo: "maquina", acao: { tipo: "bicas", abertas: 0 } },
+  { tipo: "maquina", acao: { tipo: "bica", indice: 4 } },
+  LOTE_2,
+  REPARTIR,
+  FECHAR,
+  SEGUIR,
+];
+
+const REGISTRO: Entrada[] = [
+  { tipo: "lacuna", lacuna: "a", valor: "26" },
+  { tipo: "lacuna", lacuna: "b", valor: "4" },
+  { tipo: "lacuna", lacuna: "c", valor: "6" },
+  { tipo: "lacuna", lacuna: "d", valor: "2" },
+  CONFERIR,
+  SEGUIR,
+  SEGUIR,
+  { tipo: "maquina", acao: { tipo: "carga", quantidade: 23 } },
+  { tipo: "maquina", acao: { tipo: "bicas", abertas: 5 } },
+  LOTE_4,
+  REPARTIR,
+  FECHAR,
+  SEGUIR,
+  SEGUIR,
+];
+
+export const MISSAO_3: Atividade = {
+  id: "partilha.arco1.sobrou",
+  tipo: "missao",
+  distrito: "partilha",
+  arco: "partilha.arco1",
+  numero: 3,
+  titulo: "Sobrou",
+  ideia: "o resto e o que fazer com ele",
+  conceitos: ["div.resto"],
+  passos: [
+    {
+      id: "pedido",
+      tipo: "narrativa",
+      fase: "problema",
+      pedido: "Leia o pedido da Dália.",
+      falas: [
+        { quem: "dalia", texto: "Vinte e seis sacas, quatro carroças, todas iguais. O manual diz para jogar o resto no rio." },
+        { quem: "dalia", texto: "Nunca joguei. Também nunca soube o que fazer com ele." },
+      ],
+      manual: {
+        titulo: "Repartidor — sobras",
+        linhas: ["Repartir até não caber mais.", "O resto deve ser levado ao", "e despejado sem anotação."],
+      },
+      botao: "Aceitar o serviço",
+    },
+    {
+      id: "palpite",
+      tipo: "palpite",
+      fase: "palpite",
+      pedido: "Antes de ligar, um palpite.",
+      maquina: { config: PARTILHA },
+      pergunta: "Quantas sacas você acha que vão em cada carroça?",
+      resposta: { tipo: "numero", minimo: 0, maximo: 26, unidade: "sacas" },
+      certo: "6",
+    },
+    {
+      id: "repartir",
+      tipo: "operar",
+      fase: "experimentacao",
+      pedido: "26 sacas, 4 carroças, todas iguais.",
+      maquina: { config: PARTILHA },
+      objetivo: { validador: "partilha.fechada" },
+      resolucao: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }],
+      dicas: [
+        { texto: "Repare na esteira: quando a pilha não dá mais uma volta inteira, o que fica é sobra.", alvo: "esteira" },
+        {
+          texto: "Na esteira há {ha}. Uma volta de 1 para cada pede {abertas}.",
+          cota: { alvo: "pilha", texto: "há {ha} · uma volta de 1 pede {abertas}" },
+        },
+        {
+          texto: "Com outros números: 11 sacas, 3 carroças. Três em cada, e duas não dão outra volta.",
+          caso: {
+            maquina: { pele: "sacas-carrocas", pecas: { quantidade: 11 }, bicas: { quantidade: 3, ajustavel: false } },
+            acoes: [{ tipo: "lote", valor: 3 }, { tipo: "repartir" }],
+          },
+        },
+      ],
+      equivocos: ["parou-cedo", "lote-maior-que-cabe"],
+      evidencias: [
+        { conceito: "div.resto", tipo: "experimento" },
+        { conceito: "div.partilha", tipo: "aplicacao" },
+      ],
+      aoConcluir: [{ quem: "dalia", texto: "Seis em cada, duas na bandeja. A bandeja é o resto. E o rio continua limpo." }],
+    },
+    {
+      id: "vinte-e-sete",
+      tipo: "prever",
+      fase: "descoberta",
+      pedido: "Outro dia, outra carga.",
+      maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 27 }, bicas: { quantidade: 4, ajustavel: false } } },
+      pergunta: "27 sacas, 4 carroças. Quanto sobra?",
+      resposta: { tipo: "numero", minimo: 0, maximo: 27, unidade: "sacas" },
+      medida: "sobra",
+      demonstracao: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }],
+      respostasEquivoco: [{ resposta: "0", equivoco: "resto-jogado-fora" }],
+      explicacao: "Seis em cada usa 24. Sobram 3, e 3 não dão outra volta para 4 carroças.",
+      dicas: [
+        { texto: "Pense em quantas voltas inteiras cabem.", alvo: "pilha" },
+        { texto: "Seis voltas de 1 em cada usam 24 sacas." },
+        {
+          texto: "Com outros números: 11 sacas entre 3 carroças deixam 2 na bandeja.",
+          caso: {
+            maquina: { pele: "sacas-carrocas", pecas: { quantidade: 11 }, bicas: { quantidade: 3, ajustavel: false } },
+            acoes: [{ tipo: "lote", valor: 3 }, { tipo: "repartir" }],
+          },
+        },
+      ],
+      evidencias: [{ conceito: "div.resto", tipo: "descoberta" }],
+    },
+    {
+      id: "pode-sobrar-quatro",
+      tipo: "prever",
+      fase: "descoberta",
+      pedido: "Uma pergunta sobre a bandeja.",
+      maquina: {
+        config: { pele: "sacas-carrocas", pecas: { quantidade: 28 }, bicas: { quantidade: 4, ajustavel: false } },
+        acoes: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }],
+      },
+      pergunta: "Com 4 carroças, pode sobrar 4 na bandeja?",
+      resposta: {
+        tipo: "opcoes",
+        opcoes: [
+          { id: "sim", texto: "Pode" },
+          { id: "nao", texto: "Não pode" },
+        ],
+      },
+      esperado: "nao",
+      demonstracao: [{ tipo: "lote", valor: 1 }, { tipo: "repartir" }],
+      explicacao: "Com 4 na esteira e 4 carroças, fecha mais uma volta. O resto é sempre menor que o número de carroças.",
+      dicas: [
+        { texto: "Olhe a esteira: há 4 sacas e 4 carroças.", alvo: "esteira" },
+        { texto: "Uma volta de 1 em cada pede 4. Há 4." },
+        { texto: "Com outros números: com 3 carroças, a bandeja nunca guarda 3." },
+      ],
+      evidencias: [{ conceito: "div.resto", tipo: "descoberta" }],
+    },
+    {
+      id: "hoje-tudo-sai",
+      tipo: "narrativa",
+      fase: "problema",
+      pedido: "Mesmos números, outra situação.",
+      falas: [
+        { quem: "dalia", texto: "Hoje é diferente: as 26 precisam sair todas. Cada carroça leva até 6, não mais." },
+        { quem: "dalia", texto: "As cargas não precisam ser iguais. Quantas carroças você chama?" },
+      ],
+      botao: "Chamar carroças",
+    },
+    {
+      id: "transporte",
+      tipo: "operar",
+      fase: "aplicacao",
+      pedido: "Tudo sai, até 6 por carroça.",
+      maquina: { config: TRANSPORTE },
+      objetivo: { validador: "transporte.tudo-saiu", params: { teto: 6 } },
+      resolucao: [
+        { tipo: "lote", valor: 6 },
+        { tipo: "repartir" },
+        { tipo: "bicas", abertas: 0 },
+        { tipo: "bica", indice: 4 },
+        { tipo: "lote", valor: 2 },
+        { tipo: "repartir" },
+      ],
+      dicas: [
+        { texto: "A linha vermelha nos medidores é o teto: 6. O que ficar na esteira não sai hoje.", alvo: "esteira" },
+        { texto: "Na esteira ainda há {ha}. Carroças em uso: {emUso}.", cota: { alvo: "pilha", texto: "ainda há {ha} · carroças: {emUso}" } },
+        {
+          texto: "Com outros números: 14 sacas, até 4 por carroça. Três cheias e uma com 2: quatro carroças.",
+          caso: {
+            maquina: { pele: "sacas-carrocas", pecas: { quantidade: 14 }, bicas: { quantidade: 3, ajustavel: true, vagas: 5 }, teto: 4 },
+            acoes: [{ tipo: "lote", valor: 4 }, { tipo: "repartir" }, { tipo: "bicas", abertas: 0 }, { tipo: "bica", indice: 3 }, { tipo: "lote", valor: 2 }, { tipo: "repartir" }],
+          },
+        },
+      ],
+      equivocos: ["arredondou-para-baixo"],
+      evidencias: [
+        { conceito: "div.medida", tipo: "aplicacao" },
+        { conceito: "div.resto", tipo: "aplicacao" },
+      ],
+      aoConcluir: [{ quem: "dalia", texto: "Cinco carroças. A última vai leve, mas vai. A mesma conta, duas respostas: quem decide é a situação." }],
+    },
+    {
+      id: "frase",
+      tipo: "frase",
+      fase: "formalizacao",
+      pedido: "Toque numa cota, depois na lacuna.",
+      maquina: { config: PARTILHA, acoes: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }] },
+      frase: "{a} sacas entre {b} carroças dão {c} em cada, e sobram {d}.",
+      lacunas: [
+        { id: "a", medida: "carga-total" },
+        { id: "b", medida: "bicas-em-uso" },
+        { id: "c", medida: "carga-por-bica" },
+        { id: "d", medida: "sobra" },
+      ],
+      fichas: ["carga-total", "bicas-em-uso", "carga-por-bica", "sobra"],
+      dicas: [
+        { texto: "A sobra também é uma cota: está na esteira.", alvo: "esteira" },
+        { texto: "Total {total}; em cada carroça, {cada}; sobra {sobra}." },
+        { texto: "Com outros números: 11 sacas entre 3 carroças dão 3 em cada, e sobram 2." },
+      ],
+    },
+    {
+      id: "notacao",
+      tipo: "notacao",
+      fase: "formalizacao",
+      pedido: "Comprima a frase em notação.",
+      linhas: ["26 ÷ 4 = 6, resto 2", "26 = 4 × 6 + 2"],
+      falas: [{ quem: "nonio", texto: "O resto é sempre menor que o divisor. Se não for, cabe mais uma volta." }],
+    },
+    {
+      id: "volta",
+      tipo: "operar",
+      fase: "formalizacao",
+      pedido: "Caminho de volta: monte 23 ÷ 5.",
+      conta: "23 ÷ 5",
+      maquina: { config: MAQUINA_MONTAR_SACAS },
+      objetivo: { validador: "maquina.mostra-divisao", params: { dividendo: 23, divisor: 5 } },
+      resolucao: [{ tipo: "carga", quantidade: 23 }, { tipo: "bicas", abertas: 5 }, { tipo: "lote", valor: 4 }, { tipo: "repartir" }],
+      dicas: [
+        { texto: "O primeiro número vai para a esteira; o segundo diz quantas bicas abrir. O resto aparece sozinho.", alvo: "esteira" },
+        { texto: "Na esteira há {total}; abertas, {abertas}." },
+        { texto: "Com outros números: 11 ÷ 3 é 11 sacas e 3 bicas; sobram 2." },
+      ],
+      rotuloFechar: "Conferir",
+    },
+    {
+      id: "registro",
+      tipo: "registro",
+      fase: "formalizacao",
+      pedido: "Guarde a página no Caderno.",
+      pagina: {
+        id: "partilha.arco1.sobrou",
+        titulo: "O que sobra",
+        notacao: ["26 ÷ 4 = 6, resto 2", "26 = 4 × 6 + 2"],
+        volta: "23 ÷ 5 = 4, resto 3",
+        notas: ["O resto nunca vai para o rio. Às vezes vira mais uma carroça.", "Resto menor que o divisor. Sempre."],
+      },
+    },
+  ],
+  prova: [
+    {
+      id: "prova-pedido",
+      tipo: "narrativa",
+      fase: "problema",
+      pedido: "Prova direta: duas encomendas.",
+      falas: [{ quem: "dalia", texto: "Trinta e uma sacas. Primeiro entre quatro carroças iguais. Depois, todas saindo, até sete por carroça." }],
+      botao: "Aceitar",
+    },
+    {
+      id: "prova-partilha",
+      tipo: "operar",
+      fase: "aplicacao",
+      pedido: "31 sacas entre 4 carroças, todas iguais.",
+      maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 31 }, bicas: { quantidade: 4, ajustavel: false } } },
+      objetivo: { validador: "partilha.fechada" },
+      resolucao: [{ tipo: "lote", valor: 7 }, { tipo: "repartir" }],
+      dicas: [
+        { texto: "Iguais, e a sobra menor que o número de carroças.", alvo: "esteira" },
+        { texto: "Na esteira há {ha}; uma volta de {lote} pede {pedido}." },
+        { texto: "Com outros números: 11 entre 3 dá 3 em cada, sobra 2." },
+      ],
+      equivocos: ["parou-cedo", "lote-maior-que-cabe"],
+      evidencias: [{ conceito: "div.resto", tipo: "aplicacao" }],
+    },
+    {
+      id: "prova-transporte",
+      tipo: "operar",
+      fase: "aplicacao",
+      pedido: "31 sacas, todas saem, até 7 por carroça.",
+      maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 31 }, bicas: { quantidade: 4, ajustavel: true, vagas: 7 }, teto: 7 } },
+      objetivo: { validador: "transporte.tudo-saiu", params: { teto: 7 } },
+      resolucao: [
+        { tipo: "lote", valor: 7 },
+        { tipo: "repartir" },
+        { tipo: "bicas", abertas: 0 },
+        { tipo: "bica", indice: 4 },
+        { tipo: "lote", valor: 3 },
+        { tipo: "repartir" },
+      ],
+      dicas: [
+        { texto: "Nada fica na esteira, nenhuma carroça passa da linha vermelha.", alvo: "esteira" },
+        { texto: "Na esteira há {ha}; carroças em uso: {emUso}." },
+        { texto: "Com outros números: 14 sacas até 4 por carroça pedem 4 carroças." },
+      ],
+      equivocos: ["arredondou-para-baixo"],
+      evidencias: [{ conceito: "div.medida", tipo: "aplicacao" }],
+      aoConcluir: [{ quem: "dalia", texto: "Sete em cada e três de sobra; e cinco carroças quando tudo sai. A missão fica marcada como feita." }],
+    },
+  ],
+  solucoesDeTeste: [
+    { nome: "seis de uma vez, depois transporte", modo: "guiada", entradas: [...ABERTURA, LOTE_6, REPARTIR, FECHAR, SEGUIR, ...DESCOBERTA, ...TRANSPORTE_OK, ...REGISTRO] },
+    {
+      nome: "quocientes parciais: 5 e depois 1",
+      modo: "guiada",
+      entradas: [...ABERTURA, LOTE_5, REPARTIR, { tipo: "maquina", acao: { tipo: "lote", valor: 1 } }, REPARTIR, FECHAR, SEGUIR, ...DESCOBERTA, ...TRANSPORTE_OK, ...REGISTRO],
+    },
+    {
+      nome: "transporte com cargas 5, 5, 5, 5 e 6",
+      modo: "guiada",
+      entradas: [
+        ...ABERTURA,
+        LOTE_6,
+        REPARTIR,
+        FECHAR,
+        SEGUIR,
+        ...DESCOBERTA,
+        { tipo: "maquina", acao: { tipo: "bicas", abertas: 5 } },
+        LOTE_5,
+        REPARTIR,
+        { tipo: "maquina", acao: { tipo: "bicas", abertas: 0 } },
+        { tipo: "maquina", acao: { tipo: "bica", indice: 4 } },
+        { tipo: "maquina", acao: { tipo: "lote", valor: 1 } },
+        REPARTIR,
+        FECHAR,
+        SEGUIR,
+        ...REGISTRO,
+      ],
+    },
+    {
+      nome: "prova direta",
+      modo: "prova",
+      entradas: [
+        SEGUIR,
+        LOTE_7,
+        REPARTIR,
+        FECHAR,
+        SEGUIR,
+        LOTE_7,
+        REPARTIR,
+        { tipo: "maquina", acao: { tipo: "bicas", abertas: 0 } },
+        { tipo: "maquina", acao: { tipo: "bica", indice: 4 } },
+        LOTE_3,
+        REPARTIR,
+        FECHAR,
+        SEGUIR,
+      ],
+    },
+    { nome: "só o registro", modo: "registro", entradas: REGISTRO },
+  ],
+  sabotagens: [
+    { nome: "fecha com 6 na esteira", modo: "guiada", entradas: [...ABERTURA, LOTE_5, REPARTIR, FECHAR], equivoco: "parou-cedo" },
+    { nome: "diz que não sobra nada", modo: "guiada", entradas: [...ABERTURA, LOTE_6, REPARTIR, FECHAR, SEGUIR, { tipo: "responder", valor: "0" }], equivoco: "resto-jogado-fora" },
+    {
+      nome: "chama 4 carroças e deixa 2 no pátio",
+      modo: "guiada",
+      entradas: [...ABERTURA, LOTE_6, REPARTIR, FECHAR, SEGUIR, ...DESCOBERTA, LOTE_6, REPARTIR, FECHAR],
+      equivoco: "arredondou-para-baixo",
+    },
+  ],
+};

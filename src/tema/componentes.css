@@ -1,0 +1,335 @@
+/*
+ * Controles do mundo: botão é placa esmaltada ou alavanca; painel é chapa de instrumento.
+ * Turquesa = o jogador pode mexer. Sem hover como sinal: a cor ensina onde tocar.
+ * Sem cor literal: tudo vem de tokens.css.
+ */
+
+@layer components {
+.chapa {
+  position: relative;
+  background: var(--noite-clara);
+  border: 1.5px solid var(--latao-sombra);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 1px 0 var(--noite-borda),
+    0 6px 18px var(--sombra);
+}
+
+.chapa::before,
+.chapa::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--latao);
+  box-shadow: inset -1px -1px 0 var(--latao-sombra);
+}
+
+.chapa::before {
+  left: 7px;
+}
+
+.chapa::after {
+  right: 7px;
+}
+
+.placa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45em;
+  min-height: 46px;
+  min-width: 46px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-family: var(--fonte-sinal), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.12rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  background: var(--esmalte);
+  color: var(--texto-mundo);
+  border: 2px solid var(--turquesa);
+  box-shadow: 0 3px 0 var(--turquesa-sombra);
+  transition:
+    transform 90ms var(--curva-firme),
+    box-shadow 90ms var(--curva-firme),
+    opacity 200ms;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.placa:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--turquesa-sombra);
+}
+
+.placa-cheia {
+  background: var(--turquesa);
+  color: var(--noite-funda);
+  border-color: var(--turquesa-clara);
+}
+
+.placa-escolhida {
+  background: var(--turquesa);
+  color: var(--noite-funda);
+  border-color: var(--turquesa-clara);
+  box-shadow: 0 1px 0 var(--turquesa-sombra);
+  transform: translateY(2px);
+}
+
+.placa-discreta {
+  border-color: var(--noite-borda);
+  box-shadow: 0 3px 0 var(--noite-funda);
+  color: var(--texto-mundo-suave);
+}
+
+.placa-discreta:not(:disabled) {
+  border-color: var(--turquesa-sombra);
+}
+
+.placa:disabled {
+  background: transparent;
+  border-color: var(--noite-borda);
+  color: var(--texto-mundo-apagado);
+  box-shadow: none;
+  opacity: 0.75;
+}
+
+.placa-papel {
+  background: var(--papel);
+  color: var(--turquesa-tinta);
+  border-color: var(--turquesa-tinta);
+  box-shadow: 0 3px 0 var(--turquesa-sombra);
+}
+
+.placa-papel.placa-escolhida,
+.placa-papel.placa-cheia {
+  background: var(--turquesa-tinta);
+  color: var(--papel);
+}
+
+.placa-papel:disabled {
+  background: transparent;
+  color: var(--tinta-suave);
+  border-color: var(--papel-linha);
+}
+
+.placa-pequena {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 0.98rem;
+}
+
+/* Mostrador: visor escuro com moldura de latão e algarismos de sinalização */
+.mostrador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.2rem;
+  height: 46px;
+  padding: 0 8px;
+  border-radius: 7px;
+  background: var(--noite-funda);
+  border: 2px solid var(--latao);
+  color: var(--ambar);
+  font-family: var(--fonte-sinal), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.7rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.rotulo-chapa {
+  font-family: var(--fonte-sinal), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.86rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--latao-claro);
+}
+
+/* Visor da máquina: uma linha de estado, região viva */
+.visor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--noite-funda);
+  border: 1px solid var(--noite-borda);
+  color: var(--texto-mundo-suave);
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.visor[data-tom="atencao"] {
+  color: var(--vermelhao-claro);
+  border-color: var(--vermelhao-sombra);
+}
+
+.visor[data-tom="ambar"] {
+  color: var(--ambar);
+  border-color: var(--ambar-sombra);
+}
+
+/* Frações empilhadas, traço horizontal */
+.fracao {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1;
+  font-variant-numeric: tabular-nums lining-nums;
+  margin: 0 0.08em;
+}
+
+.fracao > span:first-child {
+  padding: 0 0.15em 0.08em;
+  border-bottom: 0.09em solid currentColor;
+}
+
+.fracao > span:last-child {
+  padding: 0.08em 0.15em 0;
+}
+
+.fracao-pequena {
+  font-size: 0.78em;
+}
+
+/* Papel: a matemática formal */
+.papel {
+  background-color: var(--papel);
+  color: var(--tinta);
+  background-image:
+    linear-gradient(var(--papel-grade) 1px, transparent 1px),
+    linear-gradient(90deg, var(--papel-grade) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.papel-liso {
+  background: var(--papel);
+  color: var(--tinta);
+}
+
+.letra-dalia {
+  font-family: var(--fonte-mao), cursive;
+  color: var(--tinta-dalia);
+  font-size: 1.32rem;
+  line-height: 1.15;
+}
+
+/* A dobra: a página se desdobra por cima do mundo, a partir da borda de baixo */
+.dobra {
+  transform-origin: 50% 100%;
+  transform: perspective(1400px) rotateX(-88deg);
+  opacity: 0;
+  transition:
+    transform var(--t-dobra) var(--curva-mecanica),
+    opacity 220ms linear;
+  will-change: transform;
+}
+
+.dobra[data-aberta="sim"] {
+  transform: perspective(1400px) rotateX(0deg);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dobra {
+    transform: none;
+    transition: opacity 360ms linear;
+  }
+  .dobra[data-aberta="sim"] {
+    transform: none;
+  }
+}
+
+html[data-animacoes="leves"] .dobra {
+  transition-duration: 200ms;
+}
+
+/* Palco: máquina + bancada de controles */
+.palco {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.palco-maquina {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-top: max(6px, env(safe-area-inset-top));
+}
+
+.palco-desenho {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+}
+
+.palco-desenho > svg {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+.palco-controles {
+  position: relative;
+  max-height: 58dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.palco-chapa {
+  margin: 0 6px 6px;
+  padding: 16px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
+}
+
+@media (orientation: landscape) and (min-width: 640px) {
+  .palco {
+    grid-template-columns: minmax(0, 1.35fr) minmax(330px, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .palco-controles {
+    max-height: none;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+  .palco-chapa {
+    margin: 10px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .palco {
+    grid-template-columns: minmax(0, 1.6fr) minmax(380px, 460px);
+  }
+}
+
+.bancada-caixa {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bancada-caixa > svg {
+  width: 100%;
+  height: 100%;
+}
+}

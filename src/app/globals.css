@@ -1,0 +1,372 @@
+@import "tailwindcss";
+@import "../tema/tokens.css";
+@import "../tema/componentes.css";
+
+@theme inline {
+  --color-noite: var(--noite);
+  --color-noite-clara: var(--noite-clara);
+  --color-noite-funda: var(--noite-funda);
+  --color-noite-borda: var(--noite-borda);
+  --color-texto-mundo: var(--texto-mundo);
+  --color-texto-mundo-suave: var(--texto-mundo-suave);
+  --color-texto-mundo-apagado: var(--texto-mundo-apagado);
+  --color-turquesa: var(--turquesa);
+  --color-turquesa-clara: var(--turquesa-clara);
+  --color-turquesa-sombra: var(--turquesa-sombra);
+  --color-turquesa-tinta: var(--turquesa-tinta);
+  --color-ambar: var(--ambar);
+  --color-ambar-sombra: var(--ambar-sombra);
+  --color-vermelhao: var(--vermelhao);
+  --color-vermelhao-claro: var(--vermelhao-claro);
+  --color-latao: var(--latao);
+  --color-latao-claro: var(--latao-claro);
+  --color-latao-sombra: var(--latao-sombra);
+  --color-mostarda: var(--mostarda);
+  --color-esmalte: var(--esmalte);
+  --color-papel: var(--papel);
+  --color-papel-sombra: var(--papel-sombra);
+  --color-papel-linha: var(--papel-linha);
+  --color-tinta: var(--tinta);
+  --color-tinta-suave: var(--tinta-suave);
+  --color-tinta-dalia: var(--tinta-dalia);
+  --color-tinta-vermelha: var(--tinta-vermelha);
+
+  --font-sinal: var(--fonte-sinal);
+  --font-texto: var(--fonte-texto);
+  --font-mao: var(--fonte-mao);
+}
+
+/* ---------- Base (o preflight do Tailwind já zera botões e fontes) ---------- */
+
+html {
+  background: var(--noite-funda);
+  color: var(--texto-mundo);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--noite);
+  color: var(--texto-mundo);
+  font-family: var(--fonte-texto), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  overscroll-behavior-y: none;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 3px solid var(--turquesa-clara);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+svg :focus-visible {
+  outline: none;
+}
+
+svg [data-focavel]:focus-visible .anel-foco {
+  opacity: 1;
+}
+
+.anel-foco {
+  opacity: 0;
+  fill: none;
+  stroke: var(--turquesa-clara);
+  stroke-width: 2.5;
+}
+
+.so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.fonte-sinal {
+  font-family: var(--fonte-sinal), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.fonte-mao {
+  font-family: var(--fonte-mao), cursive;
+}
+
+.algarismos {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Área segura do aparelho */
+.area-segura {
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+.area-segura-base {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.area-segura-topo {
+  padding-top: max(8px, env(safe-area-inset-top));
+}
+
+/* ---------- Movimento ---------- */
+
+@keyframes acender {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulso-piloto {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes oscilar-luz {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.35;
+  }
+  55% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes esteira-anda {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-16px);
+  }
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes esmaecer-entrar {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.piloto {
+  animation: pulso-piloto 2.6s ease-in-out infinite;
+}
+
+.luz-oscilante {
+  animation: oscilar-luz 1.8s steps(6, end) infinite;
+}
+
+.ambiente-esteira {
+  animation: esteira-anda 1.2s linear infinite;
+}
+
+.ambiente-girar {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: girar 9s linear infinite;
+}
+
+/* Animação ambiente parada fora da tela, durante a rolagem e no modo leve */
+[data-ambiente="pausado"] .piloto,
+[data-ambiente="pausado"] .ambiente-esteira,
+[data-ambiente="pausado"] .ambiente-girar,
+[data-ambiente="pausado"] .luz-oscilante,
+html[data-animacoes="leves"] .ambiente-esteira,
+html[data-animacoes="leves"] .ambiente-girar {
+  animation-play-state: paused;
+}
+
+html[data-animacoes="leves"] .piloto {
+  animation: none;
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambiente-esteira,
+  .ambiente-girar {
+    animation: none;
+  }
+  .piloto,
+  .luz-oscilante {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+/* ---------- Animações da bancada (transições de evento) ---------- */
+
+@keyframes voo {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+}
+
+@keyframes voo-leve {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes engasgo {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(5px);
+  }
+  40% {
+    transform: translateY(1px);
+  }
+  55% {
+    transform: translateY(5px);
+  }
+  75% {
+    transform: translateY(0) translateX(-2px);
+  }
+  85% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes lamina {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(26px);
+  }
+}
+
+@keyframes realce {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.anima-voo {
+  animation: voo 560ms var(--curva-firme) forwards;
+}
+
+.anima-engasgo {
+  animation: engasgo 640ms var(--curva-firme);
+}
+
+.anima-lamina {
+  animation: lamina 420ms var(--curva-mecanica);
+}
+
+.anima-esmaecer {
+  animation: esmaecer-entrar 320ms var(--curva-firme);
+}
+
+.anima-realce {
+  animation: realce 1.4s ease-in-out 3;
+}
+
+html[data-animacoes="leves"] .anima-engasgo,
+html[data-animacoes="leves"] .anima-lamina {
+  animation-duration: 1ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anima-voo {
+    animation: voo-leve 400ms linear forwards;
+  }
+  .anima-engasgo,
+  .anima-lamina {
+    animation: none;
+  }
+  .anima-realce {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+@keyframes alavanca {
+  0%,
+  100% {
+    transform: rotate(-24deg);
+  }
+  45% {
+    transform: rotate(28deg);
+  }
+}
+
+.anima-alavanca {
+  animation: alavanca 420ms var(--curva-mecanica);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anima-alavanca {
+    animation: none;
+  }
+}
+
+/* ---------- Abertura ---------- */
+
+@keyframes apagar {
+  to {
+    opacity: 0.08;
+  }
+}
+
+.anima-apagar {
+  animation: apagar 420ms var(--curva-firme) forwards;
+}
+
+.anima-cena {
+  animation: esmaecer-entrar 700ms var(--curva-firme);
+}

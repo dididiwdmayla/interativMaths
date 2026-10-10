@@ -1,0 +1,104 @@
+/*
+ * tokens.css — o ÚNICO arquivo do projeto com cor literal.
+ * Todo o resto usa var(--token) ou as classes do Tailwind geradas a partir destes tokens.
+ *
+ * Dois materiais:
+ *   o mundo é noite com luz quente (onde se experimenta);
+ *   a matemática formal é papel (onde se registra).
+ * Cor tem significado: turquesa = mexível; âmbar = funcionou; vermelhão = sobra/atenção.
+ */
+:root {
+  /* Mundo */
+  --noite: #0f1830;
+  --noite-clara: #1b2847;
+  --noite-funda: #090f20;
+  --noite-borda: #2c3c66;
+  --noite-traco: #3b4d7d;
+  --ceu-alto: #060a17;
+  --ceu-baixo: #1a2550;
+  --estrela: #c9d4ee;
+
+  --texto-mundo: #e9eef8;
+  --texto-mundo-suave: #a9b5cf;
+  --texto-mundo-apagado: #7a8aae;
+
+  /* Mexível: tudo o que o jogador pode tocar */
+  --turquesa: #2fb5ac;
+  --turquesa-clara: #6ed8cf;
+  --turquesa-sombra: #1e7f79;
+  --turquesa-tinta: #146660;
+  --turquesa-halo: rgb(47 181 172 / 0.28);
+
+  /* Funcionou, energizado */
+  --ambar: #ffc857;
+  --ambar-sombra: #d89b2b;
+  --ambar-halo: rgb(255 200 87 / 0.34);
+  --janela: #ffd27a;
+  --janela-apagada: #2a3556;
+
+  /* Sobra, excesso, atenção (nunca "erro") */
+  --vermelhao: #e4572e;
+  --vermelhao-sombra: #b23e1c;
+  --vermelhao-claro: #f07a55;
+  --vermelhao-halo: rgb(228 87 46 / 0.3);
+
+  /* Estrutura das máquinas */
+  --latao: #c99a3f;
+  --latao-claro: #e2be6e;
+  --latao-sombra: #8e6a26;
+  --mostarda: #e3b23c;
+  --esmalte: #24345c;
+  --esmalte-sombra: #17223f;
+  --aco: #5a6890;
+  --aco-claro: #8090b8;
+  --aco-sombra: #3d4a6e;
+
+  /* Papel: a matemática formal */
+  --papel: #f4ecdd;
+  --papel-sombra: #e6dac3;
+  --papel-linha: #d9cbb0;
+  --papel-grade: #ebe1cd;
+  --tinta: #1d2233;
+  --tinta-suave: #4a4f63;
+  --tinta-dalia: #2b4c8c;
+  --tinta-vermelha: #a63a1b;
+  --tinta-ambar: #8c6416;
+
+  /* Materiais das peles */
+  --saca: #c8a46a;
+  --saca-sombra: #9c7b45;
+  --broa: #d9984a;
+  --broa-sombra: #a86a2a;
+  --miolo: #f2d49b;
+  --pizza: #e8b04b;
+  --pizza-sombra: #b97f2a;
+  --molho: #c6492a;
+  --agua: #4e8fd1;
+  --agua-sombra: #2f6aa8;
+  --madeira: #8c5a33;
+  --madeira-sombra: #643f22;
+  --pao: #d6a15a;
+  --pao-sombra: #a9733a;
+
+  /* Joias: cada uma com a cor de um mineral */
+  --granada: #a3263f;
+  --granada-luz: #e06a83;
+  --safira: #2f55c4;
+  --safira-luz: #7c9bf0;
+  --ametista: #7b4fc0;
+  --ametista-luz: #b795ec;
+  --turmalina: #c84e86;
+  --turmalina-luz: #f09ac0;
+
+  /* Véus e sombras */
+  --sombra: rgb(4 8 20 / 0.55);
+  --veu: rgb(9 15 32 / 0.78);
+  --papel-veu: rgb(29 34 51 / 0.08);
+
+  /* Ritmos do movimento: mecânico, sem quique */
+  --t-luz: 450ms;
+  --t-assentar: 320ms;
+  --t-dobra: 560ms;
+  --curva-mecanica: cubic-bezier(0.3, 0.7, 0.35, 1.04);
+  --curva-firme: cubic-bezier(0.4, 0, 0.2, 1);
+}
