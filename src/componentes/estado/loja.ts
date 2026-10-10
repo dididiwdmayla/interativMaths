@@ -71,8 +71,16 @@ export function atualizarProgresso(f: (p: Progresso, agora: number) => Progresso
   const a = carregar();
   const novo = f(a.progresso, agoraDoJogo(a.progresso));
   if (novo === a.progresso) return;
-  atual = { ...a, progresso: novo };
-  salvarProgresso(armazenamentoNavegador(), novo);
+  const salvo = salvarProgresso(armazenamentoNavegador(), novo);
+  atual = { ...a, progresso: novo, aviso: salvo ? a.aviso : "sem-armazenamento" };
+  for (const o of ouvintes) o();
+}
+
+/** O jogador leu o aviso. */
+export function dispensarAviso(): void {
+  const a = carregar();
+  if (a.aviso === null) return;
+  atual = { ...a, aviso: null };
   for (const o of ouvintes) o();
 }
 

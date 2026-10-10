@@ -21,7 +21,7 @@ const ITENS: { id: Destino; href: string; rotulo: string; Icone: () => React.Rea
 export function NavJogo({ atual }: { atual?: Destino }) {
   return (
     <nav aria-label="Navegação do jogo" className="fixed inset-x-0 bottom-0 z-30 area-segura-base">
-      <ul className="chapa mx-2 mb-2 flex justify-around px-1 py-1.5">
+      <ul className="chapa mx-2 mb-2 flex justify-around px-1 py-1.5 sm:mx-auto sm:max-w-xl">
         {ITENS.map(({ id, href, rotulo, Icone }) => {
           const ativo = id === atual;
           return (

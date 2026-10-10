@@ -3,7 +3,9 @@
  * e fecham, uma lente no lugar do olho. A expressão vem da abertura das hastes e da lente.
  * Sem rosto, sem emoji.
  */
-export type ExpressaoNonio = "neutro" | "atento" | "medindo" | "duvida" | "satisfeito" | "quieto";
+import type { ExpressaoTutor } from "@/nucleo/tutor/expressoes";
+
+export type ExpressaoNonio = ExpressaoTutor;
 
 const ABERTURA: Record<ExpressaoNonio, number> = {
   neutro: 7,

@@ -3,40 +3,42 @@
 Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
 
 ## Implementado e verificado
-- Etapa 0 — Base: Next.js 16 (App Router), TypeScript estrito, Tailwind v4 lendo `src/tema/tokens.css`,
-  fontes (Big Shoulders, Atkinson Hyperlegible Next, Caveat), Vitest e Playwright instalados.
+- Etapa 0 — Base: Next.js 16 (App Router, Cache Components), TypeScript estrito, Tailwind v4 lendo
+  `src/tema/tokens.css`, fontes (Big Shoulders, Atkinson Hyperlegible Next, Caveat), Vitest e Playwright.
 - Etapa 1 — Núcleo: `Racional` exato e leitura por extenso; notação com papéis; currículo; evidências
-  e modelo de domínio v1 (sondagem, ajuste, revisita); progresso versionado com normalização,
-  cadeia de migrações e relógio injetável. Higiene: cor literal só em tokens, zero emoji.
-- Etapa 2 — Máquinas: bancada de partilha (Repartidor + Fatiador) em TS puro, com desfazer,
-  recomeçar, engasgo medido, viabilidade de corte e seis validadores por propriedade do estado;
-  invariante de conservação testada; desenho SVG com kit de peças, cotas vivas, medidor de nível,
-  cinco peles; toque e teclado; `/lab/maquinas`.
-- Etapa 3 — Missões: motor de atividade puro (entrada → execução + efeitos), as cinco missões do
-  Arco 1 como dados, com provas diretas, soluções de teste e sabotagens; checagens de conteúdo
-  (todas as soluções passam, sabotagens falham com o equívoco certo, cada conceito do arco chega
-  a dominado); tela da missão com palpite, máquina, previsão conferida, frase com cotas, dobra do
-  papel, compressão em notação, caminho de volta e registro; Nônio com escada de dicas e
-  "resolver junto"; Caderno com miniatura e "rever na máquina".
-- Etapa 4 — Mundo: abertura (pulável, até 30 s), calibragem adaptativa D1–D6 com recomendação
-  recusável e provas diretas liberadas, mapa do Engenho em corte (desperto, bloqueado, em projeto),
-  distrito com as cinco estações e quadro de chamados, Planta em papel com estados e evidências em
-  palavras, Relicário com as quatro joias e estágios (sem treino), menu de preferências,
-  `/lab/progresso` (zerar, saltar, adiantar o relógio, evidências e estados).
-- Etapa 5 — Transferência e retenção: eco (tonéis e casas, resposta antes da máquina), revisita
-  20 h depois com três perguntas geradas por semente, sondagem (duas falhas com o mesmo equívoco em
-  atividades diferentes) com desvio para a missão do pré-requisito e volta ao ponto exato, Museu
-  ("Os pães de Ahmes", fatos conferidos, três faixas) e Rua ("Três pizzas, quatro amigos",
-  aplicação direta). Tudo na mesma bancada; tudo com solução de teste.
+  e modelo de domínio v1 (sondagem, ajuste, revisita); progresso versionado com normalização, cadeia
+  de migrações e relógio injetável. Higiene: cor literal só em tokens, zero emoji, conteúdo sem função.
+- Etapa 2 — Máquinas: bancada de partilha (Repartidor + Fatiador) com desfazer, recomeçar, engasgo
+  medido, viabilidade de corte e seis validadores por propriedade do estado; invariante de
+  conservação testada; desenho SVG com kit de peças, cotas vivas, medidor de nível, cinco peles;
+  toque e teclado; `/lab/maquinas`.
+- Etapa 3 — Missões: motor puro (entrada → execução + efeitos); as cinco missões do Arco 1 como
+  dados, com provas diretas, soluções de teste e sabotagens; checagens de conteúdo; tela da missão
+  (palpite, máquina, previsão conferida, frase com cotas, dobra, compressão em notação, caminho de
+  volta, registro); Nônio com escada de dicas e "resolver junto"; Caderno.
+- Etapa 4 — Mundo: abertura, calibragem D1–D6, mapa do Engenho em corte, distrito, Planta,
+  Relicário (vitrine), menu, `/lab/progresso`.
+- Etapa 5 — Transferência e retenção: eco, revisita gerada por semente, sondagem com desvio e volta
+  ao ponto exato, Museu ("Os pães de Ahmes"), Rua ("Três pizzas, quatro amigos").
+- Etapa 6 — Acabamento: avisos de falha do progresso, páginas de erro e de sala inexistente, ícone
+  gerado dos tokens, rota `POST /api/tutor` desligada com contrato, `/lab/vitrine`, percurso de
+  navegador (`npm run e2e`), capturas em `docs/capturas/v0.1/`, documentação.
 
 ## Parcialmente implementado
-- (nada)
+- Joias: contratos, estágios e campos no progresso prontos; só a Joia do Ábaco é encontrada (fim do
+  arco). Treino e bancada de lapidação aparecem como em projeto.
+- Equivalência de frações: aparece como prévia (Missão 4, comparação; Missão 5, dois jeitos), sem
+  formalização nem conceito ativo.
+- Palpites: guardados no progresso para a futura Joia da Estimativa; ainda não geram evidência.
+- Tutor por conversa: contrato e rota prontos; sem integração com modelo.
 
 ## Planejado
-- Etapa 2 — Máquinas. Etapa 3 — Missões. Etapa 4 — Mundo.
-- Etapa 6 — Acabamento.
+- Treino das joias, começando pelo soroban (sessão própria).
+- Arco 2 de A Partilha: equivalência, comparação, fração de quantidade, razão e proporção.
+- O Contrapeso (incógnitas e equações) e os outros distritos.
+- Segunda exposição do museu e novas cenas da Rua (as três categorias já existem nos dados).
+- Revisitas espaçadas além da primeira (hoje: uma revisita até consolidar).
 
 ## Fora do escopo atual
-- Treino de joias e soroban; outros distritos; equivalência, comparação, razão e proporção como
-  missões; som; modelo generativo; conta, login, banco, sincronização; multiplayer, ranking, loja;
-  aplicativo nativo; editor de fases; simulador físico genérico.
+- Som; chamada a modelo generativo; conta, login, banco, sincronização; multiplayer, ranking, loja,
+  economia; aplicativo nativo; editor de fases; simulador físico genérico.

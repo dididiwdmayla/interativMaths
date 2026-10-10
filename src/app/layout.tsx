@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { AplicarPreferencias } from "@/componentes/estado/Preferencias";
+import { AvisoProgresso } from "@/componentes/estado/AvisoProgresso";
 import { fonteMao, fonteSinal, fonteTexto } from "./fontes";
 import "./globals.css";
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body>
         <AplicarPreferencias />
+        <AvisoProgresso />
         {children}
       </body>
     </html>

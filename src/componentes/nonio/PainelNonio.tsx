@@ -5,6 +5,7 @@
  * Nunca a resposta do caso atual: o caso parecido usa outros números.
  */
 import { useEffect, useState } from "react";
+import type { RespostaTutor } from "@/nucleo/tutor/contrato";
 import { criarBancada, operar } from "@/nucleo/maquinas/bancada/bancada";
 import type { Bancada as EstadoBancada } from "@/nucleo/maquinas/bancada/tipos";
 import type { Dica, EscadaDicas } from "@/nucleo/missoes/tipos";
@@ -37,6 +38,47 @@ export function PainelNonio({
   aplicacao: boolean;
 }) {
   if (!aberto) return null;
+  return <PainelAberto {...{ onFechar, dicas, ajuda, medidas, onPedir, onJunto, podeJunto, aplicacao }} />;
+}
+
+/** A conversa livre só aparece se a rota do tutor disser que está disponível. */
+function useTutorDisponivel(): boolean {
+  const [disponivel, setDisponivel] = useState(false);
+  useEffect(() => {
+    let vivo = true;
+    fetch("/api/tutor", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tipo: "disponibilidade" }) })
+      .then((r) => (r.ok ? (r.json() as Promise<RespostaTutor>) : null))
+      .then((r) => {
+        if (vivo && r) setDisponivel(r.disponivel);
+      })
+      .catch(() => undefined);
+    return () => {
+      vivo = false;
+    };
+  }, []);
+  return disponivel;
+}
+
+function PainelAberto({
+  onFechar,
+  dicas,
+  ajuda,
+  medidas,
+  onPedir,
+  onJunto,
+  podeJunto,
+  aplicacao,
+}: {
+  onFechar: () => void;
+  dicas: EscadaDicas | undefined;
+  ajuda: number;
+  medidas: Readonly<Record<string, string>>;
+  onPedir: () => void;
+  onJunto: () => void;
+  podeJunto: boolean;
+  aplicacao: boolean;
+}) {
+  const conversa = useTutorDisponivel();
   const mostradas = dicas ? dicas.slice(0, Math.min(ajuda, 3)) : [];
   return (
     <div className="fixed inset-0 z-40 flex flex-col justify-end" role="dialog" aria-modal="true" aria-label="Nônio">
@@ -87,6 +129,12 @@ export function PainelNonio({
             Voltar à máquina
           </button>
         </div>
+        {conversa && (
+          <label className="mt-4 flex flex-col gap-1 text-[0.92rem] text-texto-mundo-suave" data-conversa="">
+            Pergunte com suas palavras
+            <input className="rounded-md border border-turquesa bg-noite-funda p-2 text-texto-mundo" maxLength={500} />
+          </label>
+        )}
       </div>
     </div>
   );

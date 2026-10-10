@@ -3,6 +3,7 @@ import Link from "next/link";
 const PAGINAS = [
   { href: "/lab/maquinas", titulo: "Máquinas", linha: "A bancada solta, com qualquer configuração e pele, e os validadores." },
   { href: "/lab/progresso", titulo: "Progresso", linha: "Zerar, saltar para pontos do arco, adiantar o relógio, ver evidências e estados." },
+  { href: "/lab/vitrine", titulo: "Vitrine", linha: "Tokens, kit de peças, expressões do Nônio, estágios das joias, notação." },
 ];
 
 export default function PaginaLab() {

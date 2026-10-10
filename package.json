@@ -10,7 +10,7 @@
     "tipos": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test",
+    "e2e": "next build && playwright test",
     "verificar": "npm run tipos && npm run lint && npm run test && npm run build"
   },
   "dependencies": {
