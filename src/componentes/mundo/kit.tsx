@@ -1,194 +1,320 @@
 /**
- * Kit de peças do Engenho, em SVG. Geometria simples, duas tonalidades por forma (luz e sombra).
- * Todas as cenas são compostas com estas peças: é o que dá unidade e barateia a próxima região.
+ * Kit de desenho do caderno, em SVG. Contorno de tinta, preenchimento chapado, sem degradê e sem
+ * sombra. O mesmo desenho a lápis é só o grupo `a-lapis` por fora (traço grafite, preenchimento
+ * grafite-claro). Todas as cenas são compostas com estas peças: é o que dá unidade ao jogo.
  */
 import type { ReactNode } from "react";
 
-export function Rebite({ x, y, r = 2.2 }: { x: number; y: number; r?: number }) {
+/** Contorno de tinta, em px de tela (os desenhos grandes usam `traco-fixo`). */
+export const TRACO = 2.4;
+
+/** Um desenho a lápis: ainda não foi feito ou entendido. */
+export function ALapis({ children, lapis = true }: { children: ReactNode; lapis?: boolean }) {
+  return <g className={lapis ? "a-lapis" : undefined}>{children}</g>;
+}
+
+/**
+ * Passar a caneta: o mesmo desenho em duas camadas; a de lápis esmaece e a de tinta aparece.
+ * Só para desenho puro (sem ids, papéis nem atributos de teste dentro).
+ */
+export function PassarACaneta({ feito, children }: { feito: boolean; children: ReactNode }) {
   return (
-    <g>
-      <circle cx={x} cy={y} r={r} fill="var(--latao-sombra)" />
-      <circle cx={x - r * 0.25} cy={y - r * 0.25} r={r * 0.55} fill="var(--latao-claro)" />
+    <g aria-hidden="true">
+      <g className="a-lapis camada" style={{ opacity: feito ? 0 : 1 }}>
+        {children}
+      </g>
+      <g className="camada" style={{ opacity: feito ? 1 : 0 }}>
+        {children}
+      </g>
     </g>
   );
 }
 
-/** Viga de latão com rebites nas pontas. */
-export function Viga({
+/** Engrenagem com dentes, amarela, de contorno de tinta. */
+export function Engrenagem({
   x,
   y,
-  largura,
-  altura = 8,
-  rebites = 2,
+  r,
+  dentes = 9,
+  girando = false,
+  cor = "var(--marca-texto)",
 }: {
   x: number;
   y: number;
-  largura: number;
-  altura?: number;
-  rebites?: number;
+  r: number;
+  dentes?: number;
+  girando?: boolean;
+  cor?: string;
 }) {
-  const passos = Math.max(rebites, 2);
+  const pontos: string[] = [];
+  for (let i = 0; i < dentes; i++) {
+    const base = (Math.PI * 2 * i) / dentes;
+    const passo = (Math.PI * 2) / dentes;
+    const fora = r;
+    const dentro = r * 0.78;
+    pontos.push(`${x + dentro * Math.cos(base)},${y + dentro * Math.sin(base)}`);
+    pontos.push(`${x + fora * Math.cos(base + passo * 0.18)},${y + fora * Math.sin(base + passo * 0.18)}`);
+    pontos.push(`${x + fora * Math.cos(base + passo * 0.5)},${y + fora * Math.sin(base + passo * 0.5)}`);
+    pontos.push(`${x + dentro * Math.cos(base + passo * 0.68)},${y + dentro * Math.sin(base + passo * 0.68)}`);
+  }
   return (
-    <g>
-      <rect x={x} y={y} width={largura} height={altura} rx={1.5} fill="var(--latao)" />
-      <rect x={x} y={y + altura * 0.62} width={largura} height={altura * 0.38} rx={1.5} fill="var(--latao-sombra)" />
-      {Array.from({ length: passos }, (_, i) => (
-        <Rebite key={i} x={x + 5 + ((largura - 10) * i) / (passos - 1)} y={y + altura * 0.4} r={1.5} />
+    <g className={girando ? "ambiente-girar" : undefined}>
+      <polygon points={pontos.join(" ")} fill={cor} stroke="var(--tinta)" strokeWidth={TRACO} strokeLinejoin="round" />
+      <circle cx={x} cy={y} r={r * 0.24} fill="var(--tinta)" stroke="var(--tinta)" strokeWidth={1} />
+    </g>
+  );
+}
+
+/** Esteira: faixa branca de tinta com os roletes em ponto; os traços de dentro andam. */
+export function Esteira({ id, x0, x1, y, altura = 14, andando = true }: { id: string; x0: number; x1: number; y: number; altura?: number; andando?: boolean }) {
+  const largura = x1 - x0;
+  const roletes = Math.max(2, Math.round(largura / 62) + 1);
+  return (
+    <g aria-hidden="true">
+      <defs>
+        <clipPath id={id}>
+          <rect x={x0 + altura / 2} y={y} width={Math.max(0, largura - altura)} height={altura} />
+        </clipPath>
+      </defs>
+      <rect x={x0} y={y} width={largura} height={altura} rx={altura / 2} fill="var(--folha)" stroke="var(--tinta)" strokeWidth={TRACO} />
+      {andando && (
+        <g clipPath={`url(#${id})`}>
+          <g className="ambiente-esteira">
+            {Array.from({ length: Math.ceil(largura / 20) + 2 }, (_, i) => (
+              <line key={i} x1={x0 + i * 20 + 6} x2={x0 + i * 20 + 12} y1={y + altura / 2} y2={y + altura / 2} stroke="var(--grade)" strokeWidth={2} strokeLinecap="round" />
+            ))}
+          </g>
+        </g>
+      )}
+      {Array.from({ length: roletes }, (_, i) => (
+        <circle key={i} cx={x0 + altura / 2 + ((largura - altura) * i) / (roletes - 1)} cy={y + altura / 2} r={1.7} fill="var(--tinta)" stroke="none" />
       ))}
     </g>
   );
 }
 
-/** Placa esmaltada com texto (sinalização). */
-export function Placa({
+/** Trilho das bicas: faixa clara de contorno de tinta. */
+export function Trilho({ x0, x1, y }: { x0: number; x1: number; y: number }) {
+  return <rect x={x0} y={y} width={x1 - x0} height={8} rx={4} fill="var(--grade)" stroke="var(--tinta)" strokeWidth={TRACO} />;
+}
+
+/** Bica: caixa azul presa ao trilho e o bico claro por baixo. */
+export function Bica({ cx, y }: { cx: number; y: number }) {
+  return (
+    <g>
+      <rect x={cx - 4} y={y + 13} width={8} height={7} fill="var(--caneta-clara)" stroke="var(--tinta)" strokeWidth={TRACO} strokeLinejoin="round" />
+      <rect x={cx - 8} y={y} width={16} height={15} rx={3} fill="var(--caneta)" stroke="var(--tinta)" strokeWidth={TRACO} />
+    </g>
+  );
+}
+
+/** Medidor de nível: barra branca de tinta com o nível em marca-texto, que sobe por scaleY. */
+export function Medidor({
   x,
   y,
   largura,
-  altura = 18,
-  children,
-  tom = "esmalte",
+  altura,
+  fracao,
+  marcas = [],
+  teto,
+}: {
+  x: number;
+  y: number;
+  largura: number;
+  altura: number;
+  /** 0 a 1. */
+  fracao: number;
+  marcas?: readonly number[];
+  /** 0 a 1: a marca do limite, tracejada. */
+  teto?: number;
+}) {
+  const r = largura / 2;
+  return (
+    <g aria-hidden="true">
+      <rect x={x} y={y} width={largura} height={altura} rx={r} fill="var(--folha)" stroke="none" />
+      <rect
+        x={x}
+        y={y}
+        width={largura}
+        height={altura}
+        rx={r}
+        fill="var(--marca-texto)"
+        stroke="none"
+        style={{
+          transform: `scaleY(${Math.max(0, Math.min(1, fracao))})`,
+          transformOrigin: `${x}px ${y + altura}px`,
+          transformBox: "view-box",
+          transition: "transform 480ms var(--curva-saida)",
+        }}
+      />
+      {marcas.slice(1, -1).map((m, k) => (
+        <line key={k} x1={x + largura * 0.55} x2={x + largura} y1={y + altura * (1 - m)} y2={y + altura * (1 - m)} stroke="var(--tinta-suave)" strokeWidth={1.2} />
+      ))}
+      {teto !== undefined && (
+        <line x1={x - 4} x2={x + largura + 4} y1={y + altura * (1 - teto)} y2={y + altura * (1 - teto)} stroke="var(--tinta)" strokeWidth={2} strokeDasharray="3 3" />
+      )}
+      <rect x={x} y={y} width={largura} height={altura} rx={r} fill="none" stroke="var(--tinta)" strokeWidth={TRACO} />
+    </g>
+  );
+}
+
+/** Faixa de marca-texto, um pouco inclinada, que cresce da esquerda. */
+export function FaixaMarcaTexto({
+  x,
+  y,
+  largura,
+  altura = 14,
+  inclinacao = -1.5,
+  cresce = false,
 }: {
   x: number;
   y: number;
   largura: number;
   altura?: number;
+  inclinacao?: number;
+  cresce?: boolean;
+}) {
+  return (
+    <g transform={`rotate(${inclinacao} ${x + largura / 2} ${y + altura / 2})`} aria-hidden="true">
+      <rect x={x} y={y} width={largura} height={altura} rx={4} fill="var(--marca-texto)" stroke="none" className={cresce ? "anima-marca-texto" : undefined} />
+    </g>
+  );
+}
+
+/** Elipse de marca-texto por trás de um desenho. */
+export function ElipseMarcaTexto({ cx, cy, rx, ry, inclinacao = -2 }: { cx: number; cy: number; rx: number; ry: number; inclinacao?: number }) {
+  return <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="var(--marca-texto)" stroke="none" transform={`rotate(${inclinacao} ${cx} ${cy})`} aria-hidden="true" />;
+}
+
+/** Anotação a caneta: palavras em letra de mão azul. Números vão dentro de <NumeroAnotado>. */
+export function Anotacao({
+  x,
+  y,
+  children,
+  ancora = "start",
+  tamanho = 22,
+  inclinacao = -2,
+  cor = "var(--caneta)",
+}: {
+  x: number;
+  y: number;
   children: ReactNode;
-  tom?: "esmalte" | "latao";
+  ancora?: "start" | "middle" | "end";
+  tamanho?: number;
+  inclinacao?: number;
+  cor?: string;
 }) {
-  const fundo = tom === "esmalte" ? "var(--esmalte)" : "var(--latao)";
-  const sombra = tom === "esmalte" ? "var(--esmalte-sombra)" : "var(--latao-sombra)";
-  const texto = tom === "esmalte" ? "var(--texto-mundo)" : "var(--tinta)";
   return (
-    <g>
-      <rect x={x} y={y + 1.5} width={largura} height={altura} rx={3} fill={sombra} />
-      <rect x={x} y={y} width={largura} height={altura} rx={3} fill={fundo} stroke="var(--latao)" strokeWidth={1} />
-      <Rebite x={x + 4} y={y + altura / 2} r={1.3} />
-      <Rebite x={x + largura - 4} y={y + altura / 2} r={1.3} />
-      <text
-        x={x + largura / 2}
-        y={y + altura / 2 + 0.5}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill={texto}
-        className="fonte-sinal"
-        fontSize={altura * 0.58}
-        fontWeight={700}
-        style={{ textTransform: "uppercase" }}
-      >
-        {children}
-      </text>
+    <text
+      x={x}
+      y={y}
+      textAnchor={ancora}
+      fontFamily="var(--fonte-mao), cursive"
+      fontWeight={700}
+      fontSize={tamanho}
+      fill={cor}
+      stroke="none"
+      transform={`rotate(${inclinacao} ${x} ${y})`}
+    >
+      {children}
+    </text>
+  );
+}
+
+/** Número dentro de uma anotação: sempre Rubik, que se lê com precisão. */
+export function NumeroAnotado({ children, tamanho }: { children: ReactNode; tamanho?: number }) {
+  return (
+    <tspan fontFamily="var(--fonte-interface), sans-serif" fontWeight={700} fontSize={tamanho} className="algarismos">
+      {children}
+    </tspan>
+  );
+}
+
+/** Setinha curva a caneta, de um ponto a outro. */
+export function SetaCurva({ de, para, curva = 0.35, cor = "var(--caneta)" }: { de: [number, number]; para: [number, number]; curva?: number; cor?: string }) {
+  const [x1, y1] = de;
+  const [x2, y2] = para;
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const cx = mx - dy * curva;
+  const cy = my + dx * curva;
+  const ang = Math.atan2(y2 - cy, x2 - cx);
+  const ponta = 6;
+  const a1 = ang + Math.PI * 0.8;
+  const a2 = ang - Math.PI * 0.8;
+  return (
+    <g fill="none" stroke={cor} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`} />
+      <path d={`M ${x2 + ponta * Math.cos(a1)} ${y2 + ponta * Math.sin(a1)} L ${x2} ${y2} L ${x2 + ponta * Math.cos(a2)} ${y2 + ponta * Math.sin(a2)}`} />
     </g>
   );
 }
 
-/** Lâmpada: apagada, piloto (pulsa baixo) ou acesa em âmbar com halo. */
-export function Lampada({
-  x,
-  y,
-  r = 4,
-  estado,
-}: {
-  x: number;
-  y: number;
-  r?: number;
-  estado: "apagada" | "piloto" | "acesa" | "atencao";
-}) {
-  const acesa = estado === "acesa";
-  const atencao = estado === "atencao";
+/** Chave a caneta sobre uma medida, com a ponta para cima. */
+export function Chave({ x1, x2, y, cor = "var(--caneta)" }: { x1: number; x2: number; y: number; cor?: string }) {
+  const m = (x1 + x2) / 2;
+  const r = Math.min(5, (x2 - x1) / 4);
   return (
-    <g>
-      <circle
-        cx={x}
-        cy={y}
-        r={r * 2.4}
-        fill={atencao ? "var(--vermelhao-halo)" : "var(--ambar-halo)"}
-        style={{
-          opacity: acesa || atencao ? 1 : 0,
-          transition: "opacity var(--t-luz) var(--curva-firme)",
-        }}
-      />
-      <circle cx={x} cy={y + 0.6} r={r} fill="var(--latao-sombra)" />
-      <circle
-        cx={x}
-        cy={y}
-        r={r * 0.78}
-        fill={acesa ? "var(--ambar)" : atencao ? "var(--vermelhao)" : estado === "piloto" ? "var(--ambar-sombra)" : "var(--janela-apagada)"}
-        className={estado === "piloto" ? "piloto" : atencao ? "luz-oscilante" : undefined}
-        style={{ transition: "fill var(--t-luz) var(--curva-firme)" }}
-      />
-      <circle cx={x - r * 0.28} cy={y - r * 0.3} r={r * 0.22} fill="var(--texto-mundo)" opacity={acesa ? 0.8 : 0.25} />
-    </g>
+    <path
+      d={`M ${x1} ${y} q 0 ${-r} ${r} ${-r} H ${m - r} q ${r} 0 ${r} ${-r} q 0 ${r} ${r} ${r} H ${x2 - r} q ${r} 0 ${r} ${r}`}
+      fill="none"
+      stroke={cor}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    />
   );
 }
 
-/** Volante (registro de uma bica). Turquesa quando o jogador pode girar. */
-export function Volante({
-  x,
-  y,
-  r = 6,
-  mexivel,
-  aberto,
-}: {
-  x: number;
-  y: number;
-  r?: number;
-  mexivel: boolean;
-  aberto: boolean;
-}) {
-  const cor = mexivel ? "var(--turquesa)" : "var(--aco)";
-  const sombra = mexivel ? "var(--turquesa-sombra)" : "var(--aco-sombra)";
-  return (
-    <g style={{ transform: `rotate(${aberto ? 0 : 45}deg)`, transformOrigin: `${x}px ${y}px`, transformBox: "view-box", transition: "transform var(--t-assentar) var(--curva-mecanica)" }}>
-      <circle cx={x} cy={y} r={r} fill="none" stroke={sombra} strokeWidth={2.6} />
-      <circle cx={x} cy={y} r={r} fill="none" stroke={cor} strokeWidth={1.8} />
-      <line x1={x - r} y1={y} x2={x + r} y2={y} stroke={cor} strokeWidth={1.6} />
-      <line x1={x} y1={y - r} x2={x} y2={y + r} stroke={cor} strokeWidth={1.6} />
-      <circle cx={x} cy={y} r={r * 0.32} fill={sombra} />
-    </g>
-  );
+/** Pseudoaleatório determinístico, para o traço à mão sair sempre igual. */
+function variacao(semente: number, i: number): number {
+  const s = Math.sin(semente * 12.9898 + i * 78.233) * 43758.5453;
+  return s - Math.floor(s);
 }
 
-/** Rolo da esteira. */
-export function Rolo({ x, y, r = 8, girando = true }: { x: number; y: number; r?: number; girando?: boolean }) {
-  return (
-    <g>
-      <circle cx={x} cy={y} r={r} fill="var(--latao-sombra)" />
-      <circle cx={x} cy={y} r={r * 0.82} fill="var(--latao)" />
-      <g className={girando ? "ambiente-girar" : undefined}>
-        <line x1={x - r * 0.6} y1={y} x2={x + r * 0.6} y2={y} stroke="var(--latao-sombra)" strokeWidth={1.4} />
-        <line x1={x} y1={y - r * 0.6} x2={x} y2={y + r * 0.6} stroke="var(--latao-sombra)" strokeWidth={1.4} />
-      </g>
-      <circle cx={x} cy={y} r={r * 0.22} fill="var(--latao-claro)" />
-    </g>
-  );
-}
-
-/** Cano vertical com flange. */
-export function Cano({ x, y1, y2, largura = 5, apagado = false }: { x: number; y1: number; y2: number; largura?: number; apagado?: boolean }) {
-  return (
-    <g opacity={apagado ? 0.55 : 1} style={{ transition: "opacity var(--t-assentar)" }}>
-      <rect x={x - largura / 2} y={y1} width={largura} height={y2 - y1} fill="var(--aco)" />
-      <rect x={x + largura * 0.1} y={y1} width={largura * 0.4} height={y2 - y1} fill="var(--aco-sombra)" />
-      <rect x={x - largura * 0.8} y={y2 - 2} width={largura * 1.6} height={3} rx={1} fill="var(--latao)" />
-    </g>
-  );
-}
-
-/** Engrenagem decorativa (gira em modo ambiente). */
-export function Engrenagem({ x, y, r, dentes = 8, girando = false, cor = "var(--latao-sombra)" }: { x: number; y: number; r: number; dentes?: number; girando?: boolean; cor?: string }) {
-  const pontos: string[] = [];
-  for (let i = 0; i < dentes * 2; i++) {
-    const ang = (Math.PI * i) / dentes;
-    const raio = i % 2 === 0 ? r : r * 0.78;
-    const a1 = ang - Math.PI / dentes / 2.2;
-    const a2 = ang + Math.PI / dentes / 2.2;
-    pontos.push(`${x + raio * Math.cos(a1)},${y + raio * Math.sin(a1)}`);
-    pontos.push(`${x + raio * Math.cos(a2)},${y + raio * Math.sin(a2)}`);
+/**
+ * Círculo a lápis vermelho: traço irregular que não fecha certinho, como feito à mão.
+ * Só chama o olhar. Nunca risca nem corrige.
+ */
+export function CirculoVermelho({ cx, cy, rx, ry, semente = 1, className }: { cx: number; cy: number; rx: number; ry: number; semente?: number; className?: string }) {
+  const n = 12;
+  const inicio = -Math.PI * 0.62 + variacao(semente, 0) * 0.3;
+  const voltas = Math.PI * 2 + 0.5;
+  const pts = Array.from({ length: n + 1 }, (_, i) => {
+    const t = i / n;
+    const a = inicio + voltas * t;
+    const k = 1.05 - 0.1 * t + (variacao(semente, i + 1) - 0.5) * 0.06;
+    return [cx + rx * k * Math.cos(a), cy + ry * k * Math.sin(a)] as const;
+  });
+  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C ${c1[0].toFixed(1)} ${c1[1].toFixed(1)}, ${c2[0].toFixed(1)} ${c2[1].toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
   }
+  return <path d={d} fill="none" stroke="var(--vermelho)" strokeWidth={2.6} strokeLinecap="round" className={className} aria-hidden="true" style={{ pointerEvents: "none" }} />;
+}
+
+/** Rabisco de margem em grafite. Tempero: no máximo três por tela, nunca sobre conteúdo. */
+export function Rabisco({ tipo, x, y }: { tipo: "mais" | "dividir" | "triangulo"; x: number; y: number }) {
   return (
-    <g className={girando ? "ambiente-girar" : undefined}>
-      <polygon points={pontos.join(" ")} fill={cor} />
-      <circle cx={x} cy={y} r={r * 0.32} fill="var(--noite)" />
+    <g fill="none" stroke="var(--grafite)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {tipo === "mais" && <path d={`M ${x - 7} ${y} h 14 M ${x} ${y - 7} v 14`} />}
+      {tipo === "dividir" && (
+        <>
+          <path d={`M ${x - 8} ${y} h 16`} />
+          <circle cx={x} cy={y - 7} r={1.4} fill="var(--grafite)" />
+          <circle cx={x} cy={y + 7} r={1.4} fill="var(--grafite)" />
+        </>
+      )}
+      {tipo === "triangulo" && <path d={`M ${x - 8} ${y + 7} l 8 -14 l 8 14 Z`} />}
     </g>
   );
 }
