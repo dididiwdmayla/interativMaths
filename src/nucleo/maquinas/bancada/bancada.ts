@@ -289,3 +289,17 @@ export function pecasNaEsteiraComoInteiros(e: EstadoBancada): number {
 }
 
 export { deChave, ZERO };
+
+/** Confere se um valor salvo parece um estado de bancada (para miniaturas do Caderno). */
+export function ehEstadoBancada(x: unknown): x is EstadoBancada {
+  if (typeof x !== "object" || x === null) return false;
+  const e = x as Partial<EstadoBancada>;
+  return (
+    typeof e.config === "object" &&
+    e.config !== null &&
+    typeof e.config.pele === "string" &&
+    Array.isArray(e.esteira) &&
+    Array.isArray(e.bicas) &&
+    Array.isArray(e.bandeja)
+  );
+}

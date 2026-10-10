@@ -164,6 +164,11 @@ describe("fatiador (missão 4)", () => {
     expect(aindaFecha(criarBancada(broas(1, 4)).atual)).toBe(true);
   });
 
+  it("cortar em 3 com outras broas inteiras ainda fecha (sextos e oitavos)", () => {
+    const b = operarVarias(criarBancada(broas(3, 4)), [partes(3), { tipo: "fatiar", quantidade: 1 }]);
+    expect(aindaFecha(b.atual)).toBe(true);
+  });
+
   it("metade primeiro, para 3 mesas, ainda fecha (1/2 + 1/6)", () => {
     const b = operarVarias(criarBancada(broas(2, 3)), [partes(2), fatiarTodas]);
     expect(aindaFecha(b.atual)).toBe(true);

@@ -64,7 +64,8 @@ export type MotivoValidacao =
   | "solucao-repetida"
   | "falta-solucao"
   | "carga-inicial-diferente"
-  | "bicas-diferentes";
+  | "bicas-diferentes"
+  | "voltas-demais";
 
 export interface ResultadoValidacao {
   readonly ok: boolean;
@@ -256,6 +257,9 @@ export function validarBancada(
   e: EstadoBancada,
   ctx: ContextoValidacao = {},
 ): ResultadoValidacao {
+  if (typeof params.voltasMax === "number" && e.voltas > params.voltasMax) {
+    return resultado(false, "voltas-demais", { voltas: String(e.voltas), maximo: String(params.voltasMax) });
+  }
   switch (nome) {
     case "partilha.fechada":
       return conferirFechada(e);

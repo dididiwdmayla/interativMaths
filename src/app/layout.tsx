@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { AplicarPreferencias } from "@/componentes/estado/Preferencias";
 import { fonteMao, fonteSinal, fonteTexto } from "./fontes";
 import "./globals.css";
 
@@ -24,7 +25,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="pt-BR"
       className={`${fonteSinal.variable} ${fonteTexto.variable} ${fonteMao.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <AplicarPreferencias />
+        {children}
+      </body>
     </html>
   );
 }

@@ -19,8 +19,8 @@ export function Palco({
   topo?: ReactNode;
   maquina: ReactNode;
   visor?: ReactNode;
-  controles: ReactNode;
-  /** Algo que cobre a área dos controles (a página do Caderno, pela dobra). */
+  controles?: ReactNode;
+  /** Algo que ocupa o lugar dos controles (a página do Caderno, pela dobra). */
   sobreposicao?: ReactNode;
   atributos?: Record<string, string>;
 }) {
@@ -33,8 +33,7 @@ export function Palco({
         {visor && <div className="area-segura pb-1">{visor}</div>}
       </div>
       <div className="palco-controles">
-        <div className="chapa palco-chapa area-segura-base">{controles}</div>
-        {sobreposicao}
+        {sobreposicao ?? <div className="chapa palco-chapa area-segura-base">{controles}</div>}
       </div>
     </div>
   );

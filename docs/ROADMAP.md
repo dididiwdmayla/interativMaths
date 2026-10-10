@@ -12,6 +12,12 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   recomeçar, engasgo medido, viabilidade de corte e seis validadores por propriedade do estado;
   invariante de conservação testada; desenho SVG com kit de peças, cotas vivas, medidor de nível,
   cinco peles; toque e teclado; `/lab/maquinas`.
+- Etapa 3 — Missões: motor de atividade puro (entrada → execução + efeitos), as cinco missões do
+  Arco 1 como dados, com provas diretas, soluções de teste e sabotagens; checagens de conteúdo
+  (todas as soluções passam, sabotagens falham com o equívoco certo, cada conceito do arco chega
+  a dominado); tela da missão com palpite, máquina, previsão conferida, frase com cotas, dobra do
+  papel, compressão em notação, caminho de volta e registro; Nônio com escada de dicas e
+  "resolver junto"; Caderno com miniatura e "rever na máquina".
 
 ## Parcialmente implementado
 - (nada)

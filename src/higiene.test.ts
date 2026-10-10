@@ -36,4 +36,13 @@ describe("higiene", () => {
       .map((f) => relative(RAIZ, f));
     expect(infratores).toEqual([]);
   });
+
+  it("conteúdo é só dado: nada de função nem JSX em src/conteudo", () => {
+    const infratores = todos
+      .filter((f) => relative(RAIZ, f).split(/[\\/]/)[0] === "conteudo")
+      .filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))
+      .filter((f) => /=>|\bfunction\b|<[A-Z][A-Za-z]*[\s/>]/.test(readFileSync(f, "utf8")))
+      .map((f) => relative(RAIZ, f));
+    expect(infratores).toEqual([]);
+  });
 });
