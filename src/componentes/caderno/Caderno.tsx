@@ -1,7 +1,9 @@
 "use client";
 
 /**
- * O Caderno: as páginas que o jogador registrou. É a referência dele; substitui explicações longas.
+ * O Caderno: as páginas que o jogador passou a limpo, em folha pautada. É a referência dele;
+ * substitui explicações longas. Título de cada página à mão, notação em Rubik, as notas da Dália
+ * na margem, a máquina de cada página num desenho pequeno numa ficha quadriculada.
  */
 import Link from "next/link";
 import { useState } from "react";
@@ -11,11 +13,12 @@ import { MISSOES_ARCO_1 } from "@/conteudo/missoes";
 import { PELES } from "@/conteudo/peles";
 import { Bancada } from "@/componentes/maquinas/Bancada";
 import { BlocoNotacao, LinhaNotacao } from "@/componentes/notacao/Notacao";
-import { FolhaPapel, NotaDalia } from "@/componentes/missao/Papel";
+import { FolhaPautada, NotaDalia } from "@/componentes/missao/Papel";
 import { rotaDe } from "@/componentes/estado/catalogo";
 import { useProgresso } from "@/componentes/estado/useProgresso";
+import { IconeFechar } from "@/componentes/icones/IconeFechar";
+import { CabecalhoJogo } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
-import { NavJogo } from "@/componentes/ui/NavJogo";
 
 export function Caderno() {
   const { pronto, progresso } = useProgresso();
@@ -30,37 +33,42 @@ export function Caderno() {
     (m) => progresso.campanha.atividades[m.id]?.status === "concluida" && !progresso.caderno.some((p) => p.atividade === m.id),
   );
   return (
-    <main data-pronto="sim" data-tela="caderno" className="min-h-dvh pb-28">
-      <header className="area-segura area-segura-topo flex items-end justify-between pb-3 pt-4">
-        <div>
-          <p className="rotulo-chapa m-0">O que você registrou</p>
-          <h1 className="fonte-sinal m-0 text-[2.2rem] font-extrabold uppercase leading-none text-papel">Caderno</h1>
-        </div>
-        <p className="m-0 text-texto-mundo-suave">{paginas.length === 1 ? "1 página" : `${paginas.length} páginas`}</p>
-      </header>
+    <main data-pronto="sim" data-tela="caderno" className="min-h-dvh pb-16">
+      <CabecalhoJogo atual="caderno" />
+      <div className="area-segura mx-auto flex w-full max-w-[880px] flex-col gap-6 pt-5">
+        <header className="flex items-end justify-between gap-3">
+          <div>
+            <p className="m-0 text-[13px] font-semibold text-tinta-suave">O que você passou a limpo</p>
+            <h1 className="m-0 text-[24px] font-extrabold leading-tight">Caderno</h1>
+          </div>
+          <p className="m-0 pb-1 text-[14px] font-bold">
+            <span className="marca-texto">{paginas.length === 1 ? "1 página" : `${paginas.length} páginas`}</span>
+          </p>
+        </header>
 
-      <div className="area-segura mx-auto flex max-w-2xl flex-col gap-6">
         {paginas.length === 0 && (
-          <FolhaPapel titulo="Em branco">
-            <p className="text-tinta">As páginas aparecem aqui quando você registra o que a máquina fez, no fim de cada missão.</p>
-            <NotaDalia>Comecei este caderno trinta anos atrás e ele continua em branco. Fica com você.</NotaDalia>
-          </FolhaPapel>
+          <FolhaPautada titulo="Em branco" className="rounded-[16px] shadow-[0_4px_0_var(--tinta)]">
+            <p className="m-0 mt-[14px] text-[16px] font-medium leading-[28px]">As páginas aparecem aqui quando você passa a limpo o que a máquina fez, no fim de cada missão.</p>
+            <div className="mt-[14px]">
+              <NotaDalia>Comecei este caderno trinta anos atrás e ele continua em branco. Fica com você.</NotaDalia>
+            </div>
+          </FolhaPautada>
         )}
         {paginas.map((p) => (
           <Pagina key={p.id} p={p} onRever={() => setRevendo(p)} />
         ))}
         {semRegistro.map((m) => (
-          <FolhaPapel key={m.id} titulo={m.titulo} className="opacity-90">
-            <p className="text-tinta">Missão vencida pela prova direta. A página ainda está em branco.</p>
-            <Link href={`${rotaDe(m)}?modo=registro`} className="placa placa-papel placa-pequena mb-1 inline-flex">
-              Fazer o registro
+          <section key={m.id} className="ficha-lapis flex flex-col items-start gap-3 px-5 py-4">
+            <h2 className="letra-mao m-0 text-[28px] text-tinta-suave">{m.titulo}</h2>
+            <p className="m-0 text-[15px] font-medium text-tinta-suave">Missão vencida pela prova direta. A página ainda está a lápis.</p>
+            <Link href={`${rotaDe(m)}?modo=registro`} className="botao-secundario">
+              Passar a limpo
             </Link>
-          </FolhaPapel>
+          </section>
         ))}
       </div>
 
       {revendo && <ReverNaMaquina p={revendo} onFechar={() => setRevendo(null)} />}
-      <NavJogo atual="caderno" />
     </main>
   );
 }
@@ -68,41 +76,38 @@ export function Caderno() {
 function Pagina({ p, onRever }: { p: PaginaCaderno; onRever: () => void }) {
   const maquina = ehEstadoBancada(p.maquina) ? p.maquina : null;
   return (
-    <article data-pagina={p.id}>
-      <FolhaPapel
-        titulo={p.titulo}
-        className="rounded-2xl"
-        margem={
-          <div className="flex flex-col gap-1">
-            {p.notas.map((n) => (
-              <NotaDalia key={n}>{n}</NotaDalia>
-            ))}
-          </div>
-        }
-      >
-        <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-start">
-          <div className="flex flex-1 flex-col gap-3">
-            {p.frase && <p className="m-0 text-[1.05rem] text-tinta">{p.frase}</p>}
+    <article data-pagina={p.id} className="anima-subir">
+      <FolhaPautada titulo={p.titulo} className="rounded-[16px] shadow-[0_4px_0_var(--tinta)]">
+        <div className="flex flex-col gap-[14px] pt-[14px] md:flex-row md:items-start md:gap-6">
+          <div className="flex min-w-0 flex-1 flex-col gap-[14px]">
+            {p.frase && <p className="m-0 text-[16px] font-medium leading-[28px]">{p.frase}</p>}
             <BlocoNotacao linhas={p.notacao} />
             {p.volta && (
-              <div className="flex flex-wrap items-center gap-2 text-tinta-suave">
-                <span className="text-[0.82rem] uppercase tracking-wide">caminho de volta</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="letra-mao text-[22px]">caminho de volta</span>
                 <LinhaNotacao texto={p.volta} tamanho="pequena" rotulos={false} />
+              </div>
+            )}
+            {p.notas.length > 0 && (
+              <div className="flex flex-col">
+                {p.notas.map((n) => (
+                  <NotaDalia key={n}>{n}</NotaDalia>
+                ))}
               </div>
             )}
           </div>
           {maquina && (
-            <div className="flex w-full flex-col items-center gap-1 sm:w-48">
-              <div className="w-full overflow-hidden rounded-lg bg-noite" style={{ aspectRatio: "1 / 0.72" }}>
-                <Bancada estado={maquina} pele={PELES[maquina.config.pele]} cotas={false} proporcao={0.72} rotulo={`Miniatura da máquina: ${p.titulo}`} />
+            <div className="flex w-full flex-col gap-2.5 md:w-[250px]">
+              <div className="ficha-quadriculada overflow-hidden p-1 shadow-none" style={{ aspectRatio: "1 / 0.8" }}>
+                <Bancada estado={maquina} pele={PELES[maquina.config.pele]} cotas={false} proporcao={0.8} rotulo={`Miniatura da máquina: ${p.titulo}`} />
               </div>
-              <button type="button" className="placa placa-papel placa-pequena w-full" onClick={onRever} data-acao="rever">
+              <button type="button" className="botao-secundario w-full" onClick={onRever} data-acao="rever">
                 Rever na máquina
               </button>
             </div>
           )}
         </div>
-      </FolhaPapel>
+      </FolhaPautada>
     </article>
   );
 }
@@ -111,18 +116,21 @@ function ReverNaMaquina({ p, onFechar }: { p: PaginaCaderno; onFechar: () => voi
   const maquina = ehEstadoBancada(p.maquina) ? p.maquina : null;
   if (!maquina) return null;
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-noite anima-esmaecer" role="dialog" aria-modal="true" aria-label={`Rever na máquina: ${p.titulo}`}>
-      <div className="area-segura area-segura-topo flex items-center justify-between py-2">
-        <h2 className="fonte-sinal m-0 text-[1.4rem] font-bold uppercase">{p.titulo}</h2>
-        <button type="button" className="placa placa-pequena" onClick={onFechar} autoFocus>
-          Fechar
+    <div className="quadriculado fixed inset-0 z-40 flex flex-col anima-esmaecer" role="dialog" aria-modal="true" aria-label={`Rever na máquina: ${p.titulo}`}>
+      <div className="cabecalho area-segura">
+        <div className="flex min-w-0 flex-1 flex-col gap-px">
+          <p className="m-0 text-[12px] font-semibold text-tinta-suave">Caderno · Rever na máquina</p>
+          <h2 className="m-0 truncate text-[17px] font-extrabold">{p.titulo}</h2>
+        </div>
+        <button type="button" className="botao-icone" onClick={onFechar} autoFocus aria-label="Fechar">
+          <IconeFechar />
         </button>
       </div>
-      <div className="min-h-0 flex-1 px-2 pb-4">
-        <Bancada estado={maquina} pele={PELES[maquina.config.pele]} cotas rotulo={`Máquina: ${p.titulo}`} />
-      </div>
-      <div className="area-segura area-segura-base pb-3">
-        <div className="papel-liso inline-block rounded-lg px-3 py-2">
+      <div className="mx-auto flex min-h-0 w-full max-w-[880px] flex-1 flex-col gap-3 px-[14px] pb-5 pt-3">
+        <div className="ficha-quadriculada min-h-0 flex-1 p-1.5">
+          <Bancada estado={maquina} pele={PELES[maquina.config.pele]} cotas rotulo={`Máquina: ${p.titulo}`} />
+        </div>
+        <div className="quadro-notacao self-start">
           <LinhaNotacao texto={p.notacao[0] ?? ""} tamanho="media" rotulos={false} />
         </div>
       </div>

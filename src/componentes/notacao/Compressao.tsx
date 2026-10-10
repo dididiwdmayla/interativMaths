@@ -2,7 +2,7 @@
 
 /**
  * A frase se comprime em notação: as palavras somem, os números ficam, os sinais aparecem.
- * Só opacidade: com movimento reduzido continua igual.
+ * A notação passada a limpo fica num quadro de marca-texto pálido. Só opacidade.
  */
 import { useEffect, useState } from "react";
 import { BlocoNotacao } from "./Notacao";
@@ -22,10 +22,10 @@ export function Compressao({ frase, linhas, comprimida }: { frase: string; linha
   return (
     <div className="flex flex-col gap-3">
       {fase !== "notacao" ? (
-        <p className="m-0 text-[1.25rem] leading-snug text-tinta" data-frase="">
+        <p className="m-0 text-[19px] font-semibold leading-[28px] text-tinta" data-frase="">
           {pedacos.map((p, i) =>
             /^\d/.test(p) ? (
-              <strong key={i} className="font-bold text-tinta">
+              <strong key={i} className="font-extrabold text-caneta">
                 {p}
               </strong>
             ) : (
@@ -37,7 +37,9 @@ export function Compressao({ frase, linhas, comprimida }: { frase: string; linha
         </p>
       ) : (
         <div className="anima-esmaecer" data-compressao="feita">
-          <BlocoNotacao linhas={linhas} />
+          <div className="quadro-notacao">
+            <BlocoNotacao linhas={linhas} />
+          </div>
         </div>
       )}
     </div>

@@ -29,23 +29,24 @@ import { PELES, type Pele } from "@/conteudo/peles";
 import { Bancada, type MarcasBancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
-import { Visor } from "@/componentes/maquinas/Visor";
-import { mensagemDoEvento, type TomVisor } from "@/componentes/maquinas/mensagens";
+import { TiraMensagem } from "@/componentes/maquinas/Tira";
+import { mensagemDoEvento, type TomTira } from "@/componentes/maquinas/mensagens";
 import { Nonio, type ExpressaoNonio } from "@/componentes/nonio/Nonio";
 import { PainelNonio } from "@/componentes/nonio/PainelNonio";
 import { LinhaNotacao } from "@/componentes/notacao/Notacao";
 import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, SONDAGEM_ATIVA, textoDoEquivoco, textoDoMotivo } from "@/componentes/estado/catalogo";
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
+import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
-import { Falas } from "./Falas";
+import { BalaoNonio, Falas } from "./Falas";
 import { ManualRasgado } from "./Manual";
 import { descreverAcao, NOME_DA_FASE } from "./textos";
 import { FolhaFrase, FolhaNotacao, FolhaRegistro, PainelPalpite, PainelPrever, PainelVencido, Seguir } from "./Vistas";
 
 interface Aviso {
   texto: string;
-  tom: TomVisor;
+  tom: TomTira;
   /** seq da máquina quando o aviso nasceu: um evento novo apaga o aviso. */
   seq: number;
   equivoco: boolean;
@@ -64,7 +65,7 @@ function lerModo(v: string | null): ModoExecucao {
 export function Executor({ atividadeId, voltar }: { atividadeId: string; voltar: { href: string; rotulo: string } }) {
   const a = atividadePorId(atividadeId);
   const modo = lerModo(useSearchParams().get("modo"));
-  if (!a) return <p className="p-6">Atividade não encontrada.</p>;
+  if (!a) return <p className="m-0 p-6 font-semibold">Atividade não encontrada.</p>;
   return <ExecutorAtividade key={`${a.id}#${modo}`} a={a} modo={modo} voltar={voltar} />;
 }
 
@@ -144,41 +145,52 @@ export function ExecutorAtividade({
   const ofereceAjuda =
     !aplicacao && prefs.postura !== "quieto" && exec.passo.situacao === "ativo" && exec.passo.ajuda < 3 && exec.passo.tentativas >= tentativasParaOferecer && passo.dicas !== undefined;
 
+  const expressao: ExpressaoNonio = exec.passo.situacao === "vencido" ? "satisfeito" : exec.passo.ajuda >= 2 ? "medindo" : prefs.postura === "quieto" ? "quieto" : "atento";
+  const temDicas = passo.dicas !== undefined && (exec.passo.situacao === "ativo" || exec.passo.situacao === "convite");
+  const comentario = prefs.postura === "presente" && aviso?.equivoco ? aviso.texto : null;
+
   const cabecalho = (
-    <Cabecalho
-      a={a}
-      modo={modo}
-      passo={passo}
-      indice={exec.indice}
-      total={total}
+    <CabecalhoLugar
       voltar={voltar}
-      expressao={exec.passo.situacao === "vencido" ? "satisfeito" : exec.passo.ajuda >= 2 ? "medindo" : prefs.postura === "quieto" ? "quieto" : "atento"}
-      onNonio={() => setNonioAberto(true)}
-      temDicas={passo.dicas !== undefined && (exec.passo.situacao === "ativo" || exec.passo.situacao === "convite")}
-      oferta={ofereceAjuda}
-      comentario={prefs.postura === "presente" && aviso?.equivoco ? aviso.texto : null}
-      extra={
-        <>
-          {sondagem && (
-            <Link
-              href={`/partilha/sondagem?conceito=${encodeURIComponent(sondagem)}&origem=${encodeURIComponent(a.id)}`}
-              className="flex items-start gap-2 rounded-md border-2 border-turquesa bg-noite-clara px-2.5 py-1.5 text-[0.92rem] anima-esmaecer"
-              data-convite-sondagem={sondagem}
-            >
-              <span className="rotulo-chapa shrink-0 text-[0.74rem]">Nônio</span>
-              <span>A mesma medida escapou duas vezes, em lugares diferentes. Posso conferir uma coisa? Uma pergunta só; depois você volta para cá.</span>
-            </Link>
-          )}
-          {progresso.campanha.desvio?.destino === a.id && atividadePorId(progresso.campanha.desvio.origem) && (
-            <Link href={rotaDe(atividadePorId(progresso.campanha.desvio.origem) as Atividade)} className="rounded-md border border-noite-borda px-2.5 py-1 text-[0.88rem] text-texto-mundo-suave" data-desvio="">
-              Desvio. Quando quiser, volte para {atividadePorId(progresso.campanha.desvio.origem)?.titulo}: a máquina está como você deixou.
-            </Link>
-          )}
-          {a.categoria && <CategoriaRua categoria={a.categoria} />}
-        </>
-      }
+      lugar={`${lugarDe(a, modo)} · ${NOME_DA_FASE[passo.fase]}`}
+      titulo={a.titulo}
+      direita={<BotaoNonio expressao={expressao} temDicas={temDicas} oferta={ofereceAjuda} onAbrir={() => setNonioAberto(true)} />}
     />
   );
+
+  const pedido = (
+    <>
+      <span className="contador-passo" aria-label={`Passo ${exec.indice + 1} de ${total}`}>
+        {exec.indice + 1}/{total}
+      </span>
+      <p className="m-0 min-w-0 flex-1 text-[15px] font-semibold leading-snug" data-pedido="">
+        {passo.pedido}
+      </p>
+    </>
+  );
+
+  const origemDesvio = progresso.campanha.desvio?.destino === a.id ? atividadePorId(progresso.campanha.desvio.origem) : null;
+  const avisosNonio =
+    ofereceAjuda || comentario || sondagem || origemDesvio || a.categoria ? (
+      <div className="flex flex-col gap-2.5">
+        {(ofereceAjuda || comentario) && (
+          <button type="button" className="block w-full text-left anima-esmaecer" onClick={() => setNonioAberto(true)} data-oferta-nonio="">
+            <BalaoNonio texto={comentario ?? "Travou duas vezes. Quer uma medida?"} expressao={comentario ? "medindo" : "atento"} compacta />
+          </button>
+        )}
+        {sondagem && (
+          <Link href={`/partilha/sondagem?conceito=${encodeURIComponent(sondagem)}&origem=${encodeURIComponent(a.id)}`} className="block anima-esmaecer" data-convite-sondagem={sondagem}>
+            <BalaoNonio texto="A mesma medida escapou duas vezes, em lugares diferentes. Posso conferir uma coisa? Uma pergunta só; depois você volta para cá." expressao="medindo" compacta />
+          </Link>
+        )}
+        {origemDesvio && (
+          <Link href={rotaDe(origemDesvio)} className="block rotate-[-0.6deg] rounded-md border-2 border-tinta bg-marca-texto px-3 py-2 text-[14px] font-semibold" data-desvio="">
+            Desvio. Quando quiser, volte para {origemDesvio.titulo}: a máquina está como você deixou.
+          </Link>
+        )}
+        {a.categoria && <CategoriaRua categoria={a.categoria} />}
+      </div>
+    ) : null;
 
   const painelNonio = (
     <PainelNonio
@@ -198,20 +210,36 @@ export function ExecutorAtividade({
   );
 
   if (passo.tipo === "narrativa" || !exec.bancada) {
+    const exposicao = a.tipo === "exposicao" && passo.tipo === "narrativa" && passo.faixas !== undefined;
     return (
-      <TelaNarrativa atributos={atributos} cabecalho={cabecalho}>
-        {passo.tipo === "narrativa" && passo.manual && <ManualRasgado titulo={passo.manual.titulo} linhas={passo.manual.linhas} />}
-        {passo.falas && <Falas falas={passo.falas} />}
-        {passo.falasSeMarca && progresso.campanha.marcas.includes(passo.falasSeMarca.marca) && <Falas falas={passo.falasSeMarca.falas} />}
-        {passo.tipo === "narrativa" && passo.faixas && <Faixas faixas={passo.faixas} />}
-        {passo.tipo === "registro" ? (
-          <FolhaRegistro passo={passo} frase={Object.values(exec.frases).at(-1) ?? ""} onGuardar={() => enviar({ tipo: "seguir" })} />
-        ) : passo.tipo === "palpite" ? (
-          <PainelPalpite passo={passo} onResponder={(v) => enviar({ tipo: "responder", valor: v })} />
-        ) : (
-          <Seguir rotulo={passo.tipo === "narrativa" ? (passo.botao ?? "Seguir") : "Seguir"} onClick={() => enviar({ tipo: "seguir" })} />
-        )}
-      </TelaNarrativa>
+      <>
+        <TelaNarrativa atributos={atributos} cabecalho={cabecalho} pedido={pedido}>
+          {avisosNonio}
+          {passo.tipo === "narrativa" && passo.manual && <ManualRasgado titulo={passo.manual.titulo} linhas={passo.manual.linhas} />}
+          {exposicao ? (
+            <Recorte>
+              {passo.falas && <Falas falas={passo.falas} compacta />}
+              {passo.tipo === "narrativa" && passo.faixas && <Faixas faixas={passo.faixas} />}
+            </Recorte>
+          ) : (
+            <>
+              {passo.falas && <Falas falas={passo.falas} />}
+              {passo.tipo === "narrativa" && passo.faixas && <Faixas faixas={passo.faixas} />}
+            </>
+          )}
+          {passo.falasSeMarca && progresso.campanha.marcas.includes(passo.falasSeMarca.marca) && <Falas falas={passo.falasSeMarca.falas} />}
+          {passo.tipo === "registro" ? (
+            <FolhaRegistro passo={passo} frase={Object.values(exec.frases).at(-1) ?? ""} onGuardar={() => enviar({ tipo: "seguir" })} />
+          ) : passo.tipo === "palpite" ? (
+            <div className="ficha p-4">
+              <PainelPalpite passo={passo} onResponder={(v) => enviar({ tipo: "responder", valor: v })} />
+            </div>
+          ) : (
+            <Seguir rotulo={passo.tipo === "narrativa" ? (passo.botao ?? "Seguir") : "Seguir"} onClick={() => enviar({ tipo: "seguir" })} />
+          )}
+        </TelaNarrativa>
+        {painelNonio}
+      </>
     );
   }
 
@@ -224,7 +252,7 @@ export function ExecutorAtividade({
     sobraAtencao: ultimo !== null && !ultimo.ok && ["ficou-carga", "sobra-da-mais-uma-volta", "sobra-pode-ser-cortada", "sobra-diferente", "sobra-nao-fecha"].includes(ultimo.motivo),
   };
   const msgEvento = mensagemDoEvento(bancada.atual, pele);
-  const visor = aviso && aviso.seq === bancada.atual.seq ? { texto: aviso.texto, tom: aviso.tom } : msgEvento;
+  const tira = aviso && aviso.seq === bancada.atual.seq ? { texto: aviso.texto, tom: aviso.tom } : msgEvento;
   const realce = exec.passo.ajuda >= 1 && exec.passo.situacao === "ativo" ? (passo.dicas?.[0].alvo ?? null) : null;
   const cotaDica = exec.passo.ajuda >= 2 && exec.passo.situacao === "ativo" ? passo.dicas?.[1].cota : undefined;
   const vivas = medidasVivas(bancada.atual);
@@ -245,18 +273,12 @@ export function ExecutorAtividade({
     />
   );
 
-  const topo = (
-    <>
-      {cabecalho}
-      {passo.tipo === "operar" && passo.conta && (
-        <div className="area-segura flex justify-center pb-1">
-          <div className="papel-liso rounded-md px-3 py-1 shadow" aria-label={`Conta a mostrar: ${passo.conta}`}>
-            <LinhaNotacao texto={passo.conta} tamanho="pequena" rotulos={false} />
-          </div>
-        </div>
-      )}
-    </>
-  );
+  const conta =
+    passo.tipo === "operar" && passo.conta ? (
+      <div className="absolute left-3 top-3 z-10 quadro-notacao px-3 py-1" aria-label={`Conta a mostrar: ${passo.conta}`}>
+        <LinhaNotacao texto={passo.conta} tamanho="pequena" rotulos={false} />
+      </div>
+    ) : null;
 
   let controles: React.ReactNode = null;
   let sobreposicao: React.ReactNode = null;
@@ -277,7 +299,7 @@ export function ExecutorAtividade({
           convite={passo.convite && exec.passo.convite === null ? passo.convite.texto : null}
           onConvite={(aceitar) => enviar({ tipo: "convite", aceitar })}
           onSeguir={() => enviar({ tipo: "seguir" })}
-          extra={exec.passo.convite === "feito" ? <p className="m-0 text-ambar">Numa volta só. A alavanca agradece.</p> : null}
+          extra={exec.passo.convite === "feito" ? <p className="m-0 font-semibold"><span className="grifo">Numa volta só.</span> A máquina agradece.</p> : null}
         />
       );
     } else {
@@ -285,10 +307,10 @@ export function ExecutorAtividade({
       const proximaJunto = exec.passo.junto !== null ? resolucao[exec.passo.junto] : undefined;
       controles = (
         <div className="flex flex-col gap-3">
-          {exec.passo.situacao === "convite" && passo.convite && <p className="m-0 font-semibold text-ambar">{passo.convite.texto}</p>}
+          {exec.passo.situacao === "convite" && passo.convite && <p className="m-0 font-bold"><span className="grifo">{passo.convite.texto}</span></p>}
           {exec.passo.solucoes.length > 0 && passo.objetivo.validador === "partilha.solucoes-distintas" && (
-            <p className="m-0 text-ambar" data-solucoes={exec.passo.solucoes.length}>
-              Jeitos aceitos: {exec.passo.solucoes.length} de {String(passo.objetivo.params?.n ?? 2)}.
+            <p className="m-0 font-semibold" data-solucoes={exec.passo.solucoes.length}>
+              Jeitos aceitos: <span className="grifo font-extrabold">{exec.passo.solucoes.length} de {String(passo.objetivo.params?.n ?? 2)}</span>.
             </p>
           )}
           {proximaJunto && <Junto texto={descreverAcao(proximaJunto, pele)} onFazer={() => enviar({ tipo: "maquina", acao: proximaJunto })} />}
@@ -305,7 +327,7 @@ export function ExecutorAtividade({
     }
   } else if (passo.tipo === "frase") {
     sobreposicao = (
-      <Dobra>
+      <FolhaSobe>
         <FolhaFrase
           passo={passo}
           exec={exec}
@@ -320,12 +342,12 @@ export function ExecutorAtividade({
           onConferir={() => enviar({ tipo: "conferir" })}
           onSeguir={() => enviar({ tipo: "seguir" })}
         />
-      </Dobra>
+      </FolhaSobe>
     );
   } else if (passo.tipo === "notacao") {
     const frase = Object.values(exec.frases).at(-1) ?? "";
     sobreposicao = (
-      <Dobra>
+      <FolhaSobe>
         <FolhaNotacao
           passo={passo}
           frase={frase}
@@ -336,23 +358,30 @@ export function ExecutorAtividade({
             enviar({ tipo: "seguir" });
           }}
         />
-      </Dobra>
+      </FolhaSobe>
     );
   } else if (passo.tipo === "registro") {
     sobreposicao = (
-      <Dobra>
+      <FolhaSobe>
         <FolhaRegistro passo={passo} frase={Object.values(exec.frases).at(-1) ?? ""} onGuardar={() => enviar({ tipo: "seguir" })} />
-      </Dobra>
+      </FolhaSobe>
     );
   }
 
   return (
     <>
       <Palco
-        atributos={atributos}
-        topo={topo}
-        maquina={maquina}
-        visor={!formalizacao ? <Visor texto={visor?.texto ?? null} tom={visor?.tom} /> : undefined}
+        atributos={{ ...atributos, "data-cena": a.tipo === "cena" ? "sim" : "nao" }}
+        cabecalho={cabecalho}
+        pedido={pedido}
+        maquina={
+          <>
+            {conta}
+            {maquina}
+          </>
+        }
+        tira={!formalizacao ? <TiraMensagem texto={tira?.texto ?? null} tom={tira?.tom} /> : undefined}
+        nonio={!formalizacao ? avisosNonio : undefined}
         controles={controles}
         sobreposicao={sobreposicao}
       />
@@ -376,42 +405,18 @@ function avisoDe(efeitos: readonly Efeito[], exec: Execucao, pele: Pele | null):
   if (eq) return { texto: textoDoEquivoco(eq.id, eq.medidas), tom: "atencao", seq, equivoco: true };
   const r = efeitos.find((e): e is Extract<Efeito, { tipo: "resultado" }> => e.tipo === "resultado");
   if (r && pele) {
-    if (r.resultado.ok) return { texto: "Partilha fechada.", tom: "ambar", seq, equivoco: false };
-    return { texto: textoDoMotivo(r.resultado.motivo, r.resultado.medidas, pele), tom: r.resultado.parcial ? "ambar" : "atencao", seq, equivoco: false };
+    if (r.resultado.ok) return { texto: "Partilha fechada.", tom: "feito", seq, equivoco: false };
+    return { texto: textoDoMotivo(r.resultado.motivo, r.resultado.medidas, pele), tom: r.resultado.parcial ? "feito" : "atencao", seq, equivoco: false };
   }
   return null;
 }
 
 /* ---------- Peças da tela ---------- */
 
-function Cabecalho({
-  a,
-  modo,
-  passo,
-  indice,
-  total,
-  voltar,
-  expressao,
-  onNonio,
-  temDicas,
-  oferta,
-  comentario,
-  extra,
-}: {
-  a: Atividade;
-  modo: ModoExecucao;
-  passo: Passo;
-  indice: number;
-  total: number;
-  voltar: { href: string; rotulo: string };
-  expressao: ExpressaoNonio;
-  onNonio: () => void;
-  temDicas: boolean;
-  oferta: boolean;
-  comentario: string | null;
-  extra?: React.ReactNode;
-}) {
-  const rotuloModo =
+/** Onde a atividade acontece, para a linha de cima do cabeçalho. */
+function lugarDe(a: Atividade, modo: ModoExecucao): string {
+  const distrito = a.tipo === "exposicao" ? "Museu" : a.tipo === "cena" ? "A Rua" : "A Partilha";
+  const tipo =
     modo === "prova"
       ? "Prova direta"
       : modo === "registro"
@@ -419,86 +424,54 @@ function Cabecalho({
         : a.tipo === "missao"
           ? `Missão ${a.numero}`
           : a.tipo === "exposicao"
-            ? "Museu"
+            ? "Exposição"
             : a.tipo === "cena"
-              ? "A Rua"
+              ? "Cena"
               : a.tipo === "eco"
                 ? "Eco"
                 : a.tipo === "revisita"
                   ? "Revisita"
                   : "Sondagem";
-  return (
-    <header className="area-segura relative flex flex-col gap-1.5 pb-1.5">
-      <div className="flex items-center gap-2">
-        <Link href={voltar.href} className="placa placa-pequena placa-discreta shrink-0 px-2.5" aria-label={`Voltar para ${voltar.rotulo}`} data-acao="voltar">
-          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-            <path d="M 10 3 L 5 8 L 10 13" stroke="currentColor" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span className="hidden sm:inline">{voltar.rotulo}</span>
-        </Link>
-        <div className="min-w-0 flex-1">
-          <p className="rotulo-chapa m-0 truncate text-[0.78rem]">
-            {rotuloModo} · {NOME_DA_FASE[passo.fase]}
-          </p>
-          <h1 className="fonte-sinal m-0 truncate text-[1.35rem] font-bold uppercase leading-tight text-texto-mundo">{a.titulo}</h1>
-        </div>
-        <Lampadas indice={indice} total={total} />
-        <button
-          type="button"
-          className={`relative shrink-0 rounded-full border-2 p-0.5 ${temDicas ? "border-turquesa" : "border-noite-borda"}`}
-          onClick={onNonio}
-          disabled={!temDicas}
-          aria-label={temDicas ? "Chamar o Nônio" : "Nônio (sem medida para este passo)"}
-          data-acao="nonio"
-        >
-          <Nonio expressao={expressao} tamanho={34} rotulo="" />
-          {oferta && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-turquesa-clara piloto" aria-hidden="true" />}
-        </button>
-      </div>
-      <p className="m-0 rounded-md border border-noite-borda bg-noite-funda px-2.5 py-1.5 text-[0.98rem] leading-snug text-texto-mundo" data-pedido="">
-        {passo.pedido}
-      </p>
-      {(oferta || comentario) && (
-        <button type="button" className="flex items-start gap-2 rounded-md border border-turquesa-sombra bg-noite-clara px-2.5 py-1.5 text-left text-[0.92rem] text-texto-mundo-suave anima-esmaecer" onClick={onNonio} data-oferta-nonio="">
-          <span className="rotulo-chapa shrink-0 text-[0.74rem]">Nônio</span>
-          <span>{comentario ?? "Travou duas vezes. Quer uma medida?"}</span>
-        </button>
-      )}
-      {extra}
-    </header>
-  );
+  return `${distrito} · ${tipo}`;
 }
 
-function Lampadas({ indice, total }: { indice: number; total: number }) {
+function BotaoNonio({ expressao, temDicas, oferta, onAbrir }: { expressao: ExpressaoNonio; temDicas: boolean; oferta: boolean; onAbrir: () => void }) {
   return (
-    <div className="flex shrink-0 items-center gap-[3px]" role="img" aria-label={`Passo ${indice + 1} de ${total}`}>
-      {Array.from({ length: total }, (_, i) => (
-        <span key={i} className={`block h-1.5 w-1.5 rounded-full ${i < indice ? "bg-ambar" : i === indice ? "bg-turquesa-clara" : "bg-noite-borda"}`} />
-      ))}
-    </div>
+    <button
+      type="button"
+      className="botao-icone relative w-12"
+      onClick={onAbrir}
+      disabled={!temDicas}
+      aria-label={temDicas ? "Pedir uma medida ao Nônio" : "Nônio (sem medida para este passo)"}
+      data-acao="nonio"
+    >
+      <Nonio expressao={temDicas ? expressao : "quieto"} tamanho={34} rotulo="" pes={false} />
+      {oferta && <span className="anima-oferta absolute -right-1.5 -top-1.5 h-3.5 w-3.5 rounded-full border-2 border-tinta bg-marca-texto" aria-hidden="true" />}
+    </button>
   );
 }
 
 function Junto({ texto, onFazer }: { texto: string; onFazer: () => void }) {
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-turquesa bg-noite-funda px-3 py-2" data-junto="">
-      <span className="rotulo-chapa shrink-0 text-[0.74rem]">Juntos</span>
-      <span className="flex-1 text-[0.95rem]">{texto}</span>
-      <button type="button" className="placa placa-pequena" onClick={onFazer} data-acao="fazer-junto">
+    <div className="flex items-center gap-3 rounded-xl border-2 border-caneta bg-caneta-palida px-3 py-2" data-junto="">
+      <span className="letra-mao shrink-0 text-[22px]">juntos</span>
+      <span className="min-w-0 flex-1 text-[15px] font-semibold">{texto}</span>
+      <button type="button" className="botao-secundario shrink-0" onClick={onFazer} data-acao="fazer-junto">
         Fazer
       </button>
     </div>
   );
 }
 
-function Dobra({ children }: { children: React.ReactNode }) {
+/** A folha pautada sobe da borda de baixo, por cima da folha quadriculada. */
+function FolhaSobe({ children }: { children: React.ReactNode }) {
   const [aberta, setAberta] = useState(false);
   useEffect(() => {
     const t = requestAnimationFrame(() => setAberta(true));
     return () => cancelAnimationFrame(t);
   }, []);
   return (
-    <div className="dobra" data-aberta={aberta ? "sim" : "nao"}>
+    <div className="folha-sobe" data-aberta={aberta ? "sim" : "nao"} data-dobra="">
       {children}
     </div>
   );
@@ -582,12 +555,35 @@ function PainelPreverComDemo({
   return <PainelPrever passo={passo} exec={exec} demonstrando={conferindo && !pronto} onResponder={onResponder} onSeguir={onSeguir} />;
 }
 
-function TelaNarrativa({ atributos, cabecalho, children }: { atributos: Record<string, string>; cabecalho: React.ReactNode; children: React.ReactNode }) {
+function TelaNarrativa({
+  atributos,
+  cabecalho,
+  pedido,
+  children,
+}: {
+  atributos: Record<string, string>;
+  cabecalho: React.ReactNode;
+  pedido: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <main {...atributos} className="flex min-h-dvh flex-col area-segura-topo">
+    <main {...atributos} className="flex min-h-dvh flex-col">
       {cabecalho}
-      <div className="area-segura mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-5 py-6 area-segura-base">{children}</div>
+      <div className="palco-pedido lg:hidden">{pedido}</div>
+      <div className="area-segura area-segura-base mx-auto flex w-full max-w-[600px] flex-1 flex-col gap-5 py-6">
+        <div className="palco-pedido hidden lg:flex">{pedido}</div>
+        {children}
+      </div>
     </main>
+  );
+}
+
+/** A exposição do museu: um recorte colado na folha, com fita adesiva nos cantos. */
+function Recorte({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="recorte flex flex-col gap-4 p-4 pt-5" data-recorte="">
+      {children}
+    </div>
   );
 }
 
@@ -611,77 +607,82 @@ function TelaFim({ a, fim, voltar, desvio }: { a: Atividade; fim: Fim; voltar: {
     fim.via === "prova"
       ? "Prova direta vencida. O registro no Caderno fica à sua espera, quando quiser."
       : fim.pagina
-        ? "A página ficou no Caderno, com a sua letra e a da Dália."
+        ? "A página ficou no Caderno, passada a limpo, com a sua letra e a da Dália."
         : a.tipo === "revisita"
           ? "As medidas de um dia depois foram para a Planta."
           : a.tipo === "exposicao" || a.tipo === "cena" || a.tipo === "eco"
             ? "A mesma ideia, com outra roupa. Isso também conta na Planta."
             : "Fica registrado.";
+  const principal = origem ? "origem" : prox ? "proxima" : "voltar";
   return (
-    <main data-pronto="sim" data-tela="fim" data-atividade={a.id} className="area-segura flex min-h-dvh flex-col items-center justify-center gap-5 py-8 text-center">
-      <svg viewBox="0 0 80 80" width="96" height="96" aria-hidden="true">
-        <circle cx="40" cy="40" r="34" fill="var(--ambar-halo)" className="anima-esmaecer" />
-        <circle cx="40" cy="40" r="16" fill="var(--ambar)" />
-        <circle cx="35" cy="35" r="4" fill="var(--texto-mundo)" opacity="0.7" />
-      </svg>
-      <h1 className="fonte-sinal m-0 text-[2rem] font-extrabold uppercase text-ambar">{titulo}</h1>
-      <p className="m-0 max-w-sm text-texto-mundo-suave">{texto}</p>
-      {fim.joia && (
-        <p className="m-0 max-w-sm text-ambar" data-joia-encontrada={fim.joia}>
-          A Joia do Ábaco foi para o primeiro engaste do Relicário. Ainda bruta.
+    <main data-pronto="sim" data-tela="fim" data-atividade={a.id} className="area-segura flex min-h-dvh flex-col items-center justify-center py-8">
+      <section className="ficha relative flex w-full max-w-[420px] flex-col items-center gap-4 px-5 pb-6 pt-6 text-center">
+        <Nonio expressao="satisfeito" tamanho={110} />
+        <p className="letra-mao absolute right-6 top-5 m-0 rotate-[-6deg] text-[30px] text-verde-escuro" aria-hidden="true">
+          feita!
         </p>
-      )}
-      <div className="flex w-full max-w-sm flex-col gap-2">
-        {origem && (
-          <Link
-            href={rotaDe(origem)}
-            className="placa placa-cheia w-full"
-            onClick={() => atualizar((p, t) => definirDesvio(p, null, t))}
-            data-acao="voltar-do-desvio"
-          >
-            Voltar para {origem.titulo}
-          </Link>
-        )}
-        {prox && !origem && (
-          <Link href={rotaDe(prox)} className="placa placa-cheia w-full" data-acao="proxima">
-            Missão {prox.numero}: {prox.titulo}
-          </Link>
-        )}
-        {fim.pagina && (
-          <Link href="/caderno" className="placa w-full">
-            Abrir o Caderno
-          </Link>
-        )}
+        <h1 className="m-0 text-[24px] font-extrabold leading-tight">
+          <span className="marca-texto" data-cresce="">
+            {titulo}
+          </span>
+        </h1>
+        <p className="m-0 max-w-sm text-[16px] font-medium text-tinta-suave">{texto}</p>
         {fim.joia && (
-          <Link href="/relicario" className="placa w-full">
-            Ver o Relicário
-          </Link>
+          <p className="m-0 max-w-sm text-[15px] font-semibold" data-joia-encontrada={fim.joia}>
+            A Joia do Ábaco foi para o primeiro engaste do Relicário. Ainda bruta.
+          </p>
         )}
-        <Link href={voltar.href} className={`placa w-full ${prox || origem ? "placa-discreta" : "placa-cheia"}`} data-acao="voltar">
-          {voltar.rotulo}
-        </Link>
-      </div>
+        <div className="mt-1 flex w-full flex-col gap-2.5">
+          {origem && (
+            <Link href={rotaDe(origem)} className="botao-principal w-full" onClick={() => atualizar((p, t) => definirDesvio(p, null, t))} data-acao="voltar-do-desvio">
+              Voltar para {origem.titulo}
+            </Link>
+          )}
+          {prox && !origem && (
+            <Link href={rotaDe(prox)} className="botao-principal w-full" data-acao="proxima">
+              Missão {prox.numero}: {prox.titulo}
+            </Link>
+          )}
+          {fim.pagina && (
+            <Link href="/caderno" className="botao-secundario w-full">
+              Abrir o Caderno
+            </Link>
+          )}
+          {fim.joia && (
+            <Link href="/relicario" className="botao-secundario w-full">
+              Ver as joias
+            </Link>
+          )}
+          <Link href={voltar.href} className={`${principal === "voltar" ? "botao-principal" : "botao-discreto"} w-full`} data-acao="voltar">
+            {voltar.rotulo}
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
 
 function Faixas({ faixas }: { faixas: FaixasExposicao }) {
-  const faixa = (rotulo: string, linhas: readonly string[], tom: string) => (
-    <section className="papel-liso rounded-lg border-l-4 px-4 py-3" style={{ borderColor: tom }} aria-label={rotulo}>
-      <h2 className="fonte-sinal m-0 text-[1.05rem] font-bold uppercase tracking-wide text-tinta">{rotulo}</h2>
-      {linhas.map((l) => (
-        <p key={l} className="m-0 mt-1.5 text-[1rem] text-tinta">
-          {l}
-        </p>
-      ))}
+  const faixa = (rotulo: string, linhas: readonly string[], estado: string) => (
+    <section className="flex flex-col items-start" aria-label={rotulo}>
+      <h2 className="etiqueta-estado relative z-[1] -mb-[2px] ml-3 rounded-b-none border-b-0 text-[13px]" data-estado={estado}>
+        {rotulo}
+      </h2>
+      <div className="caixa w-full px-4 py-3">
+        {linhas.map((l) => (
+          <p key={l} className="m-0 mt-1.5 text-[15px] font-medium leading-[1.45] first:mt-0">
+            {l}
+          </p>
+        ))}
+      </div>
     </section>
   );
   return (
-    <div className="flex flex-col gap-3" data-faixas="">
-      {faixa("O que se sabe", faixas.sabe, "var(--latao)")}
-      {faixa("O que é interpretação", faixas.interpretacao, "var(--turquesa-tinta)")}
-      {faixa("O que simplificamos", faixas.simplificamos, "var(--tinta-vermelha)")}
-      <p className="m-0 text-[0.82rem] text-texto-mundo-apagado">Fontes: {faixas.fontes.join("; ")}.</p>
+    <div className="flex flex-col gap-4" data-faixas="">
+      {faixa("O que se sabe", faixas.sabe, "dominado")}
+      {faixa("O que é interpretação", faixas.interpretacao, "em_aprendizagem")}
+      {faixa("O que simplificamos", faixas.simplificamos, "pede_ajuste")}
+      <p className="m-0 text-[13px] font-medium text-tinta-suave">Fontes: {faixas.fontes.join("; ")}.</p>
     </div>
   );
 }
@@ -689,9 +690,11 @@ function Faixas({ faixas }: { faixas: FaixasExposicao }) {
 function CategoriaRua({ categoria }: { categoria: NonNullable<Atividade["categoria"]> }) {
   const c = CATEGORIAS_RUA[categoria];
   return (
-    <p className="m-0 flex flex-wrap items-baseline gap-x-2 text-[0.88rem]" data-categoria={categoria}>
-      <span className="rounded border border-ambar-sombra px-1.5 py-0.5 fonte-sinal font-bold uppercase tracking-wide text-ambar">{c.nome}</span>
-      <span className="text-texto-mundo-suave">{c.explicacao}</span>
+    <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] font-medium text-tinta-suave" data-categoria={categoria}>
+      <span className="etiqueta-estado" data-estado="em_aprendizagem">
+        {c.nome}
+      </span>
+      <span>{c.explicacao}</span>
     </p>
   );
 }
