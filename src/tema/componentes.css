@@ -1,180 +1,615 @@
 /*
- * Controles do mundo: botão é placa esmaltada ou alavanca; painel é chapa de instrumento.
- * Turquesa = o jogador pode mexer. Sem hover como sinal: a cor ensina onde tocar.
+ * Receitas de componente da identidade Quadriculado. A força dela é a repetição exata:
+ * toda tela usa estas mesmas peças, com os mesmos raios, bordas e sombras.
+ * A única sombra do jogo é a sombra dura de tinta das fichas e dos botões.
  * Sem cor literal: tudo vem de tokens.css.
  */
 
 @layer components {
-.chapa {
-  position: relative;
-  background: var(--noite-clara);
-  border: 1.5px solid var(--latao-sombra);
-  border-radius: 14px;
-  box-shadow:
-    inset 0 1px 0 var(--noite-borda),
-    0 6px 18px var(--sombra);
+/* ---------- Papel ---------- */
+
+.quadriculado {
+  background-color: var(--papel);
+  background-image:
+    linear-gradient(var(--grade) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grade) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-.chapa::before,
-.chapa::after {
-  content: "";
-  position: absolute;
-  top: 7px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--latao);
-  box-shadow: inset -1px -1px 0 var(--latao-sombra);
+.quadriculado-suave {
+  background-color: var(--folha);
+  background-image:
+    linear-gradient(var(--grade-suave) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grade-suave) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-.chapa::before {
-  left: 7px;
+/* Passado a limpo: folha pautada, linhas a cada 28 px e a margem vertical à esquerda. */
+.folha-pautada {
+  background-color: var(--folha);
+  background-image:
+    linear-gradient(90deg, transparent 33px, var(--margem) 33px, var(--margem) 35px, transparent 35px),
+    linear-gradient(var(--pauta) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    100% 28px;
+  background-position:
+    0 0,
+    0 7px;
 }
 
-.chapa::after {
-  right: 7px;
+/* ---------- Ficha (cartão) ---------- */
+
+.ficha {
+  background: var(--folha);
+  border: 2px solid var(--tinta);
+  border-radius: 16px;
+  box-shadow: 0 4px 0 var(--tinta);
 }
 
-.placa {
+.ficha-quadriculada {
+  border: 2px solid var(--tinta);
+  border-radius: 16px;
+  box-shadow: 0 4px 0 var(--tinta);
+  background-color: var(--folha);
+  background-image:
+    linear-gradient(var(--grade-suave) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grade-suave) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Ficha a lápis: o lugar existe no projeto, ainda não foi feito. */
+.ficha-lapis {
+  background: var(--folha);
+  border: 2px dashed var(--grafite);
+  border-radius: 16px;
+}
+
+/* Uma caixa dentro da ficha, só quando o de dentro é um objeto de verdade. */
+.caixa {
+  background: var(--folha);
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+}
+
+/* ---------- Botões ---------- */
+
+.botao-principal,
+.botao-secundario,
+.botao-discreto {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45em;
-  min-height: 46px;
-  min-width: 46px;
-  padding: 0 14px;
-  border-radius: 9px;
-  font-family: var(--fonte-sinal), system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 1.12rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  line-height: 1;
-  background: var(--esmalte);
-  color: var(--texto-mundo);
-  border: 2px solid var(--turquesa);
-  box-shadow: 0 3px 0 var(--turquesa-sombra);
-  transition:
-    transform 90ms var(--curva-firme),
-    box-shadow 90ms var(--curva-firme),
-    opacity 200ms;
+  gap: 8px;
+  font-family: var(--fonte-interface), system-ui, sans-serif;
+  line-height: 1.15;
+  text-align: center;
   user-select: none;
   -webkit-user-select: none;
+  transition:
+    transform 90ms var(--curva-firme),
+    opacity 200ms var(--curva-firme);
 }
 
-.placa:active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--turquesa-sombra);
+.botao-principal {
+  min-height: 50px;
+  padding: 6px 18px;
+  border: 2px solid var(--tinta);
+  border-radius: 14px;
+  background: var(--caneta);
+  box-shadow: 0 4px 0 var(--tinta);
+  color: var(--folha);
+  font-size: 18px;
+  font-weight: 700;
 }
 
-.placa-cheia {
-  background: var(--turquesa);
-  color: var(--noite-funda);
-  border-color: var(--turquesa-clara);
-}
-
-.placa-escolhida {
-  background: var(--turquesa);
-  color: var(--noite-funda);
-  border-color: var(--turquesa-clara);
-  box-shadow: 0 1px 0 var(--turquesa-sombra);
-  transform: translateY(2px);
-}
-
-.placa-discreta {
-  border-color: var(--noite-borda);
-  box-shadow: 0 3px 0 var(--noite-funda);
-  color: var(--texto-mundo-suave);
-}
-
-.placa-discreta:not(:disabled) {
-  border-color: var(--turquesa-sombra);
-}
-
-.placa:disabled {
-  background: transparent;
-  border-color: var(--noite-borda);
-  color: var(--texto-mundo-apagado);
+.botao-principal:active:not(:disabled) {
+  transform: translateY(3px);
   box-shadow: none;
-  opacity: 0.75;
 }
 
-.placa-papel {
-  background: var(--papel);
-  color: var(--turquesa-tinta);
-  border-color: var(--turquesa-tinta);
-  box-shadow: 0 3px 0 var(--turquesa-sombra);
+.botao-secundario {
+  min-height: 46px;
+  padding: 6px 14px;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.placa-papel.placa-escolhida,
-.placa-papel.placa-cheia {
-  background: var(--turquesa-tinta);
-  color: var(--papel);
+.botao-secundario:active:not(:disabled) {
+  transform: translateY(2px);
 }
 
-.placa-papel:disabled {
+.botao-discreto {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
   background: transparent;
   color: var(--tinta-suave);
-  border-color: var(--papel-linha);
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.placa-pequena {
+.botao-discreto:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+/* Desabilitado é "ainda não": fica a lápis. */
+.botao-principal:disabled,
+.botao-secundario:disabled,
+.opcao:disabled,
+.passo-valor-botao:disabled {
+  background: var(--grafite-claro);
+  border-color: var(--grafite);
+  box-shadow: none;
+  color: var(--tinta-suave);
+}
+
+.botao-discreto:disabled {
+  opacity: 0.55;
+}
+
+/* Botão quadrado de cabeçalho: voltar, menu, Nônio. */
+.botao-icone {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--folha);
+  color: var(--tinta);
+  transition: transform 90ms var(--curva-firme);
+}
+
+.botao-icone:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.botao-icone:disabled {
+  border-color: var(--grafite);
+}
+
+.botao-icone[aria-current="page"] {
+  background: var(--marca-texto);
+}
+
+/* ---------- Opções (uma entre várias) ---------- */
+
+.opcoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+  gap: 8px;
+}
+
+.opcao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   min-height: 44px;
-  padding: 0 10px;
-  font-size: 0.98rem;
+  padding: 4px 10px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.15;
+  transition: transform 90ms var(--curva-firme);
 }
 
-/* Mostrador: visor escuro com moldura de latão e algarismos de sinalização */
-.mostrador {
+.opcao[aria-checked="true"],
+.opcao[aria-pressed="true"] {
+  background: var(--caneta);
+  box-shadow: 0 3px 0 var(--tinta);
+  color: var(--folha);
+}
+
+.opcao:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+/* Opção de texto, em linha cheia (respostas, preferências). */
+.opcao-texto {
+  justify-content: flex-start;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* ---------- Passo a passo de valor ---------- */
+
+.passo-valor {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.passo-valor-botao {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--folha);
+  color: var(--tinta);
+  transition: transform 90ms var(--curva-firme);
+}
+
+.passo-valor-botao:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.passo-valor-quadro {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 46px;
+  padding: 0 8px;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--marca-texto-palido);
+  color: var(--tinta);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.passo-valor[data-desabilitado="sim"] .passo-valor-quadro {
+  background: var(--grafite-claro);
+  border-color: var(--grafite);
+  color: var(--tinta-suave);
+}
+
+/* Rótulo de controle, à esquerda dos controles da bancada. */
+.rotulo {
+  color: var(--tinta-suave);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* ---------- Etiquetas ---------- */
+
+.etiqueta-lugar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--tinta);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.etiqueta-lugar[data-material="lapis"],
+.etiqueta-lapis {
+  border: 2px dashed var(--grafite);
+  box-shadow: none;
+  color: var(--tinta-suave);
+}
+
+/* Etiqueta da fila de lugares: sem sombra; o alvo de toque passa de 44 px. */
+.etiqueta-nav {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.etiqueta-nav::after {
+  content: "";
+  position: absolute;
+  inset: -7px -4px;
+}
+
+.etiqueta-nav[aria-current="page"] {
+  background: var(--marca-texto);
+}
+
+.etiqueta-nav[data-material="lapis"] {
+  border-style: dashed;
+  border-color: var(--grafite);
+  color: var(--tinta-suave);
+}
+
+/* Marca-texto: faixa amarela levemente inclinada atrás do texto. */
+.marca-texto {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+  padding: 1px 8px;
+  color: var(--tinta);
+  transform: rotate(-1.5deg);
+}
+
+.marca-texto::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 4px;
+  background: var(--marca-texto);
+}
+
+.marca-texto[data-cresce]::before {
+  transform-origin: 0 50%;
+  animation: crescer-x 420ms var(--curva-saida) both;
+}
+
+/* Grifo no meio de uma frase, sem inclinar. */
+.grifo {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--marca-texto);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.contador-passo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 7px;
+  background: var(--tinta);
+  color: var(--folha);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.etiqueta-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border: 2px solid var(--tinta);
+  border-radius: 8px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.etiqueta-estado[data-estado="nao_avaliado"],
+.etiqueta-estado[data-estado="em_projeto"] {
+  border-style: dashed;
+  border-color: var(--grafite);
+  color: var(--tinta-suave);
+  font-weight: 600;
+}
+
+.etiqueta-estado[data-estado="em_aprendizagem"] {
+  background: var(--caneta-palida);
+}
+
+.etiqueta-estado[data-estado="dominado"],
+.etiqueta-estado[data-estado="consolidado"] {
+  background: var(--verde-palido);
+}
+
+.etiqueta-estado[data-estado="pede_ajuste"] {
+  background: var(--marca-texto-palido);
+}
+
+/* Etiqueta de conceito na Planta: a tinta quando em uso, a lápis quando ainda não. */
+.etiqueta-planta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 6px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--tinta);
+  color: var(--tinta);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.etiqueta-planta[data-estado="nao_avaliado"],
+.etiqueta-planta[data-estado="em_projeto"] {
+  border-style: dashed;
+  border-color: var(--grafite);
+  box-shadow: none;
+  color: var(--tinta-suave);
+  font-weight: 600;
+}
+
+.etiqueta-planta[data-estado="em_aprendizagem"] {
+  background: var(--caneta-palida);
+}
+
+.etiqueta-planta[data-estado="dominado"],
+.etiqueta-planta[data-estado="consolidado"] {
+  background: var(--verde-palido);
+}
+
+.etiqueta-planta[data-estado="pede_ajuste"] {
+  background: var(--marca-texto-palido);
+}
+
+/* ---------- Nônio, cabeçalho, bancada ---------- */
+
+.balao-nonio {
+  padding: 10px 14px 11px;
+  border: 2px solid var(--tinta);
+  border-radius: 14px 14px 14px 4px;
+  background: var(--folha);
+}
+
+.balao-nonio-nome {
+  color: var(--caneta);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cabecalho {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  border-bottom: 2px solid var(--tinta);
+  background: var(--folha);
+}
+
+.fila-lugares {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  border-bottom: 2px solid var(--tinta);
+  background: var(--folha);
+}
+
+.fila-lugares::-webkit-scrollbar {
+  display: none;
+}
+
+.bancada-controles {
+  border-top: 2px solid var(--tinta);
+  border-radius: 18px 18px 0 0;
+  background: var(--folha);
+}
+
+/* Tira de papel com a mensagem da máquina. */
+.tira {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 6px 12px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Cota tocável da folha: ficha azul. */
+.opcao.ficha-cota {
+  background: var(--caneta-palida);
+  color: var(--caneta-escura);
+}
+
+.opcao.ficha-cota[aria-pressed="true"] {
+  background: var(--caneta);
+  color: var(--folha);
+}
+
+/* Lacuna da frase: caixa tracejada (a lápis) até receber o número do jogador, a caneta. */
+.lacuna {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 3.2rem;
-  height: 46px;
+  min-height: 44px;
   padding: 0 8px;
-  border-radius: 7px;
-  background: var(--noite-funda);
-  border: 2px solid var(--latao);
-  color: var(--ambar);
-  font-family: var(--fonte-sinal), system-ui, sans-serif;
+  border: 2px dashed var(--grafite);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta-suave);
   font-weight: 800;
-  font-size: 1.7rem;
-  font-variant-numeric: tabular-nums;
   line-height: 1;
+  vertical-align: middle;
 }
 
-.rotulo-chapa {
-  font-family: var(--fonte-sinal), system-ui, sans-serif;
+.lacuna.lacuna-preenchida {
+  border: 2px solid var(--caneta);
+  color: var(--caneta);
+}
+
+/* Recorte colado na folha (a exposição do museu), com fita adesiva nos cantos. */
+.recorte {
+  position: relative;
+  border: 2px solid var(--tinta);
+  border-radius: 6px;
+  background: var(--folha);
+  transform: rotate(-0.6deg);
+}
+
+.recorte::before,
+.recorte::after {
+  content: "";
+  position: absolute;
+  top: -11px;
+  width: 64px;
+  height: 22px;
+  border: 1.5px solid var(--grafite);
+  background: var(--grafite-claro);
+  opacity: 0.92;
+}
+
+.recorte::before {
+  left: -14px;
+  transform: rotate(-32deg);
+}
+
+.recorte::after {
+  right: -14px;
+  transform: rotate(28deg);
+}
+
+/* A cena da Rua é uma foto colada: moldura branca com borda de tinta, levemente inclinada. */
+.palco[data-cena="sim"] .palco-maquina {
+  padding: 10px 10px 26px;
+  border-radius: 6px;
+  background: var(--folha);
+  transform: rotate(-0.8deg);
+}
+
+/* ---------- Letra e números ---------- */
+
+.letra-mao {
+  font-family: var(--fonte-mao), cursive;
   font-weight: 700;
-  font-size: 0.86rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--latao-claro);
-}
-
-/* Visor da máquina: uma linha de estado, região viva */
-.visor {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 34px;
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: var(--noite-funda);
-  border: 1px solid var(--noite-borda);
-  color: var(--texto-mundo-suave);
-  font-size: 0.95rem;
-  line-height: 1.25;
-}
-
-.visor[data-tom="atencao"] {
-  color: var(--vermelhao-claro);
-  border-color: var(--vermelhao-sombra);
-}
-
-.visor[data-tom="ambar"] {
-  color: var(--ambar);
-  border-color: var(--ambar-sombra);
+  font-size: 22px;
+  line-height: 1.05;
+  color: var(--caneta);
 }
 
 /* Frações empilhadas, traço horizontal */
@@ -189,134 +624,219 @@
 }
 
 .fracao > span:first-child {
-  padding: 0 0.15em 0.08em;
-  border-bottom: 0.09em solid currentColor;
+  padding: 0 0.15em 0.1em;
+  border-bottom: 0.11em solid currentColor;
 }
 
 .fracao > span:last-child {
-  padding: 0.08em 0.15em 0;
+  padding: 0.1em 0.15em 0;
 }
 
 .fracao-pequena {
-  font-size: 0.78em;
+  font-size: 0.8em;
 }
 
-/* Papel: a matemática formal */
-.papel {
-  background-color: var(--papel);
-  color: var(--tinta);
-  background-image:
-    linear-gradient(var(--papel-grade) 1px, transparent 1px),
-    linear-gradient(90deg, var(--papel-grade) 1px, transparent 1px);
-  background-size: 22px 22px;
+/* Quadro de notação: fundo marca-texto pálido, borda de tinta. */
+.quadro-notacao {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--marca-texto-palido);
 }
 
-.papel-liso {
-  background: var(--papel);
-  color: var(--tinta);
-}
+/* ---------- Folha que sobe (o Caderno por cima do quadriculado) ---------- */
 
-.letra-dalia {
-  font-family: var(--fonte-mao), cursive;
-  color: var(--tinta-dalia);
-  font-size: 1.32rem;
-  line-height: 1.15;
-}
-
-/* A dobra: a página se desdobra por cima do mundo, a partir da borda de baixo */
-.dobra {
-  transform-origin: 50% 100%;
-  transform: perspective(1400px) rotateX(-88deg);
+.folha-sobe {
+  transform: translateY(104%);
   opacity: 0;
   transition:
-    transform var(--t-dobra) var(--curva-mecanica),
-    opacity 220ms linear;
-  will-change: transform;
+    transform var(--t-folha) var(--curva-saida),
+    opacity 200ms linear;
 }
 
-.dobra[data-aberta="sim"] {
-  transform: perspective(1400px) rotateX(0deg);
+.folha-sobe[data-aberta="sim"] {
+  transform: none;
   opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dobra {
+  .folha-sobe {
     transform: none;
     transition: opacity 360ms linear;
   }
-  .dobra[data-aberta="sim"] {
-    transform: none;
-  }
 }
 
-html[data-animacoes="leves"] .dobra {
+html[data-animacoes="leves"] .folha-sobe {
   transition-duration: 200ms;
 }
 
-/* Palco: máquina + bancada de controles */
+/* ---------- Desenho ---------- */
+
+/* Desenhos grandes que escalam: o traço continua com a mesma espessura na tela. */
+.traco-fixo :is(path, rect, circle, ellipse, line, polyline, polygon) {
+  vector-effect: non-scaling-stroke;
+}
+
+/* A lápis: o mesmo desenho, com traço grafite cheio e preenchimento grafite-claro. */
+.a-lapis [stroke]:not([stroke="none"]) {
+  stroke: var(--grafite);
+  stroke-width: 2.2px;
+}
+
+.a-lapis [fill]:not([fill="none"]):not([fill="transparent"]) {
+  fill: var(--grafite-claro);
+}
+
+.a-lapis text[fill]:not([fill="none"]):not([fill="transparent"]) {
+  fill: var(--tinta-suave);
+}
+
+/* ---------- Palco: máquina + bancada de controles ---------- */
+
 .palco {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto;
+  display: flex;
+  flex-direction: column;
   height: 100dvh;
   overflow: hidden;
 }
 
-.palco-maquina {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  padding-top: max(6px, env(safe-area-inset-top));
-}
-
-.palco-desenho {
+.palco-grade {
+  display: grid;
   flex: 1;
   min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(150px, 1fr) auto auto auto;
+  grid-template-areas: "pedido" "maquina" "tira" "nonio" "controles";
 }
 
-.palco-desenho > svg {
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
+.palco-pedido {
+  grid-area: pedido;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 6px max(14px, env(safe-area-inset-right)) 6px max(14px, env(safe-area-inset-left));
+  border-bottom: 2px solid var(--tinta);
+  background: var(--folha);
+}
+
+.palco-maquina {
+  grid-area: maquina;
+  position: relative;
+  min-height: 0;
+  margin: 12px max(14px, env(safe-area-inset-right)) 4px max(14px, env(safe-area-inset-left));
+  padding: 6px;
+  overflow: hidden;
+}
+
+.palco-tira {
+  grid-area: tira;
+  margin: 8px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
+}
+
+.palco-nonio {
+  grid-area: nonio;
+  margin: 10px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
 }
 
 .palco-controles {
+  grid-area: controles;
   position: relative;
-  max-height: 58dvh;
+  max-height: 52dvh;
+  margin-top: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px max(14px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+}
+
+.palco-folha {
+  grid-area: controles;
+  position: relative;
+  max-height: 68dvh;
+  margin-top: 10px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-.palco-chapa {
-  margin: 0 6px 6px;
-  padding: 16px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
-}
-
-@media (orientation: landscape) and (min-width: 640px) {
-  .palco {
-    grid-template-columns: minmax(0, 1.35fr) minmax(330px, 1fr);
-    grid-template-rows: minmax(0, 1fr);
+/* No computador: a máquina numa ficha à esquerda; à direita, o pedido, o Nônio e a bancada. */
+@media (min-width: 1024px) {
+  .palco-grade {
+    grid-template-columns: minmax(0, 760px) 380px;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "maquina pedido"
+      "maquina nonio"
+      "maquina controles"
+      "tira controles";
+    justify-content: center;
+    column-gap: 24px;
+    padding: 20px 28px 26px;
+  }
+  .palco-pedido {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border: 2px solid var(--tinta);
+    border-radius: 16px;
+    box-shadow: 0 4px 0 var(--tinta);
+  }
+  .palco-maquina {
+    margin: 0;
+    padding: 10px;
+  }
+  .palco-tira {
+    margin: 12px 0 0;
+  }
+  .palco-nonio {
+    margin: 0 0 14px;
   }
   .palco-controles {
-    max-height: none;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding-top: max(10px, env(safe-area-inset-top));
+    align-self: start;
+    max-height: 100%;
+    margin: 0;
+    padding: 16px;
+    border: 2px solid var(--tinta);
+    border-radius: 18px;
+    box-shadow: 0 4px 0 var(--tinta);
   }
-  .palco-chapa {
-    margin: 10px;
+  .palco-folha {
+    align-self: start;
+    max-height: 100%;
+    margin: 0;
   }
 }
 
-@media (min-width: 1100px) {
-  .palco {
-    grid-template-columns: minmax(0, 1.6fr) minmax(380px, 460px);
+/* Deitado, numa tela média: duas colunas também. */
+@media (orientation: landscape) and (min-width: 640px) and (max-width: 1023px) {
+  .palco-grade {
+    grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "maquina pedido"
+      "maquina nonio"
+      "maquina controles"
+      "tira controles";
+    column-gap: 12px;
+    padding: 10px 14px;
+  }
+  .palco-pedido {
+    border: 2px solid var(--tinta);
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .palco-maquina,
+  .palco-tira,
+  .palco-nonio {
+    margin: 0 0 8px;
+  }
+  .palco-controles,
+  .palco-folha {
+    max-height: 100%;
+    margin: 0;
+    border: 2px solid var(--tinta);
+    border-radius: 16px;
   }
 }
 
@@ -331,5 +851,21 @@ html[data-animacoes="leves"] .dobra {
 .bancada-caixa > svg {
   width: 100%;
   height: 100%;
+}
+
+/* Painel que sobe por cima da tela (Nônio, detalhe da Planta). */
+.painel-sobe {
+  border: 2px solid var(--tinta);
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  background: var(--folha);
+}
+
+@media (min-width: 1024px) {
+  .painel-sobe {
+    border-bottom: 2px solid var(--tinta);
+    border-radius: 18px;
+    box-shadow: 0 4px 0 var(--tinta);
+  }
 }
 }

@@ -1,9 +1,11 @@
 "use client";
 
 /**
- * Seletor numérico: [−] mostrador [+]. Teclado: setas mudam o valor.
+ * Passo a passo de valor: [−] quadro [+]. Teclado: setas mudam o valor.
  */
 import type { KeyboardEvent, ReactNode } from "react";
+import { IconeMais } from "@/componentes/icones/IconeMais";
+import { IconeMenos } from "@/componentes/icones/IconeMenos";
 
 export function Seletor({
   rotulo,
@@ -13,7 +15,6 @@ export function Seletor({
   onMudar,
   desabilitado = false,
   exibicao,
-  papel = false,
   idTeste,
 }: {
   rotulo: string;
@@ -23,7 +24,6 @@ export function Seletor({
   onMudar: (v: number) => void;
   desabilitado?: boolean;
   exibicao?: ReactNode;
-  papel?: boolean;
   idTeste?: string;
 }) {
   const mudar = (v: number) => {
@@ -39,14 +39,13 @@ export function Seletor({
       mudar(valor - 1);
     }
   };
-  const classe = `placa placa-pequena${papel ? " placa-papel" : ""}`;
   return (
-    <div className="flex items-center gap-1.5" role="group" aria-label={rotulo} data-seletor={idTeste}>
-      <button type="button" className={classe} aria-label={`${rotulo}: menos um`} disabled={desabilitado || valor <= minimo} onClick={() => mudar(valor - 1)} onKeyDown={teclas}>
+    <div className="passo-valor" role="group" aria-label={rotulo} data-seletor={idTeste} data-desabilitado={desabilitado ? "sim" : "nao"}>
+      <button type="button" className="passo-valor-botao" aria-label={`${rotulo}: menos um`} disabled={desabilitado || valor <= minimo} onClick={() => mudar(valor - 1)} onKeyDown={teclas}>
         <IconeMenos />
       </button>
       <output
-        className="mostrador"
+        className="passo-valor-quadro"
         aria-live="polite"
         aria-label={`${rotulo}: ${valor}`}
         tabIndex={desabilitado ? -1 : 0}
@@ -55,26 +54,9 @@ export function Seletor({
       >
         {exibicao ?? valor}
       </output>
-      <button type="button" className={classe} aria-label={`${rotulo}: mais um`} disabled={desabilitado || valor >= maximo} onClick={() => mudar(valor + 1)} onKeyDown={teclas}>
+      <button type="button" className="passo-valor-botao" aria-label={`${rotulo}: mais um`} disabled={desabilitado || valor >= maximo} onClick={() => mudar(valor + 1)} onKeyDown={teclas}>
         <IconeMais />
       </button>
     </div>
-  );
-}
-
-function IconeMenos() {
-  return (
-    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-      <rect x="2" y="7" width="12" height="2.4" rx="1" fill="currentColor" />
-    </svg>
-  );
-}
-
-function IconeMais() {
-  return (
-    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-      <rect x="2" y="7" width="12" height="2.4" rx="1" fill="currentColor" />
-      <rect x="6.8" y="2.2" width="2.4" height="12" rx="1" fill="currentColor" />
-    </svg>
   );
 }
