@@ -129,8 +129,13 @@ export function registrarCena(p: Progresso, id: string, agora: number): Progress
   return tocar({ ...p, cenas: { ...p.cenas, [id]: agora } }, agora);
 }
 
-export function contarRevisitaGerada(p: Progresso, agora: number): Progresso {
-  return tocar({ ...p, revisitas: { geradas: p.revisitas.geradas + 1 } }, agora);
+export function iniciarRevisita(p: Progresso, conceitos: readonly string[], agora: number): Progresso {
+  if (p.revisitas.atual) return p;
+  return tocar({ ...p, revisitas: { ...p.revisitas, atual: { semente: 7919 * (p.revisitas.geradas + 1), conceitos } } }, agora);
+}
+
+export function encerrarRevisita(p: Progresso, agora: number): Progresso {
+  return tocar({ ...p, revisitas: { geradas: p.revisitas.geradas + 1, atual: null } }, agora);
 }
 
 export function adiantarRelogio(p: Progresso, ms: number, agora: number): Progresso {

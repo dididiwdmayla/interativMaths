@@ -25,10 +25,9 @@ export function Distrito() {
   const agora = agoraDoJogo(progresso);
   const estacoes = situacaoMissoes(progresso, MISSOES_ARCO_1, REGRAS_CALIBRAGEM);
   const chamados: { id: string; titulo: string; linha: string; href: string }[] = [];
-  const revisita = ATIVIDADES.find((a) => a.id === "partilha.arco1.revisita");
   const devidas = revisitaDisponivel(progresso, CONCEITOS_DO_ARCO_1, agora);
-  if (revisita && devidas.length > 0) {
-    chamados.push({ id: "revisita", titulo: "Revisita do Nônio", linha: "Três perguntas rápidas com números novos, um dia depois.", href: rotaDe(revisita) });
+  if (devidas.length > 0 || progresso.revisitas.atual) {
+    chamados.push({ id: "revisita", titulo: "Revisita do Nônio", linha: "Três perguntas rápidas com números novos, um dia depois.", href: "/partilha/revisita" });
   }
   const sondagens = SONDAGEM_ATIVA ? sondagensPendentes(progresso, CONCEITOS_DO_ARCO_1, agora) : [];
   for (const s of sondagens) {

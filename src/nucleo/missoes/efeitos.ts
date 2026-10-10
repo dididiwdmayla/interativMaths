@@ -5,6 +5,7 @@ import {
   acrescentarMarca,
   concluirAtividade,
   descartarExecucao,
+  encerrarRevisita,
   encontrarJoia,
   guardarPagina,
   registrarCena,
@@ -46,6 +47,7 @@ export function aplicarEfeitos(p: Progresso, a: Atividade, exec: Execucao, efeit
           q = concluirAtividade(q, a.id, ef.via, agora);
           if (a.tipo === "exposicao") q = registrarVisitaMuseu(q, a.id, agora);
           if (a.tipo === "cena") q = registrarCena(q, a.id, agora);
+          if (a.tipo === "revisita") q = encerrarRevisita(q, agora);
         }
         break;
       case "equivoco":

@@ -23,6 +23,7 @@ export function atividadePorSlug(slug: string, tipos?: readonly Atividade["tipo"
 export function rotaDe(a: Atividade): string {
   if (a.tipo === "exposicao") return `/museu/${slugDe(a)}`;
   if (a.tipo === "cena") return `/rua/${slugDe(a)}`;
+  if (a.tipo === "revisita") return "/partilha/revisita";
   return `/partilha/${slugDe(a)}`;
 }
 
@@ -46,7 +47,7 @@ export function proximaMissao(a: Atividade): Atividade | null {
 }
 
 /** A tela de sondagem existe nesta versão? (enquanto não existir, o chamado não aparece) */
-export const SONDAGEM_ATIVA = false;
+export const SONDAGEM_ATIVA = true;
 
 export function existeAtividade(id: string): boolean {
   return ATIVIDADES.some((a) => a.id === id);

@@ -35,7 +35,7 @@ export function Mapa() {
   if (!pronto) return <Carregando />;
   const agora = agoraDoJogo(progresso);
   const transferencia = concluida(progresso, M4);
-  const revisita = revisitaDisponivel(progresso, CONCEITOS_DO_ARCO_1, agora).length > 0;
+  const revisita = revisitaDisponivel(progresso, CONCEITOS_DO_ARCO_1, agora).length > 0 || progresso.revisitas.atual !== null;
   const sondagem = SONDAGEM_ATIVA && sondagensPendentes(progresso, CONCEITOS_DO_ARCO_1, agora).length > 0;
   const eco = ATIVIDADES.some((a) => a.id === ECO) && ecoDisponivel(progresso, M4, ECO);
   const estado: EstadoCorte = {
@@ -70,7 +70,7 @@ export function Mapa() {
             partilha: () => router.push("/partilha"),
             museu: () => router.push("/museu/paes-de-ahmes"),
             rua: () => router.push("/rua/tres-pizzas"),
-            chamado: () => (estado.chamado === "revisita" ? ir("partilha.arco1.revisita") : estado.chamado === "eco" ? ir(ECO) : router.push("/partilha")),
+            chamado: () => (estado.chamado === "revisita" ? router.push("/partilha/revisita") : estado.chamado === "eco" ? ir(ECO) : router.push("/partilha")),
           }}
         />
       </div>

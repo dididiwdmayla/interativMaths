@@ -84,12 +84,24 @@ interface PassoBase {
   readonly evidencias?: readonly EvidenciaDeclarada[];
   /** Fala depois de vencido o passo. */
   readonly aoConcluir?: readonly Fala[];
+  /** Falas extras quando o progresso tem uma marca (ex.: o jogador já chegou a um estilo sozinho). */
+  readonly falasSeMarca?: { readonly marca: string; readonly falas: readonly Fala[] };
+}
+
+/** Texto de exposição em três faixas rotuladas: a separação é parte do produto. */
+export interface FaixasExposicao {
+  readonly sabe: readonly string[];
+  readonly interpretacao: readonly string[];
+  readonly simplificamos: readonly string[];
+  readonly fontes: readonly string[];
 }
 
 export interface PassoNarrativa extends PassoBase {
   readonly tipo: "narrativa";
   /** A página do manual, rasgada onde falta o porquê. */
   readonly manual?: { readonly titulo: string; readonly linhas: readonly string[] };
+  /** Texto da exposição do museu. */
+  readonly faixas?: FaixasExposicao;
   readonly botao?: string;
 }
 

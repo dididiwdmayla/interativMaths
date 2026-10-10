@@ -9,9 +9,9 @@ import { situacaoConceito, type Evidencia } from "@/nucleo/dominio";
 import { VALIDADORES_BANCADA } from "@/nucleo/maquinas/bancada/validadores";
 import { CONCEITOS, CONCEITOS_DO_ARCO_1 } from "./conceitos";
 import { EQUIVOCOS, MOTIVOS } from "./equivocos";
-import { MISSOES_ARCO_1 } from "./missoes";
+import { ATIVIDADES } from "./atividades";
 
-export const TODAS: readonly Atividade[] = [...MISSOES_ARCO_1];
+export const TODAS: readonly Atividade[] = ATIVIDADES;
 
 const ctx = (agora: number) => ({
   agora,

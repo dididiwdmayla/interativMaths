@@ -23,13 +23,18 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   distrito com as cinco estações e quadro de chamados, Planta em papel com estados e evidências em
   palavras, Relicário com as quatro joias e estágios (sem treino), menu de preferências,
   `/lab/progresso` (zerar, saltar, adiantar o relógio, evidências e estados).
+- Etapa 5 — Transferência e retenção: eco (tonéis e casas, resposta antes da máquina), revisita
+  20 h depois com três perguntas geradas por semente, sondagem (duas falhas com o mesmo equívoco em
+  atividades diferentes) com desvio para a missão do pré-requisito e volta ao ponto exato, Museu
+  ("Os pães de Ahmes", fatos conferidos, três faixas) e Rua ("Três pizzas, quatro amigos",
+  aplicação direta). Tudo na mesma bancada; tudo com solução de teste.
 
 ## Parcialmente implementado
 - (nada)
 
 ## Planejado
 - Etapa 2 — Máquinas. Etapa 3 — Missões. Etapa 4 — Mundo.
-- Etapa 5 — Transferência e retenção. Etapa 6 — Acabamento.
+- Etapa 6 — Acabamento.
 
 ## Fora do escopo atual
 - Treino de joias e soroban; outros distritos; equivalência, comparação, razão e proporção como

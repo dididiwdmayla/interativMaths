@@ -21,8 +21,10 @@ import {
   type Execucao,
 } from "@/nucleo/missoes/motor";
 import { aplicarEfeitos, chaveExecucao, restaurarExecucao } from "@/nucleo/missoes/efeitos";
-import type { AlvoMaquina, Atividade, Entrada, ModoExecucao, Passo } from "@/nucleo/missoes/tipos";
-import { iniciarAtividade } from "@/nucleo/progresso";
+import type { AlvoMaquina, Atividade, Entrada, FaixasExposicao, ModoExecucao, Passo } from "@/nucleo/missoes/tipos";
+import { definirDesvio, iniciarAtividade, type Desvio } from "@/nucleo/progresso";
+import { situacaoConceito } from "@/nucleo/dominio/dominio";
+import { CATEGORIAS_RUA } from "@/conteudo/rua";
 import { PELES, type Pele } from "@/conteudo/peles";
 import { Bancada, type MarcasBancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
@@ -32,7 +34,7 @@ import { mensagemDoEvento, type TomVisor } from "@/componentes/maquinas/mensagen
 import { Nonio, type ExpressaoNonio } from "@/componentes/nonio/Nonio";
 import { PainelNonio } from "@/componentes/nonio/PainelNonio";
 import { LinhaNotacao } from "@/componentes/notacao/Notacao";
-import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, textoDoEquivoco, textoDoMotivo } from "@/componentes/estado/catalogo";
+import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, SONDAGEM_ATIVA, textoDoEquivoco, textoDoMotivo } from "@/componentes/estado/catalogo";
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { Carregando } from "@/componentes/ui/Carregando";
@@ -63,19 +65,32 @@ export function Executor({ atividadeId, voltar }: { atividadeId: string; voltar:
   const a = atividadePorId(atividadeId);
   const modo = lerModo(useSearchParams().get("modo"));
   if (!a) return <p className="p-6">Atividade não encontrada.</p>;
-  return <ExecutorDe key={`${a.id}#${modo}`} a={a} modo={modo} voltar={voltar} />;
+  return <ExecutorAtividade key={`${a.id}#${modo}`} a={a} modo={modo} voltar={voltar} />;
 }
 
-function ExecutorDe({ a, modo, voltar }: { a: Atividade; modo: ModoExecucao; voltar: { href: string; rotulo: string } }) {
+/** Executa uma atividade dada (também as geradas: revisita e sondagem). */
+export function ExecutorAtividade({
+  a,
+  modo = "guiada",
+  voltar,
+  aoTerminar,
+}: {
+  a: Atividade;
+  modo?: ModoExecucao;
+  voltar: { href: string; rotulo: string };
+  /** Tela própria de fim (a sondagem usa para oferecer o desvio). */
+  aoTerminar?: () => React.ReactNode;
+}) {
   const { pronto, progresso, atualizar } = useProgresso();
   const [fim, setFim] = useState<Fim | null>(null);
+  const [sondagem, setSondagem] = useState<string | null>(null);
   const [nonioAberto, setNonioAberto] = useState(false);
   const [aviso, setAviso] = useState<Aviso | null>(null);
   const [cotaEscolhida, setCotaEscolhida] = useState<string | null>(null);
   const [comprimida, setComprimida] = useState<string | null>(null);
 
   if (!pronto) return <Carregando />;
-  if (fim) return <TelaFim a={a} fim={fim} voltar={voltar} />;
+  if (fim) return aoTerminar ? <>{aoTerminar()}</> : <TelaFim a={a} fim={fim} voltar={voltar} desvio={progresso.campanha.desvio} />;
 
   const salva = restaurarExecucao(progresso.campanha.execucoes[chaveExecucao(a, modo)], a, (m) => passosDoModo(a, m).length);
   const exec: Execucao = salva && salva.modo === modo ? salva : iniciarExecucao(a, modo);
@@ -90,6 +105,16 @@ function ExecutorDe({ a, modo, voltar }: { a: Atividade; modo: ModoExecucao; vol
     atualizar((p, t) => aplicarEfeitos(iniciarAtividade(p, a.id, t), a, r.exec, r.efeitos, t));
     const pele = r.exec.bancada ? PELES[r.exec.bancada.atual.config.pele] : null;
     setAviso(avisoDe(r.efeitos, r.exec, pele));
+    // Duas falhas com o mesmo equívoco, em atividades diferentes: o Nônio pede uma sondagem.
+    if (SONDAGEM_ATIVA && a.tipo !== "sondagem") {
+      const novas = r.efeitos.flatMap((e) => (e.tipo === "evidencias" ? e.lista : []));
+      for (const ev of novas) {
+        if (ev.resultado !== "falha" || !ev.equivoco) continue;
+        const antes = situacaoConceito(ev.conceito, progresso.evidencias, agora);
+        const depois = situacaoConceito(ev.conceito, [...progresso.evidencias, ...novas], agora);
+        if (!antes.sondagemPendente && depois.sondagemPendente) setSondagem(ev.conceito);
+      }
+    }
     if (r.exec.indice !== exec.indice) {
       setCotaEscolhida(null);
       setNonioAberto(false);
@@ -132,6 +157,26 @@ function ExecutorDe({ a, modo, voltar }: { a: Atividade; modo: ModoExecucao; vol
       temDicas={passo.dicas !== undefined && (exec.passo.situacao === "ativo" || exec.passo.situacao === "convite")}
       oferta={ofereceAjuda}
       comentario={prefs.postura === "presente" && aviso?.equivoco ? aviso.texto : null}
+      extra={
+        <>
+          {sondagem && (
+            <Link
+              href={`/partilha/sondagem?conceito=${encodeURIComponent(sondagem)}&origem=${encodeURIComponent(a.id)}`}
+              className="flex items-start gap-2 rounded-md border-2 border-turquesa bg-noite-clara px-2.5 py-1.5 text-[0.92rem] anima-esmaecer"
+              data-convite-sondagem={sondagem}
+            >
+              <span className="rotulo-chapa shrink-0 text-[0.74rem]">Nônio</span>
+              <span>A mesma medida escapou duas vezes, em lugares diferentes. Posso conferir uma coisa? Uma pergunta só; depois você volta para cá.</span>
+            </Link>
+          )}
+          {progresso.campanha.desvio?.destino === a.id && atividadePorId(progresso.campanha.desvio.origem) && (
+            <Link href={rotaDe(atividadePorId(progresso.campanha.desvio.origem) as Atividade)} className="rounded-md border border-noite-borda px-2.5 py-1 text-[0.88rem] text-texto-mundo-suave" data-desvio="">
+              Desvio. Quando quiser, volte para {atividadePorId(progresso.campanha.desvio.origem)?.titulo}: a máquina está como você deixou.
+            </Link>
+          )}
+          {a.categoria && <CategoriaRua categoria={a.categoria} />}
+        </>
+      }
     />
   );
 
@@ -157,6 +202,8 @@ function ExecutorDe({ a, modo, voltar }: { a: Atividade; modo: ModoExecucao; vol
       <TelaNarrativa atributos={atributos} cabecalho={cabecalho}>
         {passo.tipo === "narrativa" && passo.manual && <ManualRasgado titulo={passo.manual.titulo} linhas={passo.manual.linhas} />}
         {passo.falas && <Falas falas={passo.falas} />}
+        {passo.falasSeMarca && progresso.campanha.marcas.includes(passo.falasSeMarca.marca) && <Falas falas={passo.falasSeMarca.falas} />}
+        {passo.tipo === "narrativa" && passo.faixas && <Faixas faixas={passo.faixas} />}
         {passo.tipo === "registro" ? (
           <FolhaRegistro passo={passo} frase={Object.values(exec.frases).at(-1) ?? ""} onGuardar={() => enviar({ tipo: "seguir" })} />
         ) : passo.tipo === "palpite" ? (
@@ -349,6 +396,7 @@ function Cabecalho({
   temDicas,
   oferta,
   comentario,
+  extra,
 }: {
   a: Atividade;
   modo: ModoExecucao;
@@ -361,8 +409,24 @@ function Cabecalho({
   temDicas: boolean;
   oferta: boolean;
   comentario: string | null;
+  extra?: React.ReactNode;
 }) {
-  const rotuloModo = modo === "prova" ? "Prova direta" : modo === "registro" ? "Registro" : a.tipo === "missao" ? `Missão ${a.numero}` : "";
+  const rotuloModo =
+    modo === "prova"
+      ? "Prova direta"
+      : modo === "registro"
+        ? "Registro"
+        : a.tipo === "missao"
+          ? `Missão ${a.numero}`
+          : a.tipo === "exposicao"
+            ? "Museu"
+            : a.tipo === "cena"
+              ? "A Rua"
+              : a.tipo === "eco"
+                ? "Eco"
+                : a.tipo === "revisita"
+                  ? "Revisita"
+                  : "Sondagem";
   return (
     <header className="area-segura relative flex flex-col gap-1.5 pb-1.5">
       <div className="flex items-center gap-2">
@@ -400,6 +464,7 @@ function Cabecalho({
           <span>{comentario ?? "Travou duas vezes. Quer uma medida?"}</span>
         </button>
       )}
+      {extra}
     </header>
   );
 }
@@ -526,8 +591,32 @@ function TelaNarrativa({ atributos, cabecalho, children }: { atributos: Record<s
   );
 }
 
-function TelaFim({ a, fim, voltar }: { a: Atividade; fim: Fim; voltar: { href: string; rotulo: string } }) {
+function TelaFim({ a, fim, voltar, desvio }: { a: Atividade; fim: Fim; voltar: { href: string; rotulo: string }; desvio: Desvio | null }) {
   const prox = fim.via !== "registro" ? proximaMissao(a) : null;
+  const origem = desvio && desvio.destino === a.id ? atividadePorId(desvio.origem) : null;
+  const { atualizar } = useProgresso();
+  const titulo =
+    fim.via === "registro"
+      ? "Página guardada"
+      : a.tipo === "missao"
+        ? "Missão concluída"
+        : a.tipo === "exposicao"
+          ? "Exposição vista"
+          : a.tipo === "cena"
+            ? "Cena feita"
+            : a.tipo === "revisita"
+              ? "Revisita feita"
+              : "Feito";
+  const texto =
+    fim.via === "prova"
+      ? "Prova direta vencida. O registro no Caderno fica à sua espera, quando quiser."
+      : fim.pagina
+        ? "A página ficou no Caderno, com a sua letra e a da Dália."
+        : a.tipo === "revisita"
+          ? "As medidas de um dia depois foram para a Planta."
+          : a.tipo === "exposicao" || a.tipo === "cena" || a.tipo === "eco"
+            ? "A mesma ideia, com outra roupa. Isso também conta na Planta."
+            : "Fica registrado.";
   return (
     <main data-pronto="sim" data-tela="fim" data-atividade={a.id} className="area-segura flex min-h-dvh flex-col items-center justify-center gap-5 py-8 text-center">
       <svg viewBox="0 0 80 80" width="96" height="96" aria-hidden="true">
@@ -535,23 +624,25 @@ function TelaFim({ a, fim, voltar }: { a: Atividade; fim: Fim; voltar: { href: s
         <circle cx="40" cy="40" r="16" fill="var(--ambar)" />
         <circle cx="35" cy="35" r="4" fill="var(--texto-mundo)" opacity="0.7" />
       </svg>
-      <h1 className="fonte-sinal m-0 text-[2rem] font-extrabold uppercase text-ambar">
-        {fim.via === "registro" ? "Página guardada" : a.tipo === "missao" ? "Missão concluída" : "Feito"}
-      </h1>
-      <p className="m-0 max-w-sm text-texto-mundo-suave">
-        {fim.via === "prova"
-          ? "Prova direta vencida. O registro no Caderno fica à sua espera, quando quiser."
-          : fim.pagina
-            ? "A página ficou no Caderno, com a sua letra e a da Dália."
-            : "Fica registrado."}
-      </p>
+      <h1 className="fonte-sinal m-0 text-[2rem] font-extrabold uppercase text-ambar">{titulo}</h1>
+      <p className="m-0 max-w-sm text-texto-mundo-suave">{texto}</p>
       {fim.joia && (
         <p className="m-0 max-w-sm text-ambar" data-joia-encontrada={fim.joia}>
           A Joia do Ábaco foi para o primeiro engaste do Relicário. Ainda bruta.
         </p>
       )}
       <div className="flex w-full max-w-sm flex-col gap-2">
-        {prox && (
+        {origem && (
+          <Link
+            href={rotaDe(origem)}
+            className="placa placa-cheia w-full"
+            onClick={() => atualizar((p, t) => definirDesvio(p, null, t))}
+            data-acao="voltar-do-desvio"
+          >
+            Voltar para {origem.titulo}
+          </Link>
+        )}
+        {prox && !origem && (
           <Link href={rotaDe(prox)} className="placa placa-cheia w-full" data-acao="proxima">
             Missão {prox.numero}: {prox.titulo}
           </Link>
@@ -566,7 +657,7 @@ function TelaFim({ a, fim, voltar }: { a: Atividade; fim: Fim; voltar: { href: s
             Ver o Relicário
           </Link>
         )}
-        <Link href={voltar.href} className={`placa w-full ${prox ? "placa-discreta" : "placa-cheia"}`} data-acao="voltar">
+        <Link href={voltar.href} className={`placa w-full ${prox || origem ? "placa-discreta" : "placa-cheia"}`} data-acao="voltar">
           {voltar.rotulo}
         </Link>
       </div>
@@ -574,3 +665,33 @@ function TelaFim({ a, fim, voltar }: { a: Atividade; fim: Fim; voltar: { href: s
   );
 }
 
+function Faixas({ faixas }: { faixas: FaixasExposicao }) {
+  const faixa = (rotulo: string, linhas: readonly string[], tom: string) => (
+    <section className="papel-liso rounded-lg border-l-4 px-4 py-3" style={{ borderColor: tom }} aria-label={rotulo}>
+      <h2 className="fonte-sinal m-0 text-[1.05rem] font-bold uppercase tracking-wide text-tinta">{rotulo}</h2>
+      {linhas.map((l) => (
+        <p key={l} className="m-0 mt-1.5 text-[1rem] text-tinta">
+          {l}
+        </p>
+      ))}
+    </section>
+  );
+  return (
+    <div className="flex flex-col gap-3" data-faixas="">
+      {faixa("O que se sabe", faixas.sabe, "var(--latao)")}
+      {faixa("O que é interpretação", faixas.interpretacao, "var(--turquesa-tinta)")}
+      {faixa("O que simplificamos", faixas.simplificamos, "var(--tinta-vermelha)")}
+      <p className="m-0 text-[0.82rem] text-texto-mundo-apagado">Fontes: {faixas.fontes.join("; ")}.</p>
+    </div>
+  );
+}
+
+function CategoriaRua({ categoria }: { categoria: NonNullable<Atividade["categoria"]> }) {
+  const c = CATEGORIAS_RUA[categoria];
+  return (
+    <p className="m-0 flex flex-wrap items-baseline gap-x-2 text-[0.88rem]" data-categoria={categoria}>
+      <span className="rounded border border-ambar-sombra px-1.5 py-0.5 fonte-sinal font-bold uppercase tracking-wide text-ambar">{c.nome}</span>
+      <span className="text-texto-mundo-suave">{c.explicacao}</span>
+    </p>
+  );
+}

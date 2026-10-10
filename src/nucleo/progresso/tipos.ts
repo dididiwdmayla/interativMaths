@@ -121,8 +121,12 @@ export interface Progresso {
   readonly museu: Readonly<Record<string, number>>;
   /** Cenas da Rua feitas até o fim (id → momento). */
   readonly cenas: Readonly<Record<string, number>>;
-  /** Semente das revisitas: muda a cada revisita gerada, para os números serem novos. */
-  readonly revisitas: { readonly geradas: number };
+  /** Revisitas: a semente muda a cada revisita, para os números serem novos. */
+  readonly revisitas: {
+    readonly geradas: number;
+    /** A revisita em andamento (conceitos e semente ficam fixos até ela terminar). */
+    readonly atual: { readonly semente: number; readonly conceitos: readonly IdConceito[] } | null;
+  };
   /** Deslocamento do relógio (o laboratório adianta um dia). */
   readonly relogio: { readonly deslocamentoMs: number };
 }
@@ -154,7 +158,7 @@ export function progressoNovo(agora: number): Progresso {
     joias: {},
     museu: {},
     cenas: {},
-    revisitas: { geradas: 0 },
+    revisitas: { geradas: 0, atual: null },
     relogio: { deslocamentoMs: 0 },
   };
 }

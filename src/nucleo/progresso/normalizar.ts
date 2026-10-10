@@ -207,7 +207,15 @@ export function normalizar(v: unknown, agora: number): Progresso {
     joias: registro(v.joias, normalizarJoia),
     museu: registro(v.museu, (x) => numOuNull(x)),
     cenas: registro(v.cenas, (x) => numOuNull(x)),
-    revisitas: { geradas: Math.max(0, Math.floor(num(revisitas.geradas, 0))) },
+    revisitas: {
+      geradas: Math.max(0, Math.floor(num(revisitas.geradas, 0))),
+      atual: ehObjeto(revisitas.atual)
+        ? {
+            semente: Math.floor(num(revisitas.atual.semente, 1)),
+            conceitos: lista(revisitas.atual.conceitos, (x) => (typeof x === "string" ? x : null)),
+          }
+        : null,
+    },
     relogio: { deslocamentoMs: Math.max(0, num(relogio.deslocamentoMs, 0)) },
   };
 }

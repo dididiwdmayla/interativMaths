@@ -193,8 +193,7 @@ function proximoPasso(c: Conceito, s: SituacaoConceito, p: Progresso, agora: num
   const ensina = MISSOES_ARCO_1.filter((m) => m.conceitos.includes(c.id));
   if (s.estado === "pede_ajuste" && ensina[0]) return { rotulo: `Revisar na missão ${ensina[0].numero}`, href: rotaDe(ensina[0]) };
   if (s.revisitaEm !== null && s.revisitaEm <= agora) {
-    const r = ATIVIDADES.find((a) => a.id === "partilha.arco1.revisita");
-    if (r) return { rotulo: "Fazer a revisita", href: rotaDe(r) };
+    return { rotulo: "Fazer a revisita", href: "/partilha/revisita" };
   }
   const pendente = ensina.find((m) => p.campanha.atividades[m.id]?.status !== "concluida");
   if (pendente) return { rotulo: `Missão ${pendente.numero}: ${pendente.titulo}`, href: rotaDe(pendente) };

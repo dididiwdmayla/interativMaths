@@ -223,10 +223,12 @@ export function aplicar(e: EstadoBancada, acao: AcaoBancada): EstadoBancada {
       if (novo.d > f.denominadorMaximo) return recusa(e, "pedaco-pequeno-demais");
       const q = acao.quantidade === "todas" ? p.quantidade : Math.min(Math.max(1, Math.round(acao.quantidade)), p.quantidade);
       const esteira = adicionarPecas(removerPecas(e.esteira, p.tamanho, q), novo, q * e.partes);
+      // Enquanto a pilha cortada ainda tem peças, ela continua escolhida (cortar 1 de novo corta outra).
+      const continua = pilhaDe(esteira, e.pilha) !== null;
       return comEvento(
         e,
         { tipo: "fatia", tamanho: chave(p.tamanho), partes: e.partes, quantidade: q, novo: chave(novo) },
-        { esteira, pilha: chave(novo), cargaTravada: true },
+        { esteira, pilha: continua ? e.pilha : chave(novo), cargaTravada: true },
       );
     }
     case "fechar": {

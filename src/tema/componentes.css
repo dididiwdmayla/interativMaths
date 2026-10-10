@@ -256,6 +256,7 @@ html[data-animacoes="leves"] .dobra {
 /* Palco: máquina + bancada de controles */
 .palco {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
   height: 100dvh;
   overflow: hidden;
