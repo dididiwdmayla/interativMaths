@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../tema/tokens.css";
+@import "../tema/componentes.css";
 
 @theme inline {
   --color-noite: var(--noite);
@@ -35,7 +36,7 @@
   --font-mao: var(--fonte-mao);
 }
 
-/* ---------- Base ---------- */
+/* ---------- Base (o preflight do Tailwind já zera botões e fontes) ---------- */
 
 html {
   background: var(--noite-funda);
@@ -57,8 +58,6 @@ body {
 }
 
 button {
-  font: inherit;
-  color: inherit;
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -227,5 +226,131 @@ html[data-animacoes="leves"] .piloto {
   .luz-oscilante {
     animation: none;
     opacity: 0.85;
+  }
+}
+
+/* ---------- Animações da bancada (transições de evento) ---------- */
+
+@keyframes voo {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+}
+
+@keyframes voo-leve {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes engasgo {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(5px);
+  }
+  40% {
+    transform: translateY(1px);
+  }
+  55% {
+    transform: translateY(5px);
+  }
+  75% {
+    transform: translateY(0) translateX(-2px);
+  }
+  85% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes lamina {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(26px);
+  }
+}
+
+@keyframes realce {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.anima-voo {
+  animation: voo 560ms var(--curva-firme) forwards;
+}
+
+.anima-engasgo {
+  animation: engasgo 640ms var(--curva-firme);
+}
+
+.anima-lamina {
+  animation: lamina 420ms var(--curva-mecanica);
+}
+
+.anima-esmaecer {
+  animation: esmaecer-entrar 320ms var(--curva-firme);
+}
+
+.anima-realce {
+  animation: realce 1.4s ease-in-out 3;
+}
+
+html[data-animacoes="leves"] .anima-engasgo,
+html[data-animacoes="leves"] .anima-lamina {
+  animation-duration: 1ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anima-voo {
+    animation: voo-leve 400ms linear forwards;
+  }
+  .anima-engasgo,
+  .anima-lamina {
+    animation: none;
+  }
+  .anima-realce {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+@keyframes alavanca {
+  0%,
+  100% {
+    transform: rotate(-24deg);
+  }
+  45% {
+    transform: rotate(28deg);
+  }
+}
+
+.anima-alavanca {
+  animation: alavanca 420ms var(--curva-mecanica);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anima-alavanca {
+    animation: none;
   }
 }

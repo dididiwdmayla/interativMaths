@@ -8,6 +8,10 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
 - Etapa 1 — Núcleo: `Racional` exato e leitura por extenso; notação com papéis; currículo; evidências
   e modelo de domínio v1 (sondagem, ajuste, revisita); progresso versionado com normalização,
   cadeia de migrações e relógio injetável. Higiene: cor literal só em tokens, zero emoji.
+- Etapa 2 — Máquinas: bancada de partilha (Repartidor + Fatiador) em TS puro, com desfazer,
+  recomeçar, engasgo medido, viabilidade de corte e seis validadores por propriedade do estado;
+  invariante de conservação testada; desenho SVG com kit de peças, cotas vivas, medidor de nível,
+  cinco peles; toque e teclado; `/lab/maquinas`.
 
 ## Parcialmente implementado
 - (nada)
