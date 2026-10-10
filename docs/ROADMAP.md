@@ -18,6 +18,11 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   a dominado); tela da missão com palpite, máquina, previsão conferida, frase com cotas, dobra do
   papel, compressão em notação, caminho de volta e registro; Nônio com escada de dicas e
   "resolver junto"; Caderno com miniatura e "rever na máquina".
+- Etapa 4 — Mundo: abertura (pulável, até 30 s), calibragem adaptativa D1–D6 com recomendação
+  recusável e provas diretas liberadas, mapa do Engenho em corte (desperto, bloqueado, em projeto),
+  distrito com as cinco estações e quadro de chamados, Planta em papel com estados e evidências em
+  palavras, Relicário com as quatro joias e estágios (sem treino), menu de preferências,
+  `/lab/progresso` (zerar, saltar, adiantar o relógio, evidências e estados).
 
 ## Parcialmente implementado
 - (nada)

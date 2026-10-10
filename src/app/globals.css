@@ -354,3 +354,19 @@ html[data-animacoes="leves"] .anima-lamina {
     animation: none;
   }
 }
+
+/* ---------- Abertura ---------- */
+
+@keyframes apagar {
+  to {
+    opacity: 0.08;
+  }
+}
+
+.anima-apagar {
+  animation: apagar 420ms var(--curva-firme) forwards;
+}
+
+.anima-cena {
+  animation: esmaecer-entrar 700ms var(--curva-firme);
+}

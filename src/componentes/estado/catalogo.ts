@@ -44,3 +44,10 @@ export function proximaMissao(a: Atividade): Atividade | null {
   if (a.tipo !== "missao" || a.numero === undefined) return null;
   return MISSOES_ARCO_1.find((m) => m.numero === (a.numero ?? 0) + 1) ?? null;
 }
+
+/** A tela de sondagem existe nesta versão? (enquanto não existir, o chamado não aparece) */
+export const SONDAGEM_ATIVA = false;
+
+export function existeAtividade(id: string): boolean {
+  return ATIVIDADES.some((a) => a.id === id);
+}
