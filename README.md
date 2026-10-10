@@ -16,6 +16,11 @@ npm run e2e        # build + o percurso de navegador (Playwright, 390×844 com t
 
 Não rode `next build` com o `next dev` aberto: os dois disputam a pasta `.next`.
 
+## Publicar
+
+Na Vercel, sem variável de ambiente nenhuma. O `vercel.json` fixa o preset Next.js, para o deploy
+não depender do preset escolhido quando o projeto foi ligado (o repositório só tinha o README).
+
 ## Rotas do jogo
 
 `/` decide para onde ir (abertura, calibragem ou mapa). Depois: `/mapa`, `/partilha` (o distrito),
