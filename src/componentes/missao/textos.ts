@@ -9,13 +9,13 @@ import type { Pele } from "@/conteudo/peles";
 export function descreverAcao(a: AcaoBancada, pele: Pele): string {
   switch (a.tipo) {
     case "lote":
-      return `Gire o lote para ${a.valor}.`;
+      return `Ponha o lote em ${a.valor}.`;
     case "pilha": {
       const t = comoRacional(a.tamanho);
       return t.d === 1 ? `Escolha a pilha de ${pele.peca.plural} inteiras.` : `Escolha a pilha de pedaços de ${formatar(t)}.`;
     }
     case "bica":
-      return `Gire o volante da bica ${a.indice + 1}.`;
+      return `Toque na bica ${a.indice + 1}.`;
     case "bicas":
       return a.abertas === 0 ? "Feche todas as bicas." : `Deixe ${a.abertas} ${a.abertas === 1 ? "bica aberta" : "bicas abertas"}.`;
     case "carga":
@@ -25,7 +25,7 @@ export function descreverAcao(a: AcaoBancada, pele: Pele): string {
     case "fatiar":
       return a.quantidade === "todas" ? "Corte todas as peças da pilha." : "Corte uma peça.";
     case "repartir":
-      return `Puxe a alavanca ${pele.repartir}.`;
+      return `Aperte ${pele.repartir}.`;
     case "fechar":
       return "Feche a partilha.";
     case "desfazer":

@@ -1,6 +1,6 @@
 /**
  * Missão 5 — Encomenda sem manual (aplicação, sem dica automática). SÓ DADOS.
- * Fecha o Arco 1: o primeiro setor de A Partilha acende e a Joia do Ábaco é encontrada.
+ * Fecha o Arco 1: A Partilha volta a caneta e a Joia do Ábaco é encontrada.
  */
 import type { ConfigBancada } from "@/nucleo/maquinas/bancada/tipos";
 import type { Atividade, Entrada } from "@/nucleo/missoes/tipos";
@@ -124,9 +124,9 @@ export const MISSAO_5: Atividade = {
       id: "acendeu",
       tipo: "narrativa",
       fase: "retencao",
-      pedido: "O primeiro setor acendeu.",
+      pedido: "A Partilha voltou a caneta.",
       falas: [
-        { quem: "dalia", texto: "Olha lá em cima: o primeiro setor da Partilha acendeu. Fazia trinta anos." },
+        { quem: "dalia", texto: "Olha o mapa: a Partilha está a caneta de novo. Fazia trinta anos." },
         { quem: "nonio", texto: "Achei isto no fundo da bandeja da sobra. Uma joia bruta. Relógios usam joias nos mancais para girar com menos atrito." },
       ],
       botao: "Guardar a joia",

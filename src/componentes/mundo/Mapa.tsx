@@ -168,7 +168,7 @@ export function Mapa() {
   if (!pronto) return <Carregando />;
   const agora = agoraDoJogo(progresso);
   const feitas = MISSOES_ARCO_1.filter((m) => concluida(progresso, m.id)).length;
-  const acesa = arcoConcluido(progresso, MISSOES_ARCO_1);
+  const passadaALimpo = arcoConcluido(progresso, MISSOES_ARCO_1);
   const transferencia = concluida(progresso, M4);
   const museuAberto = transferencia && existeAtividade("museu.paes-de-ahmes");
   const ruaAberta = transferencia && existeAtividade("rua.tres-pizzas");
@@ -252,7 +252,7 @@ export function Mapa() {
               />
               <div className="pointer-events-none absolute flex -translate-x-1/2 flex-col items-center gap-1.5" style={{ left: ETIQUETAS.partilha.x, top: ETIQUETAS.partilha.y }}>
                 <span className="etiqueta-lugar text-[17px] font-extrabold">A Partilha</span>
-                <span className="marca-texto text-[13px] font-bold">{acesa ? "passada a limpo" : `${feitas} de 5 missões`}</span>
+                <span className="marca-texto text-[13px] font-bold">{passadaALimpo ? "passada a limpo" : `${feitas} de 5 missões`}</span>
               </div>
 
               {/* Distritos em projeto */}

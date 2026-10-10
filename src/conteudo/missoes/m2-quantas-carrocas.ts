@@ -75,7 +75,7 @@ export const MISSAO_2: Atividade = {
       objetivo: { validador: "partilha.carga-exata", params: { carga: 6 } },
       resolucao: [{ tipo: "bicas", abertas: 5 }, { tipo: "lote", valor: 6 }, { tipo: "repartir" }],
       dicas: [
-        { texto: "Os volantes turquesa abrem e fecham as bicas. Cada medidor precisa parar no 6, e a esteira precisa esvaziar.", alvo: "bicas" },
+        { texto: "As bicas azuis abrem e fecham com um toque. Cada medidor precisa parar no 6, e a esteira precisa esvaziar.", alvo: "bicas" },
         {
           texto: "Com {abertas} bicas abertas, uma volta de {lote} pede {pedido}. Na esteira há {ha}.",
           cota: { alvo: "bicas", texto: "{abertas} bicas · lote {lote} · pede {pedido} · há {ha}" },

@@ -246,17 +246,7 @@ export function FolhaNotacao({
 export function FolhaRegistro({ passo, frase, onGuardar }: { passo: PassoRegistro; frase: string; onGuardar: () => void }) {
   const p = passo.pagina;
   return (
-    <FolhaPautada
-      titulo={p.titulo}
-      className="rounded-t-[18px] lg:rounded-[18px]"
-      margem={
-        <div className="flex flex-col">
-          {p.notas.map((n) => (
-            <NotaDalia key={n}>{n}</NotaDalia>
-          ))}
-        </div>
-      }
-    >
+    <FolhaPautada titulo={p.titulo} className="rounded-t-[18px] lg:rounded-[18px]">
       <div className="flex flex-col gap-[14px] pt-[14px]" data-folha="registro">
         {(p.frase ?? frase) && <p className="m-0 text-[16px] font-medium leading-[28px] text-tinta">{p.frase ?? frase}</p>}
         <div className="quadro-notacao self-start">
@@ -268,6 +258,13 @@ export function FolhaRegistro({ passo, frase, onGuardar }: { passo: PassoRegistr
           <div className="flex flex-wrap items-center gap-2">
             <span className="letra-mao text-[22px]">caminho de volta</span>
             <LinhaNotacao texto={p.volta} tamanho="pequena" rotulos={false} />
+          </div>
+        )}
+        {p.notas.length > 0 && (
+          <div className="flex flex-col">
+            {p.notas.map((n) => (
+              <NotaDalia key={n}>{n}</NotaDalia>
+            ))}
           </div>
         )}
         <button type="button" className="botao-principal w-full" onClick={onGuardar} data-acao="guardar-pagina">

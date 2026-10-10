@@ -471,7 +471,7 @@ function FolhaSobe({ children }: { children: React.ReactNode }) {
     return () => cancelAnimationFrame(t);
   }, []);
   return (
-    <div className="folha-sobe" data-aberta={aberta ? "sim" : "nao"} data-dobra="">
+    <div className="folha-sobe" data-aberta={aberta ? "sim" : "nao"}>
       {children}
     </div>
   );

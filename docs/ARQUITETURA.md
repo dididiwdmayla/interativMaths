@@ -21,7 +21,9 @@ src/
     joias.ts     contrato das joias
   conteudo/      SÓ DADOS: conceitos, missões, calibragem, equívocos, peles, joias, museu, rua, eco
   componentes/   maquinas, missao, mundo, nonio, notacao, caderno, joias, estado, lab, ui, icones
-  tema/          tokens.css (única cor literal) e componentes.css (placas, chapa, papel, dobra)
+                 (identidade Quadriculado: docs/DESIGN-SYSTEM.md e docs/referencia-visual/)
+  tema/          tokens.css (única cor literal) e componentes.css (receitas: ficha, botões, etiquetas,
+                 folha pautada, palco)
   app/           rotas (cada página só monta um componente)
 ```
 
@@ -77,7 +79,8 @@ ela o passo continua a máquina anterior), `dicas?` (olhar, medir, caso parecido
    validadores por propriedade e testes (inclusive invariantes).
 2. Estenda `MaquinaDoPasso`/`Objetivo` para aceitar a nova máquina (hoje o motor conhece a bancada).
 3. Na tela, um componente SVG em `componentes/maquinas` composto com o kit (`componentes/mundo/kit`)
-   e um painel de controles; use `Palco` para o layout em pé e deitado.
+   e um painel de controles; use `Palco` (pedido, máquina, tira, Nônio, bancada; duas colunas a
+   partir de 1024 px). Bica fechada e lugar vazio ficam a lápis (`.a-lapis`, `PassarACaneta`).
 4. Uma peça nova do kit entra na `/lab/vitrine`.
 
 ## Progresso (`nucleo/progresso`)

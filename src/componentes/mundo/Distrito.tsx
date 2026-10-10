@@ -160,7 +160,7 @@ function Parada({ s, lado, atual }: { s: SituacaoMissao; lado: "esquerda" | "dir
           ? "Próxima parada."
           : "Aberta.";
   return (
-    <li className={`flex list-none items-center gap-3 ${lado === "direita" ? "flex-row-reverse" : ""}`} data-estacao={m.id} data-status={s.status}>
+    <li className={`flex w-full list-none items-center gap-3 lg:w-[640px] ${lado === "direita" ? "flex-row-reverse lg:self-end" : "lg:self-start"}`} data-estacao={m.id} data-status={s.status}>
       <div className="relative shrink-0" data-no="">
         <div className={`relative z-[1] flex h-[72px] w-[72px] items-center justify-center rounded-2xl border-2 bg-folha ${porVir ? "border-dashed border-grafite" : "border-tinta bg-marca-texto-palido"}`}>
           <MiniaturaMissao numero={m.numero ?? 1} tamanho={46} lapis={porVir} />

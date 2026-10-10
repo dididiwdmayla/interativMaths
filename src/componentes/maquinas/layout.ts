@@ -79,7 +79,7 @@ export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0
   // Orçamento vertical: o que é fixo e o que cresce com a altura disponível.
   const H = LARGURA * Math.min(1.7, Math.max(0.5, proporcao));
   const alturaRotulo = forma === "saco" ? 30 : 58;
-  const pilhasY = 48;
+  const pilhasY = 56;
   const fixoLinha = 34 + 2 + ALTURA_RECEPTOR + 6 + alturaRotulo;
   const fixo = pilhasY + 14 + 30 + linhas * fixoLinha + 58 + 8;
   const sobra = Math.max(0, H - fixo);
@@ -140,17 +140,19 @@ export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0
       if (indice >= vagas) break;
       const cx = MARGEM + 4 + larguraSlot * (k + 0.5);
       const topo = tY + 34;
-      const medidorL = Math.max(6, Math.min(10, larguraSlot * 0.12));
-      const medidorX = cx + larguraSlot / 2 - 7 - medidorL;
+      // Com poucas bicas, o lugar de cada uma não se espalha: o medidor fica junto do conteúdo.
+      const ls = Math.min(larguraSlot, 128);
+      const medidorL = Math.max(6, Math.min(10, ls * 0.12));
+      const medidorX = cx + ls / 2 - 7 - medidorL;
       bicas.push({
         indice,
         linha: l,
         cx,
         bicaY: tY + 5,
-        conteudo: { x: cx - larguraSlot / 2 + 5, y: topo, largura: medidorX - (cx - larguraSlot / 2 + 5) - 4, altura: zonaConteudo },
+        conteudo: { x: cx - ls / 2 + 5, y: topo, largura: medidorX - (cx - ls / 2 + 5) - 4, altura: zonaConteudo },
         medidor: { x: medidorX, y: topo - 4, largura: medidorL, altura: zonaConteudo + 4 },
         receptorY: topo + zonaConteudo + 2,
-        largura: larguraSlot,
+        largura: ls,
         rotuloY: topo + zonaConteudo + 2 + ALTURA_RECEPTOR + 6,
       });
     }

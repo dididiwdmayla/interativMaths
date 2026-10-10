@@ -98,14 +98,14 @@ export function Vitrine() {
             ))}
           </ul>
           <div className="ficha-quadriculada p-2 shadow-none">
-            <svg viewBox="0 0 380 92" className="traco-fixo block w-full" role="img" aria-label="O mesmo desenho a lápis e a tinta; passar a caneta.">
-              <g transform="translate(-30 -220)">
+            <svg viewBox="0 0 400 92" className="traco-fixo block w-full" role="img" aria-label="O mesmo desenho a lápis e a tinta; passar a caneta.">
+              <g transform="translate(-40 -220)">
                 <DesenhoContrapeso lapis />
               </g>
-              <g transform="translate(110 -220)">
+              <g transform="translate(92 -220)">
                 <DesenhoContrapeso lapis={false} />
               </g>
-              <g transform="translate(250 -220)">
+              <g transform="translate(224 -220)">
                 <PassarACaneta feito={aberta}>
                   <DesenhoContrapeso lapis={false} />
                 </PassarACaneta>

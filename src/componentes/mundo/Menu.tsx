@@ -86,7 +86,7 @@ export function Menu() {
           <p className="m-0 text-[13px] font-semibold text-tinta-suave">Ajustes</p>
           <h1 className="m-0 text-[24px] font-extrabold leading-tight">Menu</h1>
         </header>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
           <Grupo
             id="postura"
             titulo="Postura do Nônio"

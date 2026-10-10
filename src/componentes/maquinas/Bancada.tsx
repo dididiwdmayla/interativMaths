@@ -163,7 +163,7 @@ export function Bancada({
               </g>
               {sel && mexivel && <line x1={lp.caixa.x - 2} x2={lp.caixa.x + lp.caixa.largura + 2} y1={L.esteira.y + 19} y2={L.esteira.y + 19} stroke="var(--caneta)" strokeWidth={3} strokeLinecap="round" />}
               {cotas && (
-                <CotaCaneta x1={lp.caixa.x + 2} x2={lp.caixa.x + lp.caixa.largura - 2} y={lp.topo - 4} rotuloY={lp.pilha.tamanho.d === 1 && lp.pilha.tamanho.n === 1 ? lp.topo - 19 : lp.topo - 28}>
+                <CotaCaneta x1={lp.caixa.x + 2} x2={lp.caixa.x + lp.caixa.largura - 2} y={lp.topo - 4} rotuloY={lp.pilha.tamanho.d === 1 && lp.pilha.tamanho.n === 1 ? lp.topo - 21 : lp.topo - 30}>
                   <RotuloPilha k={lp.pilha.quantidade} tamanho={lp.pilha.tamanho} pele={pele} palavra={letraDeMao && L.pilhas.length === 1} />
                 </CotaCaneta>
               )}
@@ -250,10 +250,19 @@ export function Bancada({
                 />
               )}
               {atencao && <CirculoVermelho cx={lb.cx} cy={(lb.conteudo.y + lb.rotuloY + 30) / 2} rx={lb.largura / 2 - 1} ry={(lb.rotuloY + 30 - lb.conteudo.y) / 2 + 6} semente={lb.indice + 5} />}
-              {(realcar("bicas") || realcar(`bica:${lb.indice}`)) && <AnelRealce x={xConteudo} y={lb.conteudo.y + lb.conteudo.altura / 2} rx={Math.min(32, lb.largura / 2)} ry={lb.conteudo.altura / 2 + 8} />}
+              {realcar(`bica:${lb.indice}`) && <AnelRealce x={xConteudo} y={lb.conteudo.y + lb.conteudo.altura / 2} rx={Math.min(32, lb.largura / 2)} ry={Math.min(48, lb.conteudo.altura / 2 + 8)} />}
             </g>
           );
         })}
+
+        {realcar("bicas") && L.bicas.length > 0 && (
+          <AnelRealce
+            x={(L.bicas[0].cx + L.bicas[L.bicas.length - 1].cx) / 2}
+            y={L.bicas[0].conteudo.y + L.bicas[0].conteudo.altura / 2}
+            rx={(L.bicas[L.bicas.length - 1].cx - L.bicas[0].cx) / 2 + L.bicas[0].largura / 2 + 2}
+            ry={L.bicas[0].conteudo.altura / 2 + 22}
+          />
+        )}
 
         {/* Bandeja da sobra */}
         <Bandeja L={L} estado={estado} pele={pele} cotas={cotas} realcado={realcar("bandeja")} />
@@ -289,7 +298,7 @@ export function Bancada({
           </g>
         )}
 
-        {cotaExtra && <CotaExtra L={L} alvo={cotaExtra.alvo} texto={cotaExtra.texto} pilhaX={pilhaX} />}
+        {cotaExtra && <CotaExtra L={L} alvo={cotaExtra.alvo} texto={cotaExtra.texto} pilha={pilhaSel} />}
       </svg>
     </div>
   );
@@ -495,9 +504,11 @@ function Bandeja({ L, estado, pele, cotas, realcado }: { L: LayoutBancada; estad
       <g className="a-lapis" aria-hidden="true">
         <path d={`M ${c.x + 48} ${fundo - 12} L ${c.x + 54} ${fundo} H ${c.x + c.largura - 6} L ${c.x + c.largura} ${fundo - 12} Z`} fill="var(--folha)" stroke="var(--tinta)" />
       </g>
-      <text x={c.x + 2} y={c.y + 12} fontSize={12} fontWeight={600} fill="var(--tinta-suave)" stroke="none">
-        sobra
-      </text>
+      {cotas && (
+        <text x={c.x + 2} y={c.y + 12} fontSize={12} fontWeight={600} fill="var(--tinta-suave)" stroke="none">
+          sobra
+        </text>
+      )}
       {cotas && <NumeroSvg valor={sobra} x={c.x + 2} y={c.y + 32} tamanho={sobra.d === 1 ? 18 : 15} ancora="start" cor={sobra.n > 0 ? "var(--tinta)" : "var(--tinta-suave)"} />}
       {centros.map((p, i) =>
         forma === "saco" ? <Saco key={i} x={p.x} y={p.y} r={raio} /> : <Unidade key={i} forma={forma} x={p.x} y={p.y} r={raio} unidade={unidades[i]} contorno={false} />,
@@ -517,32 +528,42 @@ function AnelRealce({ x, y, rx, ry }: { x: number; y: number; rx: number; ry: nu
   );
 }
 
-/** A medida que o Nônio mostra: uma anotação a caneta com setinha. */
-function CotaExtra({ L, alvo, texto, pilhaX }: { L: LayoutBancada; alvo: AlvoBancada; texto: string; pilhaX: number }) {
-  let x = pilhaX;
-  let y = L.esteira.y + 34;
-  let alvoY = L.esteira.y + 6;
+/** A medida que o Nônio mostra: uma anotação a caneta com setinha, ao lado do que ela mede. */
+function CotaExtra({ L, alvo, texto, pilha }: { L: LayoutBancada; alvo: AlvoBancada; texto: string; pilha: LayoutBancada["pilhas"][number] | null }) {
+  const largura = Math.min(LARGURA - 16, texto.length * 6.9 + 20);
+  const limitar = (x: number) => Math.min(Math.max(x, largura / 2 + 8), LARGURA - largura / 2 - 8);
+  let xc: number;
+  let y: number;
+  let de: [number, number];
+  let para: [number, number];
   if (alvo === "bandeja") {
-    x = L.bandeja.x + L.bandeja.largura / 2;
-    y = L.bandeja.y - 12;
-    alvoY = L.bandeja.y + 4;
+    xc = limitar(L.bandeja.x + L.bandeja.largura / 2 - 30);
+    y = L.bandeja.y - 16;
+    de = [xc + largura / 2 - 14, y + 12];
+    para = [L.bandeja.x + L.bandeja.largura / 2 + 20, L.bandeja.y + 18];
   } else if (alvo === "bicas" || alvo.startsWith("bica:")) {
     const i = alvo.startsWith("bica:") ? Number(alvo.slice(5)) : -1;
     const lb = L.bicas[i] ?? L.bicas[Math.floor(L.bicas.length / 2)];
-    x = lb ? lb.cx : LARGURA / 2;
-    y = lb ? lb.bicaY - 18 : y;
-    alvoY = lb ? lb.bicaY : y;
+    xc = limitar(lb ? lb.cx : LARGURA / 2);
+    y = lb ? lb.conteudo.y + 20 : L.esteira.y + 60;
+    de = [xc + largura / 2 - 16, y - 12];
+    para = [lb ? lb.cx + 10 : xc, lb ? lb.bicaY + 24 : y - 30];
   } else if (alvo === "fatiador" && L.fatiador) {
-    x = L.fatiador.x + 80;
-    y = L.fatiador.y + L.fatiador.altura + 22;
-    alvoY = L.fatiador.y + L.fatiador.altura;
+    xc = limitar(L.fatiador.x + L.fatiador.largura + 20 + largura / 2);
+    y = L.fatiador.y + 14;
+    de = [xc - largura / 2 - 2, y + 4];
+    para = [L.fatiador.x + L.fatiador.largura + 2, L.fatiador.y + 30];
+  } else {
+    const direita = pilha ? pilha.caixa.x + pilha.caixa.largura : L.esteira.x0 + 60;
+    const meio = pilha ? pilha.topo + (L.esteira.y - pilha.topo) / 2 : L.esteira.y - 20;
+    xc = limitar(direita + 18 + largura / 2);
+    y = Math.max(16, meio - 10);
+    de = [xc - largura / 2 - 3, y + 6];
+    para = [direita + 6, meio + 6];
   }
-  const largura = Math.min(LARGURA - 16, texto.length * 6.9 + 20);
-  const xc = Math.min(Math.max(x, largura / 2 + 8), LARGURA - largura / 2 - 8);
-  const acima = alvoY > y;
   return (
     <g className="anima-esmaecer" aria-hidden="true">
-      <SetaCurva de={[xc + largura / 2 - 18, acima ? y + 12 : y - 12]} para={[x + 10, acima ? alvoY - 6 : alvoY + 6]} curva={0.3} />
+      <SetaCurva de={de} para={para} curva={0.3} />
       <rect x={xc - largura / 2} y={y - 12} width={largura} height={24} rx={8} fill="var(--folha)" stroke="var(--caneta)" strokeWidth={2} />
       <text x={xc} y={y + 0.5} textAnchor="middle" dominantBaseline="central" fontSize={12.5} fill="var(--caneta)" stroke="none" fontWeight={700} className="algarismos">
         {texto}

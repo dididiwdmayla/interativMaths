@@ -23,7 +23,7 @@ export interface Pele {
   readonly receptor: Nome & { readonly forma: FormaReceptor };
   /** Onde a sobra fica. */
   readonly sobra: string;
-  /** Nome da alavanca de repartir. */
+  /** Nome do botão de repartir. */
   readonly repartir: string;
 }
 

@@ -103,7 +103,7 @@ export function DesenhoContrapeso({ lapis }: { lapis: boolean }) {
   );
 }
 
-/** Pátio dos Sinais: um poste de sinais com três luzes de chave. */
+/** Pátio dos Sinais: um poste com três sinais de chave. */
 export function DesenhoPatio({ lapis }: { lapis: boolean }) {
   return (
     <Lapis lapis={lapis}>

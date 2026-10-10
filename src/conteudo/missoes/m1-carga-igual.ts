@@ -50,11 +50,11 @@ export const MISSAO_1: Atividade = {
       pedido: "Leia o pedido da Dália.",
       falas: [
         { quem: "dalia", texto: "Vinte e quatro sacas de farinha, quatro carroças. Todas saem com a mesma carga, senão a balança da ponte trava." },
-        { quem: "dalia", texto: "O manual manda girar o seletor de lote. A página com o número rasgou faz tempo." },
+        { quem: "dalia", texto: "O manual manda ajustar o lote. A página com o número rasgou faz tempo." },
       ],
       manual: {
         titulo: "Repartidor — operação",
-        linhas: ["1. Pôr as sacas na esteira.", "2. Girar o seletor de lote até o", "3. Puxar a alavanca."],
+        linhas: ["1. Pôr as sacas na esteira.", "2. Ajustar o lote até o", "3. Apertar Repartir."],
       },
       botao: "Aceitar o serviço",
     },
@@ -128,7 +128,7 @@ export const MISSAO_1: Atividade = {
       tipo: "frase",
       fase: "formalizacao",
       pedido: "Toque numa cota, depois na lacuna.",
-      falas: [{ quem: "dalia", texto: "Escreve no Caderno. Quero entender o que eu fazia no escuro." }],
+      falas: [{ quem: "dalia", texto: "Escreve no Caderno. Quero entender o que eu fazia de cor." }],
       maquina: { config: MAQUINA, acoes: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }] },
       frase: "{a} sacas repartidas entre {b} carroças dão {c} em cada.",
       lacunas: [
@@ -177,7 +177,7 @@ export const MISSAO_1: Atividade = {
         titulo: "Repartir igualmente",
         notacao: ["24 ÷ 4 = 6", "4 × 6 = 24"],
         volta: "18 ÷ 3 = 6",
-        notas: ["Então o número rasgado era 6. Trinta anos girando no escuro.", "Dividir reparte. Multiplicar junta de volta."],
+        notas: ["Então o número rasgado era 6. Trinta anos fazendo de cor.", "Dividir reparte. Multiplicar junta de volta."],
       },
     },
   ],
