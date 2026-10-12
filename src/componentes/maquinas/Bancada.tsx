@@ -28,6 +28,8 @@ export interface MarcasBancada {
   readonly bicasAtencao?: readonly number[];
   /** A sobra na esteira chama atenção (ficou no pátio). */
   readonly sobraAtencao?: boolean;
+  /** Acertou: a anotação "fechou" à mão, em verde-escuro. */
+  readonly fechou?: boolean;
 }
 
 export interface PropsBancada {
@@ -250,6 +252,7 @@ export function Bancada({
                 />
               )}
               {atencao && <CirculoVermelho cx={lb.cx} cy={(lb.conteudo.y + lb.rotuloY + 30) / 2} rx={lb.largura / 2 - 1} ry={(lb.rotuloY + 30 - lb.conteudo.y) / 2 + 6} semente={lb.indice + 5} />}
+              {marcas.aceita === true && emUso && lb.largura >= 40 && <VistoVerde x={lb.medidor.x + lb.medidor.largura / 2} y={lb.medidor.y - 12} />}
               {realcar(`bica:${lb.indice}`) && <AnelRealce x={xConteudo} y={lb.conteudo.y + lb.conteudo.altura / 2} rx={Math.min(32, lb.largura / 2)} ry={Math.min(48, lb.conteudo.altura / 2 + 8)} />}
             </g>
           );
@@ -299,6 +302,13 @@ export function Bancada({
         )}
 
         {cotaExtra && <CotaExtra L={L} alvo={cotaExtra.alvo} texto={cotaExtra.texto} pilha={pilhaSel} />}
+        {marcas.fechou && letraDeMao && (
+          <g className="anima-esmaecer" aria-hidden="true">
+            <Anotacao x={LARGURA - 14} y={36} ancora="end" tamanho={30} inclinacao={-6} cor="var(--verde-escuro)">
+              fechou
+            </Anotacao>
+          </g>
+        )}
       </svg>
     </div>
   );
@@ -519,11 +529,21 @@ function Bandeja({ L, estado, pele, cotas, realcado }: { L: LayoutBancada; estad
   );
 }
 
-/** O Nônio pede para olhar aqui: um círculo a lápis vermelho que pulsa três vezes. */
+/** O Nônio aponta: um círculo a lápis azul que pulsa, enquanto a fala está na tela. */
 function AnelRealce({ x, y, rx, ry }: { x: number; y: number; rx: number; ry: number }) {
   return (
-    <g className="anima-realce" style={{ pointerEvents: "none" }}>
-      <CirculoVermelho cx={x} cy={y} rx={rx} ry={ry} semente={7} />
+    <g className="anima-realce" style={{ pointerEvents: "none" }} data-realce="">
+      <CirculoVermelho cx={x} cy={y} rx={rx} ry={ry} semente={7} cor="var(--caneta)" />
+    </g>
+  );
+}
+
+/** Visto verde de um receptor que fechou. */
+function VistoVerde({ x, y }: { x: number; y: number }) {
+  return (
+    <g aria-hidden="true" className="anima-esmaecer" data-visto="">
+      <circle cx={x} cy={y} r={10} fill="var(--verde)" stroke="var(--tinta)" strokeWidth={2} />
+      <path d={`M ${x - 4.5} ${y + 0.5} l 3 3 l 6 -6.5`} fill="none" stroke="var(--folha)" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
     </g>
   );
 }

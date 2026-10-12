@@ -28,7 +28,7 @@ import { useProgresso } from "@/componentes/estado/useProgresso";
 import { Bancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
-import { TiraMensagem } from "@/componentes/maquinas/Tira";
+import { FaixaNonio } from "@/componentes/nonio/FaixaNonio";
 import { mensagemDoEvento } from "@/componentes/maquinas/mensagens";
 import { EntradaResposta } from "@/componentes/missao/Respostas";
 import { Nonio } from "@/componentes/nonio/Nonio";
@@ -169,7 +169,7 @@ export function Calibragem() {
       cabecalho={cabecalho}
       pedido={pedido}
       maquina={<Bancada estado={b.atual} pele={pele} onAcao={item.tipo === "maquina" && anotado === null ? (a) => setBancada(operar(b, a)) : undefined} />}
-      tira={<TiraMensagem texto={msg?.texto ?? item.fala} tom={msg?.tom} />}
+      faixa={<FaixaNonio fala={{ id: "leitura", texto: msg?.texto ?? item.fala, categoria: "evento", atencao: msg?.tom === "atencao" }} selo={null} retorno="neutro" expressao="quieto" compacta />}
       controles={
         controlesAnotado ||
         (item.tipo === "maquina" ? (

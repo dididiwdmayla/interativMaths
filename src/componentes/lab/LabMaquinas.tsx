@@ -11,7 +11,7 @@ import { PELES } from "@/conteudo/peles";
 import { Bancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
-import { TiraMensagem } from "@/componentes/maquinas/Tira";
+import { FaixaNonio } from "@/componentes/nonio/FaixaNonio";
 import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
 import { mensagemDoEvento } from "@/componentes/maquinas/mensagens";
 
@@ -100,7 +100,7 @@ export function LabMaquinas() {
           </div>
         }
         maquina={<Bancada estado={bancada.atual} pele={pele} cotas={cotas} onAcao={(a) => setBancada((b) => operar(b, a))} marcas={{ aceita: bancada.atual.fechada }} />}
-        tira={<TiraMensagem texto={msg?.texto ?? null} tom={msg?.tom} />}
+        faixa={<FaixaNonio fala={{ id: "leitura", texto: msg?.texto ?? "Máquina pronta.", categoria: "evento", atencao: msg?.tom === "atencao" }} selo={null} retorno="neutro" expressao="quieto" compacta />}
         controles={
           <div className="flex flex-col gap-3">
             <PainelBancada estado={bancada.atual} pele={pele} onAcao={(a) => setBancada((b) => operar(b, a))} onFechar={fechar} />

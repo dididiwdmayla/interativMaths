@@ -279,7 +279,24 @@ function variacao(semente: number, i: number): number {
  * Círculo a lápis vermelho: traço irregular que não fecha certinho, como feito à mão.
  * Só chama o olhar. Nunca risca nem corrige.
  */
-export function CirculoVermelho({ cx, cy, rx, ry, semente = 1, className }: { cx: number; cy: number; rx: number; ry: number; semente?: number; className?: string }) {
+export function CirculoVermelho({
+  cx,
+  cy,
+  rx,
+  ry,
+  semente = 1,
+  className,
+  cor = "var(--vermelho)",
+}: {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  semente?: number;
+  className?: string;
+  /** O mesmo traço a lápis azul é o Nônio apontando. */
+  cor?: string;
+}) {
   const n = 12;
   const inicio = -Math.PI * 0.62 + variacao(semente, 0) * 0.3;
   const voltas = Math.PI * 2 + 0.5;
@@ -299,7 +316,7 @@ export function CirculoVermelho({ cx, cy, rx, ry, semente = 1, className }: { cx
     const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
     d += ` C ${c1[0].toFixed(1)} ${c1[1].toFixed(1)}, ${c2[0].toFixed(1)} ${c2[1].toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
   }
-  return <path d={d} fill="none" stroke="var(--vermelho)" strokeWidth={2.6} strokeLinecap="round" className={className} aria-hidden="true" style={{ pointerEvents: "none" }} />;
+  return <path d={d} fill="none" stroke={cor} strokeWidth={2.6} strokeLinecap="round" className={className} aria-hidden="true" style={{ pointerEvents: "none" }} />;
 }
 
 /** Rabisco de margem em grafite. Tempero: no máximo três por tela, nunca sobre conteúdo. */

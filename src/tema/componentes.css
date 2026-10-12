@@ -181,6 +181,42 @@
   background: var(--marca-texto);
 }
 
+/* Botão pequeno de dentro do balão e do cabeçalho (Me ajuda, Perguntar, etapas). O desenho tem
+   38 px; o alvo de toque passa de 44 px. */
+.botao-pequeno {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 11px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 90ms var(--curva-firme);
+}
+
+.botao-pequeno::after {
+  content: "";
+  position: absolute;
+  inset: -5px -3px;
+}
+
+.botao-pequeno:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.botao-pequeno:disabled {
+  border-color: var(--grafite);
+  color: var(--tinta-suave);
+}
+
 /* ---------- Opções (uma entre várias) ---------- */
 
 .opcoes {
@@ -466,7 +502,108 @@
   background: var(--marca-texto-palido);
 }
 
+/* ---------- Retorno: acertou e ainda não ---------- */
+
+/* O selo no começo do balão: a palavra e uma forma, nunca só a cor. */
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border: 2px solid var(--tinta);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.selo[data-selo="acertou"] {
+  background: var(--verde-palido);
+  color: var(--verde-tinta);
+}
+
+.selo[data-selo="ainda-nao"] {
+  gap: 6px;
+  border-color: var(--vermelho);
+  background: var(--folha);
+  color: var(--tinta);
+}
+
+/* A caixa da resposta que não bateu: borda vermelha e névoa. O texto continua em tinta. */
+.caixa-ainda-nao {
+  border: 2.5px solid var(--vermelho) !important;
+  background: var(--vermelho-nevoa) !important;
+  color: var(--tinta) !important;
+}
+
 /* ---------- Nônio, cabeçalho, bancada ---------- */
+
+/* A faixa do Nônio: rosto à esquerda, balão com nome, selo, fala e ações. */
+.faixa-nonio {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.faixa-balao {
+  padding: 9px 13px 11px;
+}
+
+.faixa-fala {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.faixa-balao > .selo + .faixa-fala {
+  margin-top: 6px;
+}
+
+.faixa-ponto {
+  display: inline-flex;
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+
+.faixa-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.faixa-nonio[data-compacta="sim"] .faixa-balao {
+  padding: 7px 11px 8px;
+}
+
+.faixa-nonio[data-compacta="sim"] .faixa-fala {
+  font-size: 14px;
+}
+
+.faixa-nonio[data-compacta="sim"] .faixa-acoes {
+  margin-top: 6px;
+}
+
+/* A faixa do Nônio colada no topo da folha que sobe. */
+.faixa-na-folha {
+  padding: 10px 14px 10px;
+  border: 2px solid var(--tinta);
+  border-bottom: 1.5px solid var(--pauta);
+  border-radius: 18px 18px 0 0;
+  background: var(--folha);
+}
+
+/* A alça das folhas que sobem. */
+.alca-folha {
+  align-self: center;
+  width: 44px;
+  height: 5px;
+  margin: 0 auto 8px;
+  border-radius: 3px;
+  background: var(--pauta);
+}
+
 
 .balao-nonio {
   padding: 10px 14px 11px;
@@ -708,8 +845,8 @@ html[data-animacoes="leves"] .folha-sobe {
   flex: 1;
   min-height: 0;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(150px, 1fr) auto auto auto;
-  grid-template-areas: "pedido" "maquina" "tira" "nonio" "controles";
+  grid-template-rows: auto minmax(150px, 1fr) auto auto;
+  grid-template-areas: "pedido" "maquina" "faixa" "controles";
 }
 
 .palco-pedido {
@@ -732,14 +869,19 @@ html[data-animacoes="leves"] .folha-sobe {
   overflow: hidden;
 }
 
-.palco-tira {
-  grid-area: tira;
-  margin: 8px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
+/* A máquina vencida ganha a borda verde, com a sombra verde-escura. */
+.palco[data-retorno="acertou"] .palco-maquina {
+  border-color: var(--verde);
+  box-shadow: 0 4px 0 var(--verde-escuro);
+  transition: border-color var(--t-caneta) var(--curva-firme);
 }
 
-.palco-nonio {
-  grid-area: nonio;
-  margin: 10px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
+.palco-faixa {
+  grid-area: faixa;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
 }
 
 .palco-controles {
@@ -765,12 +907,11 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (min-width: 1024px) {
   .palco-grade {
     grid-template-columns: minmax(0, 760px) 380px;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
-      "maquina nonio"
-      "maquina controles"
-      "tira controles";
+      "maquina faixa"
+      "maquina controles";
     justify-content: center;
     column-gap: 24px;
     padding: 20px 28px 26px;
@@ -786,10 +927,7 @@ html[data-animacoes="leves"] .folha-sobe {
     margin: 0;
     padding: 10px;
   }
-  .palco-tira {
-    margin: 12px 0 0;
-  }
-  .palco-nonio {
+  .palco-faixa {
     margin: 0 0 14px;
   }
   .palco-controles {
@@ -812,12 +950,11 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (orientation: landscape) and (min-width: 640px) and (max-width: 1023px) {
   .palco-grade {
     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
-      "maquina nonio"
-      "maquina controles"
-      "tira controles";
+      "maquina faixa"
+      "maquina controles";
     column-gap: 12px;
     padding: 10px 14px;
   }
@@ -827,8 +964,7 @@ html[data-animacoes="leves"] .folha-sobe {
     margin-bottom: 8px;
   }
   .palco-maquina,
-  .palco-tira,
-  .palco-nonio {
+  .palco-faixa {
     margin: 0 0 8px;
   }
   .palco-controles,

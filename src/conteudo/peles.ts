@@ -25,6 +25,8 @@ export interface Pele {
   readonly sobra: string;
   /** Nome do botão de repartir. */
   readonly repartir: string;
+  /** Como o Nônio lembra que a peça se corta ("Pão a gente corta"). Sem fatiador, não se usa. */
+  readonly corta?: string;
 }
 
 export const PELES: Readonly<Record<IdPele, Pele>> = {
@@ -43,6 +45,7 @@ export const PELES: Readonly<Record<IdPele, Pele>> = {
     receptor: { singular: "mesa", plural: "mesas", genero: "f", forma: "mesa" },
     sobra: "bandeja da sobra",
     repartir: "Repartir",
+    corta: "Pão a gente corta",
   },
   "toneis-casas": {
     id: "toneis-casas",
@@ -51,6 +54,7 @@ export const PELES: Readonly<Record<IdPele, Pele>> = {
     receptor: { singular: "casa", plural: "casas", genero: "f", forma: "casa" },
     sobra: "reservatório",
     repartir: "Distribuir",
+    corta: "Água a gente divide",
   },
   "paes-cestos": {
     id: "paes-cestos",
@@ -59,6 +63,7 @@ export const PELES: Readonly<Record<IdPele, Pele>> = {
     receptor: { singular: "cesto", plural: "cestos", genero: "m", forma: "cesto" },
     sobra: "bandeja da sobra",
     repartir: "Repartir",
+    corta: "Pão a gente corta",
   },
   "pizzas-amigos": {
     id: "pizzas-amigos",
@@ -67,5 +72,6 @@ export const PELES: Readonly<Record<IdPele, Pele>> = {
     receptor: { singular: "prato", plural: "pratos", genero: "m", forma: "prato" },
     sobra: "caixa",
     repartir: "Servir",
+    corta: "Pizza a gente corta",
   },
 };

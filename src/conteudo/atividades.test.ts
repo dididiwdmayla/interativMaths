@@ -8,7 +8,8 @@ import type { Atividade, Entrada, ModoExecucao } from "@/nucleo/missoes/tipos";
 import { situacaoConceito, type Evidencia } from "@/nucleo/dominio";
 import { VALIDADORES_BANCADA } from "@/nucleo/maquinas/bancada/validadores";
 import { CONCEITOS, CONCEITOS_DO_ARCO_1 } from "./conceitos";
-import { EQUIVOCOS, MOTIVOS } from "./equivocos";
+import { EQUIVOCOS } from "./equivocos";
+import { MOTIVOS } from "./reacoes";
 import { ATIVIDADES } from "./atividades";
 
 export const TODAS: readonly Atividade[] = ATIVIDADES;
@@ -98,7 +99,7 @@ describe.each(TODAS.map((a) => [a.id, a] as const))("atividade %s", (_, a) => {
 describe("conteúdo das respostas", () => {
   it("todo equívoco tem resposta e conceito existente", () => {
     for (const e of EQUIVOCOS) {
-      expect(e.resposta.length).toBeGreaterThan(10);
+      expect(e.consequencia.length).toBeGreaterThan(10);
       expect(conceitosIds.has(e.conceito), e.id).toBe(true);
     }
     expect(Object.keys(MOTIVOS).length).toBeGreaterThan(10);

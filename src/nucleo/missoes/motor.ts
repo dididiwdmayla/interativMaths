@@ -31,6 +31,7 @@ import type {
   ModoExecucao,
   Objetivo,
   Passo,
+  PassoAposta,
   PassoFrase,
   PassoOperar,
   PassoPrever,
@@ -159,6 +160,7 @@ function objetivoPedeAlavanca(o: Objetivo | undefined): boolean {
 
 /** O passo deixa usar a mão? (a configuração da máquina também pode desligar) */
 export function maoLivreNoPasso(p: Passo): boolean {
+  if (p.tipo === "aposta") return true;
   if (p.tipo !== "operar") return true;
   return p.maoLivre !== false && !objetivoPedeAlavanca(p.objetivo);
 }
@@ -292,15 +294,25 @@ function aparar(b: Bancada): Bancada {
 
 /* ---------- Entradas ---------- */
 
+/** Gestos do jogador: mexer na máquina, responder, pôr uma ficha, resolver junto. */
+function ehGesto(x: Entrada): boolean {
+  return x.tipo === "maquina" || x.tipo === "responder" || x.tipo === "lacuna" || x.tipo === "junto";
+}
+
 export function aplicarEntrada(
   a: Atividade,
-  e: Execucao,
+  inicial: Execucao,
   entrada: Entrada,
   ctx: ContextoMotor,
 ): { exec: Execucao; efeitos: Efeito[] } {
+  let e = inicial;
   const efeitos: Efeito[] = [];
   const p = passoAtual(a, e);
   if (!p || e.concluida) return { exec: e, efeitos };
+  // O retorno passageiro some no primeiro gesto seguinte; o "acertou" de um passo vencido fica.
+  if (e.passo.retorno !== null && e.passo.situacao !== "vencido" && e.passo.situacao !== "conferindo" && ehGesto(entrada)) {
+    e = comPasso(e, { retorno: null });
+  }
 
   if (entrada.tipo === "dica") {
     if (e.passo.situacao !== "ativo" && e.passo.situacao !== "convite") return { exec: e, efeitos };
@@ -328,6 +340,9 @@ export function aplicarEntrada(
 
     case "prever":
       return entradaPrever(a, e, p, entrada, ctx, efeitos);
+
+    case "aposta":
+      return entradaAposta(a, e, p, entrada, ctx, efeitos);
 
     case "frase":
       return entradaFrase(a, e, p, entrada, efeitos);
@@ -357,8 +372,8 @@ export function aplicarEntrada(
 
 function resolverJunto(a: Atividade, e: Execucao, p: Passo, efeitos: Efeito[]): { exec: Execucao; efeitos: Efeito[] } {
   if (e.passo.situacao !== "ativo") return { exec: e, efeitos };
-  if (p.tipo === "operar") {
-    return { exec: { ...comPasso(e, { ajuda: 4, junto: 0 }), bancada: e.passo.inicio }, efeitos };
+  if (p.tipo === "operar" || p.tipo === "aposta") {
+    return { exec: { ...comPasso(e, { ajuda: 4, junto: 0, cumprido: false }), bancada: e.passo.inicio }, efeitos };
   }
   if (p.tipo === "frase" && e.bancada) {
     const lacunas: Record<string, string> = {};
@@ -391,30 +406,21 @@ function entradaOperar(
 
   if (entrada.tipo === "maquina") {
     if (sit === "vencido") return { exec: e, efeitos };
-    const antes = e.bancada;
-    const depois = aparar(operar(antes, entrada.acao));
-    let exec: Execucao = { ...e, bancada: depois };
-    const ev = depois.atual.evento;
-    if (ev?.tipo === "engasgo") {
-      const medidas = { lote: String(ev.lote), abertas: String(ev.abertas), pedido: String(ev.pedido), ha: String(ev.ha), falta: String(ev.pedido - ev.ha) };
-      efeitos.push({ tipo: "equivoco", id: "lote-maior-que-cabe", medidas });
-      exec = registrarEquivoco(a, exec, p, "lote-maior-que-cabe", faseRegistraExploracao(p.fase), ctx, efeitos);
-      exec = comPasso(exec, { tentativas: exec.passo.tentativas + 1 });
-    }
-    if ((ev?.tipo === "fatia" || ev?.tipo === "cortou") && aindaFecha(antes.atual) === true && aindaFecha(depois.atual) === false) {
-      const medidas = { partes: String(ev.partes), pedacos: String(ev.quantidade * ev.partes), bicas: String(bicasEmUso(depois.atual).length) };
-      efeitos.push({ tipo: "equivoco", id: "corte-que-nao-fecha", medidas });
-      exec = registrarEquivoco(a, exec, p, "corte-que-nao-fecha", faseRegistraExploracao(p.fase), ctx, efeitos);
-      exec = comPasso(exec, { tentativas: exec.passo.tentativas + 1 });
-    }
-    // Resolver junto: andou um passo da resolução?
-    const j = exec.passo.junto;
-    const resolucao = resolucaoDoPasso(p, e);
-    if (j !== null && resolucao[j] && JSON.stringify(resolucao[j]) === JSON.stringify(entrada.acao)) {
-      exec = comPasso(exec, { junto: j + 1 });
+    const exec = operarMaquina(a, e, p, entrada.acao, ctx, efeitos);
+    // O passo da mão confere a cada gesto e vence sem fechar a máquina.
+    if (p.automatico && sit === "ativo" && exec.bancada) {
+      const r = validarBancada(p.objetivo.validador, p.objetivo.params ?? {}, exec.bancada.atual);
+      if (r.ok) {
+        efeitos.push({ tipo: "resultado", resultado: r });
+        efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "sucesso", exec.passo.ajuda, ctx) });
+        return { exec: comPasso(exec, { situacao: "vencido", ultimo: r, retorno: "acertou" }), efeitos };
+      }
     }
     return { exec, efeitos };
   }
+
+  // O passo automático não tem botão de fechar: quem confere é o gesto.
+  if (entrada.tipo === "fechar" && p.automatico) return { exec: e, efeitos };
 
   if (entrada.tipo === "fechar") {
     if (sit === "vencido") return { exec: e, efeitos };
@@ -425,25 +431,25 @@ function entradaOperar(
       const fechada = operar(e.bancada, { tipo: "fechar" });
       if (sit === "convite") {
         efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.convite?.evidencias, "sucesso", e.passo.ajuda, ctx) });
-        return { exec: { ...comPasso(e, { situacao: "vencido", convite: "feito", ultimo: r }), bancada: fechada }, efeitos };
+        return { exec: { ...comPasso(e, { situacao: "vencido", convite: "feito", ultimo: r, retorno: "acertou" }), bancada: fechada }, efeitos };
       }
       efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "sucesso", e.passo.ajuda, ctx) });
       const assinaturas = r.assinatura ? [...e.passo.solucoes, r.assinatura] : e.passo.solucoes;
       if (p.marcaUnitaria && ehPartilhaUnitaria(e.bancada.atual)) efeitos.push({ tipo: "marca", id: p.marcaUnitaria });
-      return { exec: { ...comPasso(e, { situacao: "vencido", ultimo: r, solucoes: assinaturas }), bancada: fechada }, efeitos };
+      return { exec: { ...comPasso(e, { situacao: "vencido", ultimo: r, solucoes: assinaturas, retorno: "acertou" }), bancada: fechada }, efeitos };
     }
     if (r.parcial && r.assinatura) {
       // Uma solução aceita, falta outra diferente: a máquina recomeça.
       if (p.marcaUnitaria && ehPartilhaUnitaria(e.bancada.atual)) efeitos.push({ tipo: "marca", id: p.marcaUnitaria });
       return {
         exec: {
-          ...comPasso(e, { solucoes: [...e.passo.solucoes, r.assinatura], ultimo: r, junto: e.passo.junto === null ? null : 0 }),
+          ...comPasso(e, { solucoes: [...e.passo.solucoes, r.assinatura], ultimo: r, junto: e.passo.junto === null ? null : 0, retorno: "acertou" }),
           bancada: e.passo.inicio,
         },
         efeitos,
       };
     }
-    let exec = comPasso(e, { ultimo: r, tentativas: e.passo.tentativas + 1 });
+    let exec = comPasso(e, { ultimo: r, tentativas: e.passo.tentativas + 1, retorno: "ainda-nao" });
     if (r.equivoco) {
       efeitos.push({ tipo: "equivoco", id: r.equivoco, medidas: r.medidas });
       exec = registrarEquivoco(a, exec, p, r.equivoco, true, ctx, efeitos);
@@ -451,6 +457,77 @@ function entradaOperar(
     return { exec, efeitos };
   }
   return { exec: e, efeitos };
+}
+
+/** Um gesto na máquina: engasgo e corte que não fecha viram equívoco; o resolver junto anda. */
+function operarMaquina(a: Atividade, e: Execucao, p: PassoOperar | PassoAposta, acao: AcaoBancada, ctx: ContextoMotor, efeitos: Efeito[]): Execucao {
+  if (!e.bancada) return e;
+  const antes = e.bancada;
+  const depois = aparar(operar(antes, acao));
+  let exec: Execucao = { ...e, bancada: depois };
+  const ev = depois.atual.evento;
+  if (ev?.tipo === "engasgo") {
+    const medidas = { lote: String(ev.lote), abertas: String(ev.abertas), pedido: String(ev.pedido), ha: String(ev.ha), falta: String(ev.pedido - ev.ha) };
+    efeitos.push({ tipo: "equivoco", id: "lote-maior-que-cabe", medidas });
+    exec = registrarEquivoco(a, exec, p, "lote-maior-que-cabe", faseRegistraExploracao(p.fase), ctx, efeitos);
+    exec = comPasso(exec, { tentativas: exec.passo.tentativas + 1 });
+  }
+  if ((ev?.tipo === "fatia" || ev?.tipo === "cortou") && aindaFecha(antes.atual) === true && aindaFecha(depois.atual) === false) {
+    const medidas = { partes: String(ev.partes), pedacos: String(ev.quantidade * ev.partes), bicas: String(bicasEmUso(depois.atual).length) };
+    efeitos.push({ tipo: "equivoco", id: "corte-que-nao-fecha", medidas });
+    exec = registrarEquivoco(a, exec, p, "corte-que-nao-fecha", faseRegistraExploracao(p.fase), ctx, efeitos);
+    exec = comPasso(exec, { tentativas: exec.passo.tentativas + 1 });
+  }
+  // Resolver junto: andou um passo da resolução?
+  const j = exec.passo.junto;
+  const resolucao = resolucaoDoPasso(p, e);
+  if (j !== null && resolucao[j] && JSON.stringify(resolucao[j]) === JSON.stringify(acao)) {
+    exec = comPasso(exec, { junto: j + 1 });
+  }
+  return exec;
+}
+
+/**
+ * A aposta: operar até a máquina mostrar o que o bilhete diz (conferido a cada gesto); então a
+ * pergunta destrava. A resposta leva o retorno; quem perde a aposta é o Nônio, nunca o jogador.
+ */
+function entradaAposta(
+  a: Atividade,
+  e: Execucao,
+  p: PassoAposta,
+  entrada: Entrada,
+  ctx: ContextoMotor,
+  efeitos: Efeito[],
+): { exec: Execucao; efeitos: Efeito[] } {
+  const sit = e.passo.situacao;
+  if (entrada.tipo === "seguir") return sit === "vencido" ? avancar(a, e, efeitos) : { exec: e, efeitos };
+  if (sit !== "ativo") return { exec: e, efeitos };
+  if (entrada.tipo === "maquina" && e.bancada) {
+    const exec = operarMaquina(a, e, p, entrada.acao, ctx, efeitos);
+    const cumprido = exec.bancada ? validarBancada(p.objetivo.validador, p.objetivo.params ?? {}, exec.bancada.atual).ok : false;
+    return { exec: comPasso(exec, { cumprido }), efeitos };
+  }
+  if (entrada.tipo !== "responder" || !e.passo.cumprido) return { exec: e, efeitos };
+  const c = conferirResposta(entrada.valor, p.esperado, { respostasEquivoco: p.respostasEquivoco, opcao: true });
+  const primeira = e.passo.respostas === 0;
+  const ajuda = (primeira ? e.passo.ajuda : Math.max(e.passo.ajuda, 1)) as NivelAjuda;
+  const respostas = e.passo.respostas + 1;
+  if (c.naoSei) {
+    if (primeira) efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "nao_sei", ajuda, ctx) });
+    return { exec: comPasso(e, { situacao: "vencido", resposta: null, respostaCerta: false, respostas, retorno: null }), efeitos };
+  }
+  if (c.certa) {
+    efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "sucesso", ajuda, ctx) });
+    return { exec: comPasso(e, { situacao: "vencido", resposta: entrada.valor, respostaCerta: true, respostas, retorno: "acertou" }), efeitos };
+  }
+  let exec = comPasso(e, { resposta: entrada.valor, respostaCerta: false, respostas, retorno: "ainda-nao", tentativas: e.passo.tentativas + 1 });
+  if (c.equivoco) {
+    efeitos.push({ tipo: "equivoco", id: c.equivoco, medidas: { resposta: entrada.valor ?? "" } });
+    exec = registrarEquivoco(a, exec, p, c.equivoco, true, ctx, efeitos);
+  } else if (primeira) {
+    efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "falha", ajuda, ctx) });
+  }
+  return { exec, efeitos };
 }
 
 function registrarEquivoco(
@@ -477,8 +554,8 @@ function registrarEquivoco(
  * A resolução que o "resolver junto" segue: a primeira que leva a uma partilha ainda não feita
  * neste passo (importa quando o passo pede soluções distintas).
  */
-export function resolucaoDoPasso(p: PassoOperar, e: Execucao): readonly AcaoBancada[] {
-  const opcoes = [p.resolucao, ...(p.alternativas ?? [])];
+export function resolucaoDoPasso(p: PassoOperar | PassoAposta, e: Execucao): readonly AcaoBancada[] {
+  const opcoes = [p.resolucao, ...(p.tipo === "operar" ? (p.alternativas ?? []) : [])];
   const inicio = e.passo.inicio;
   if (!inicio || e.passo.solucoes.length === 0) return opcoes[0];
   for (const acoes of opcoes) {
@@ -486,6 +563,22 @@ export function resolucaoDoPasso(p: PassoOperar, e: Execucao): readonly AcaoBanc
     if (!e.passo.solucoes.includes(assinaturaPartilha(final.atual))) return acoes;
   }
   return opcoes[0];
+}
+
+/**
+ * O palpite que este passo revela: o primeiro passo de máquina (não automático) depois de um
+ * palpite, no mesmo modo. null se não há palpite a revelar aqui.
+ */
+export function palpiteDoPasso(a: Atividade, e: Execucao): { readonly valor: string | null; readonly certo: string } | null {
+  const passos = passosDoModo(a, e.modo);
+  const atual = passos[e.indice];
+  if (!atual || atual.tipo !== "operar" || atual.automatico) return null;
+  for (let i = e.indice - 1; i >= 0; i--) {
+    const p = passos[i];
+    if (p.tipo === "palpite") return p.id in e.palpites ? { valor: e.palpites[p.id], certo: p.certo } : null;
+    if (p.tipo === "operar" && !p.automatico) return null;
+  }
+  return null;
 }
 
 /** O que a máquina mostra ao conferir uma previsão. */
@@ -517,16 +610,31 @@ function entradaPrever(
     respostasEquivoco: p.respostasEquivoco,
     opcao,
   });
-  const ajuda = e.passo.ajuda;
-  let exec: Execucao = { ...comPasso(e, { situacao: "conferindo", resposta: entrada.valor, respostaCerta: c.certa }), bancada: final };
+  const primeira = e.passo.respostas === 0;
+  // Depois de um "ainda não", a segunda resposta vale com ajuda de olhar (degrau 1).
+  const ajuda = (primeira ? e.passo.ajuda : Math.max(e.passo.ajuda, 1)) as NivelAjuda;
+  const respostas = e.passo.respostas + 1;
+  const conferir = (mudancas: Partial<EstadoPasso>): Execucao => ({
+    ...comPasso(e, { situacao: "conferindo", resposta: entrada.valor, respostaCerta: c.certa, respostas, ...mudancas }),
+    bancada: final,
+  });
   if (c.naoSei) {
-    efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "nao_sei", ajuda, ctx) });
-  } else if (c.certa) {
+    if (primeira) efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "nao_sei", ajuda, ctx) });
+    return { exec: conferir({ retorno: null }), efeitos };
+  }
+  if (c.certa) {
     efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "sucesso", ajuda, ctx) });
-  } else if (c.equivoco) {
-    efeitos.push({ tipo: "equivoco", id: c.equivoco, medidas: { resposta: entrada.valor ?? "", certa: esperado } });
+    return { exec: conferir({ retorno: "acertou" }), efeitos };
+  }
+  // Não bateu. Na primeira vez (fora da sondagem, que só mede), a máquina espera outra resposta.
+  const segundaChance = primeira && a.tipo !== "sondagem";
+  let exec: Execucao = segundaChance
+    ? comPasso(e, { resposta: entrada.valor, respostaCerta: false, respostas, retorno: "ainda-nao", tentativas: e.passo.tentativas + 1 })
+    : conferir({ retorno: "ainda-nao" });
+  if (c.equivoco) {
+    efeitos.push({ tipo: "equivoco", id: c.equivoco, medidas: { resposta: entrada.valor ?? "" } });
     exec = registrarEquivoco(a, exec, p, c.equivoco, true, ctx, efeitos);
-  } else {
+  } else if (primeira) {
     efeitos.push({ tipo: "evidencias", lista: evidencias(a, p.evidencias, "falha", ajuda, ctx) });
   }
   return { exec, efeitos };
@@ -562,10 +670,10 @@ function entradaFrase(
       })
       .map((l) => l.id);
     if (erradas.length > 0) {
-      return { exec: comPasso(e, { lacunasErradas: erradas, tentativas: e.passo.tentativas + 1 }), efeitos };
+      return { exec: comPasso(e, { lacunasErradas: erradas, tentativas: e.passo.tentativas + 1, retorno: "ainda-nao" }), efeitos };
     }
     const frase = preencher(p.frase, e.passo.lacunas);
-    return { exec: { ...comPasso(e, { situacao: "vencido", lacunasErradas: [] }), frases: { ...e.frases, [p.id]: frase } }, efeitos };
+    return { exec: { ...comPasso(e, { situacao: "vencido", lacunasErradas: [], retorno: "acertou" }), frases: { ...e.frases, [p.id]: frase } }, efeitos };
   }
   return { exec: e, efeitos };
 }

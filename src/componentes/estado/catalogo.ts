@@ -2,11 +2,14 @@
  * Consultas ao catálogo de conteúdo (atividades, equívocos, peles).
  */
 import { ATIVIDADES } from "@/conteudo/atividades";
-import { EQUIVOCOS, MOTIVOS } from "@/conteudo/equivocos";
+import { EQUIVOCOS } from "@/conteudo/equivocos";
 import { MISSOES_ARCO_1 } from "@/conteudo/missoes";
 import type { Pele } from "@/conteudo/peles";
-import { preencher } from "@/nucleo/missoes/motor";
+import { TEXTOS_REACAO } from "@/conteudo/reacoes";
 import type { Atividade } from "@/nucleo/missoes/tipos";
+import { marcadoresDaPele, textoDoEquivoco as textoEquivocoNucleo, textoDoMotivo as textoMotivoNucleo } from "@/nucleo/tutor/reacoes";
+
+export { TEXTOS_REACAO };
 
 export function atividadePorId(id: string): Atividade | null {
   return ATIVIDADES.find((a) => a.id === id) ?? null;
@@ -31,14 +34,12 @@ export function conceitoDoEquivoco(id: string): string | null {
   return EQUIVOCOS.find((e) => e.id === id)?.conceito ?? null;
 }
 
-export function textoDoEquivoco(id: string, medidas: Readonly<Record<string, string>>): string {
-  const e = EQUIVOCOS.find((x) => x.id === id);
-  return e ? preencher(e.resposta, medidas) : "";
+export function textoDoEquivoco(id: string, medidas: Readonly<Record<string, string>>, pele: Pele): string {
+  return textoEquivocoNucleo(id, { ...marcadoresDaPele(pele), ...medidas }, TEXTOS_REACAO);
 }
 
 export function textoDoMotivo(motivo: string, medidas: Readonly<Record<string, string>>, pele: Pele): string {
-  const modelo = MOTIVOS[motivo] ?? "";
-  return preencher(modelo, { receptor: pele.receptor.singular, receptores: pele.receptor.plural, ...medidas });
+  return textoMotivoNucleo(motivo, { ...marcadoresDaPele(pele), ...medidas }, TEXTOS_REACAO);
 }
 
 export function proximaMissao(a: Atividade): Atividade | null {

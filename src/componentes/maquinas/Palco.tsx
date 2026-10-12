@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * O palco de uma máquina. Celular em pé: o pedido numa linha, a máquina numa ficha quadriculada,
- * a tira da mensagem, o balão do Nônio e a bancada de controles embaixo, na zona do polegar.
- * No computador: a máquina numa ficha à esquerda; à direita, o pedido, o Nônio e a bancada.
+ * O palco de uma máquina. Celular em pé: a linha do objetivo, a máquina numa ficha
+ * quadriculada, a faixa do Nônio e a bancada de controles embaixo, na zona do polegar.
+ * No computador: a máquina numa ficha à esquerda; à direita, o objetivo, o Nônio e a bancada.
  * Girar o aparelho só muda o CSS: o estado não se perde.
  */
 import type { ReactNode } from "react";
@@ -13,8 +13,7 @@ export function Palco({
   cabecalho,
   pedido,
   maquina,
-  tira,
-  nonio,
+  faixa,
   controles,
   sobreposicao,
   atributos,
@@ -22,8 +21,8 @@ export function Palco({
   cabecalho?: ReactNode;
   pedido?: ReactNode;
   maquina: ReactNode;
-  tira?: ReactNode;
-  nonio?: ReactNode;
+  /** A faixa do Nônio (e o que mora com ela: desvio, categoria da Rua). */
+  faixa?: ReactNode;
   controles?: ReactNode;
   /** Algo que ocupa o lugar dos controles (a folha pautada do Caderno, que sobe). */
   sobreposicao?: ReactNode;
@@ -38,8 +37,7 @@ export function Palco({
         <section className="palco-maquina ficha-quadriculada" aria-label="Máquina">
           {maquina}
         </section>
-        {tira && <div className="palco-tira">{tira}</div>}
-        {nonio && <div className="palco-nonio">{nonio}</div>}
+        {faixa && !sobreposicao && <div className="palco-faixa">{faixa}</div>}
         {sobreposicao ? (
           <div className="palco-folha">{sobreposicao}</div>
         ) : (
