@@ -20,8 +20,13 @@
   --color-marca-texto: var(--marca-texto);
   --color-marca-texto-palido: var(--marca-texto-palido);
   --color-vermelho: var(--vermelho);
+  --color-vermelho-nevoa: var(--vermelho-nevoa);
+  --color-verde: var(--verde);
   --color-verde-escuro: var(--verde-escuro);
+  --color-verde-tinta: var(--verde-tinta);
   --color-verde-palido: var(--verde-palido);
+  --color-bilhete: var(--bilhete);
+  --color-veu: var(--veu);
 
   --font-interface: var(--fonte-interface);
   --font-mao: var(--fonte-mao);

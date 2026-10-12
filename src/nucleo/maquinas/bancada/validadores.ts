@@ -33,7 +33,9 @@ export type NomeValidadorBancada =
   | "transporte.tudo-saiu"
   | "partilha.solucoes-distintas"
   | "partilha.unitarias-distintas"
-  | "maquina.mostra-divisao";
+  | "maquina.mostra-divisao"
+  | "partilha.inteiras-por-bica"
+  | "partilha.composicao";
 
 export const VALIDADORES_BANCADA: readonly NomeValidadorBancada[] = [
   "partilha.fechada",
@@ -42,6 +44,8 @@ export const VALIDADORES_BANCADA: readonly NomeValidadorBancada[] = [
   "partilha.solucoes-distintas",
   "partilha.unitarias-distintas",
   "maquina.mostra-divisao",
+  "partilha.inteiras-por-bica",
+  "partilha.composicao",
 ];
 
 export type Parametros = Readonly<Record<string, string | number | boolean>>;
@@ -65,7 +69,33 @@ export type MotivoValidacao =
   | "falta-solucao"
   | "carga-inicial-diferente"
   | "bicas-diferentes"
-  | "voltas-demais";
+  | "voltas-demais"
+  | "esteira-vazia"
+  | "composicao-diferente";
+
+export const MOTIVOS_VALIDACAO: readonly MotivoValidacao[] = [
+  "ok",
+  "nenhuma-bica",
+  "desiguais",
+  "mesma-contagem-quantidades-diferentes",
+  "sobra-da-mais-uma-volta",
+  "sobra-pode-ser-cortada",
+  "sobra-nao-fecha",
+  "carga-diferente",
+  "sobra-diferente",
+  "passou-do-teto",
+  "ficou-carga",
+  "bicas-demais",
+  "pedaco-repetido",
+  "pedaco-nao-unitario",
+  "solucao-repetida",
+  "falta-solucao",
+  "carga-inicial-diferente",
+  "bicas-diferentes",
+  "voltas-demais",
+  "esteira-vazia",
+  "composicao-diferente",
+];
 
 export interface ResultadoValidacao {
   readonly ok: boolean;
@@ -251,6 +281,68 @@ function conferirSolucoesDistintas(e: EstadoBancada, p: Parametros, ctx: Context
   return { ...resultado(true, "ok", { feitas: String(feitas), n: String(n) }), assinatura: ass };
 }
 
+/**
+ * Cada bica em uso com exatamente N peças inteiras, e a esteira ainda com peças: o passo da mão
+ * ("uma saca em cada carroça"), antes de a alavanca terminar o serviço.
+ */
+function conferirInteirasPorBica(e: EstadoBancada, p: Parametros): ResultadoValidacao {
+  const n = Number(p.n ?? 1);
+  const uso = bicasEmUso(e);
+  if (uso.length === 0) return resultado(false, "nenhuma-bica", { esperado: String(n) });
+  for (const i of uso) {
+    const pecas = e.bicas[i].pecas;
+    const so = pecas.length === 1 && pecas[0].tamanho.n === 1 && pecas[0].tamanho.d === 1 && pecas[0].quantidade === n;
+    if (!so) {
+      return resultado(false, "carga-diferente", {
+        esperado: String(n),
+        carga: texto(quantidadeNaBica(e.bicas[i])),
+        bica: String(i + 1),
+        bicas: String(uso.length),
+        sobra: texto(quantidadeDe(e.esteira)),
+      });
+    }
+  }
+  if (e.esteira.length === 0) return resultado(false, "esteira-vazia", { esperado: String(n), bicas: String(uso.length) });
+  return resultado(true, "ok", { cada: String(n), bicas: String(uso.length), sobra: texto(quantidadeDe(e.esteira)) });
+}
+
+/** "2x1/8" → texto curto ("2 de 1/8"). */
+function lerComposicao(s: string): { tamanho: Racional; quantidade: number }[] {
+  return s
+    .split("+")
+    .filter((x) => x.length > 0)
+    .map((x) => {
+      const [k, t] = x.split("x");
+      return { quantidade: Number(k), tamanho: comoRacional(t) };
+    });
+}
+
+function textoComposicao(pecas: readonly { tamanho: Racional; quantidade: number }[]): string {
+  if (pecas.length === 0) return "nada";
+  return pecas.map((p) => `${p.quantidade} de ${texto(p.tamanho)}`).join(" e ");
+}
+
+/**
+ * Composição declarada por bica: params `bica1`, `bica2`... no formato "2x1/8" ou "1x1/4+1x1/8".
+ * Confere só as bicas declaradas; o que ficou na esteira não importa.
+ */
+function conferirComposicao(e: EstadoBancada, p: Parametros): ResultadoValidacao {
+  for (let i = 0; i < e.bicas.length; i++) {
+    const declarada = p[`bica${i + 1}`];
+    if (declarada === undefined) continue;
+    const pedido = lerComposicao(String(declarada));
+    const tem = e.bicas[i].pecas;
+    const bate =
+      pedido.length === tem.length &&
+      pedido.every((x) => tem.some((y) => igual(y.tamanho, x.tamanho) && y.quantidade === x.quantidade));
+    if (!bate) {
+      return resultado(false, "composicao-diferente", { bica: String(i + 1), pedido: textoComposicao(pedido), tem: textoComposicao(tem) });
+    }
+  }
+  const uso = bicasEmUso(e);
+  return resultado(true, "ok", { quantidades: quantidadesPorBica(e, uso).map(texto).join(", "), bicas: String(uso.length) });
+}
+
 export function validarBancada(
   nome: NomeValidadorBancada,
   params: Parametros,
@@ -273,6 +365,10 @@ export function validarBancada(
       return conferirUnitarias(e);
     case "maquina.mostra-divisao":
       return conferirMostraDivisao(e, params);
+    case "partilha.inteiras-por-bica":
+      return conferirInteirasPorBica(e, params);
+    case "partilha.composicao":
+      return conferirComposicao(e, params);
   }
 }
 

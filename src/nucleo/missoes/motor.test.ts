@@ -99,3 +99,28 @@ describe("motor de missão", () => {
     expect(evidencias(efeitos).at(-1)).toMatchObject({ resultado: "nao_sei", conceito: "fra.parte" });
   });
 });
+
+describe("mão livre no motor", () => {
+  it("na prova direta numa volta só, a mão fica de fora", () => {
+    let e = iniciarExecucao(MISSAO_1, "prova");
+    e = aplicarEntrada(MISSAO_1, e, { tipo: "seguir" }, ctx).exec;
+    const r = aplicarEntrada(MISSAO_1, e, { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 0 } }, ctx);
+    expect(r.exec.bancada?.atual.evento).toEqual({ tipo: "recusa", motivo: "sem-mao-livre" });
+  });
+
+  it("no desafio de uma volta só, a mão também fica de fora; fora dele, vale", () => {
+    const idx = MISSAO_1.passos.findIndex((p) => p.tipo === "operar" && p.convite !== undefined);
+    const passo = MISSAO_1.passos[idx];
+    if (passo.tipo !== "operar") throw new Error("passo errado");
+    let e: Execucao = { ...iniciarExecucao(MISSAO_1, "guiada") };
+    while (e.indice < idx) e = aplicarEntrada(MISSAO_1, e, e.indice === 1 ? { tipo: "responder", valor: null } : { tipo: "seguir" }, ctx).exec;
+    const mao = aplicarEntrada(MISSAO_1, e, { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 0 } }, ctx).exec;
+    expect(mao.bancada?.atual.evento).toEqual({ tipo: "colocou", tamanho: "1/1", bica: 0 });
+    for (const acao of passo.resolucao) e = aplicarEntrada(MISSAO_1, e, { tipo: "maquina", acao }, ctx).exec;
+    e = aplicarEntrada(MISSAO_1, e, { tipo: "fechar" }, ctx).exec;
+    e = aplicarEntrada(MISSAO_1, e, { tipo: "convite", aceitar: true }, ctx).exec;
+    expect(e.passo.situacao).toBe("convite");
+    const r = aplicarEntrada(MISSAO_1, e, { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 0 } }, ctx);
+    expect(r.exec.bancada?.atual.evento).toEqual({ tipo: "recusa", motivo: "sem-mao-livre" });
+  });
+});

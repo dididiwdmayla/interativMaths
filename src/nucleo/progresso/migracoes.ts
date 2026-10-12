@@ -29,7 +29,25 @@ const DE_0_PARA_1: Migracao = {
   },
 };
 
-export const MIGRACOES: readonly Migracao[] = [DE_0_PARA_1];
+/**
+ * v0.3: o progresso passa a guardar as apresentações vistas e a preferência da conversa com o
+ * Nônio (ligada por padrão). Execuções salvas não mudam aqui: o motor reconhece as de formato
+ * antigo e recomeça a missão cujos passos mudaram, sem tocar em conclusões, evidências e Caderno.
+ */
+const DE_1_PARA_2: Migracao = {
+  de: 1,
+  descricao: "apresentações vistas e preferência da conversa",
+  migrar: (doc) => {
+    const prefs = ehObjeto(doc.preferencias) ? doc.preferencias : {};
+    return {
+      ...doc,
+      preferencias: { ...prefs, conversa: prefs.conversa === "desligada" ? "desligada" : "ligada" },
+      apresentacoes: ehObjeto(doc.apresentacoes) ? doc.apresentacoes : {},
+    };
+  },
+};
+
+export const MIGRACOES: readonly Migracao[] = [DE_0_PARA_1, DE_1_PARA_2];
 
 export function versaoDe(doc: Documento): number {
   const v = doc.versao;

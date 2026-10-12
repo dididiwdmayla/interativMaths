@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Referência · Nônio guia e retorno</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Rubik:wght@500;600;700;800&display=swap">
+<style>
+body{margin:0;padding:24px;background:#eef2f9;font-family:'Rubik',system-ui,sans-serif}
+.grade{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+.legenda{margin:0 0 10px;font-size:15px;font-weight:800;color:#1b2440}
+a{color:#2456e6}
+.tela{width:390px;height:844px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;position:relative;background-color:#fbfcff;background-image:linear-gradient(#dfe7f5 1px,transparent 1px),linear-gradient(90deg,#dfe7f5 1px,transparent 1px);background-size:20px 20px;color:#1b2440;font-family:'Rubik',system-ui,sans-serif}
+.cab{height:60px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:0 14px;background:#fff;border-bottom:2px solid #1b2440}
+.qd{width:44px;height:44px;flex:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid #1b2440;border-radius:12px;background:#fff;color:#1b2440;padding:0;text-decoration:none;cursor:pointer}
+.tit{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.tit-p{font-size:12px;font-weight:600;color:#56607d}
+.tit-g{font-size:17px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.obj{flex:none;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;padding:9px 14px 10px;background:#fff;border-bottom:2px solid #1b2440}
+.obj-l{display:flex;align-items:flex-start;gap:8px;font-size:15.5px;font-weight:600;line-height:1.3}
+.etq{flex:none;padding:2px 8px;border-radius:7px;background:#1b2440;color:#fff;font-size:12.5px;font-weight:700;line-height:1.4}
+.t2 .etq{flex:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:7px;background:#1b2440;color:#fff;font-size:12.5px;font-weight:700;line-height:1.4}
+.gesto{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#2456e6}
+.t5 .gesto{display:flex;align-items:flex-start;gap:7px;font-size:14px;font-weight:600;line-height:1.35;color:#2456e6}
+.ficha{background:#fff;border:2px solid #1b2440;border-radius:16px;box-shadow:0 4px 0 #1b2440;box-sizing:border-box}
+.maq{flex:none;margin:12px 14px 0;position:relative;overflow:hidden;background-color:#fff;background-image:linear-gradient(#e9eef8 1px,transparent 1px),linear-gradient(90deg,#e9eef8 1px,transparent 1px);background-size:20px 20px}
+.t5 .maq{flex:none;margin:14px 14px 0;position:relative;overflow:hidden;background-color:#fff;background-image:linear-gradient(#e9eef8 1px,transparent 1px),linear-gradient(90deg,#e9eef8 1px,transparent 1px);background-size:20px 20px}
+.guia{flex:none;margin:14px 14px 0;display:flex;align-items:flex-end;gap:8px}
+.balao{flex:1;min-width:0;box-sizing:border-box;padding:9px 13px 11px;border:2px solid #1b2440;border-radius:14px 14px 14px 4px;background:#fff}
+.nome{font-size:12px;font-weight:700;color:#2456e6}
+.t4 .nome{display:block;font-size:12px;font-weight:700;color:#2456e6;margin-bottom:2px}
+.fala{margin:6px 0 0;font-size:15px;font-weight:500;line-height:1.35}
+.t1 .fala{margin:2px 0 0;font-size:15px;font-weight:500;line-height:1.35}
+.acoes{display:flex;gap:8px;margin-top:9px}
+.bp{height:50px;box-sizing:border-box;border:2px solid #1b2440;border-radius:14px;background:#2456e6;box-shadow:0 4px 0 #1b2440;color:#fff;font:700 18px 'Rubik',system-ui,sans-serif;padding:0 14px;cursor:pointer}
+.bs{height:46px;box-sizing:border-box;border:2px solid #1b2440;border-radius:12px;background:#fff;color:#1b2440;font:600 15px 'Rubik',system-ui,sans-serif;padding:0 14px;cursor:pointer}
+.bsp{height:38px;box-sizing:border-box;display:flex;align-items:center;gap:6px;border:2px solid #1b2440;border-radius:10px;background:#fff;color:#1b2440;font:600 14px 'Rubik',system-ui,sans-serif;padding:0 11px;cursor:pointer}
+.t4 .bsp{height:38px;box-sizing:border-box;display:flex;align-items:center;gap:6px;border:2px solid #1b2440;border-radius:10px;background:#fff;color:#1b2440;font:600 14px 'Rubik',system-ui,sans-serif;padding:0 11px;cursor:pointer;white-space:nowrap}
+.bd{height:46px;border:0;background:transparent;color:#56607d;font:600 15px 'Rubik',system-ui,sans-serif;display:flex;align-items:center;gap:6px;padding:0 10px;cursor:pointer}
+.banc{margin-top:auto;flex:none;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;padding:16px 14px 22px;background:#fff;border-top:2px solid #1b2440;border-radius:18px 18px 0 0}
+.lin{display:flex;align-items:center;gap:8px}
+.rot{flex:none;font-size:14px;font-weight:600;color:#56607d}
+.val{width:48px;height:46px;flex:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid #1b2440;border-radius:12px;background:#fff7cf;font-size:24px;font-weight:800}
+.passo{width:44px;height:44px;flex:none;box-sizing:border-box;border:2px solid #1b2440;border-radius:12px;background:#fff;color:#1b2440;font:700 22px 'Rubik',system-ui,sans-serif;line-height:1;padding:0;cursor:pointer}
+.pop{position:absolute;box-sizing:border-box;display:flex;flex-direction:column;gap:5px;padding:7px 9px 9px;background:#fff;border:2px solid #1b2440;border-radius:12px;box-shadow:0 3px 0 #1b2440}
+.pop-r{font-size:11.5px;font-weight:700;color:#56607d}
+.pop-b{width:40px;height:38px;box-sizing:border-box;border:2px solid #1b2440;border-radius:9px;background:#fff;color:#1b2440;font:700 16px 'Rubik',system-ui,sans-serif;padding:0;cursor:pointer}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border:2px solid #1b2440;border-radius:8px;font-size:13px;font-weight:700}
+.t3 .chip{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border:2px solid #1b2440;border-radius:8px;font-size:13px;font-weight:700}
+.caixa{width:52px;height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2.5px solid #e5484d;border-radius:10px;background:#fff1f0;font-size:24px;font-weight:800}
+.fichanum{width:44px;height:44px;box-sizing:border-box;border:2px solid #1b2440;border-radius:10px;background:#fff;color:#1b2440;font:800 19px 'Rubik',system-ui,sans-serif;padding:0;cursor:pointer}
+.folha{position:absolute;left:0;right:0;bottom:0;top:150px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;padding:10px 14px 20px;background:#fff;border-top:2px solid #1b2440;border-radius:22px 22px 0 0}
+.eu{align-self:flex-end;max-width:78%;box-sizing:border-box;padding:9px 12px;border:2px solid #1b2440;border-radius:14px 14px 4px 14px;background:#dfe8ff;font-size:15px;font-weight:500;line-height:1.35}
+.ele{align-self:flex-start;max-width:84%;box-sizing:border-box;padding:9px 12px;border:2px solid #1b2440;border-radius:14px 14px 14px 4px;background:#fff;font-size:15px;font-weight:500;line-height:1.35}
+.op{height:44px;box-sizing:border-box;border:2px solid #1b2440;border-radius:10px;background:#fff;color:#1b2440;font:700 15px 'Rubik',system-ui,sans-serif;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="grade">
+<section class="t1">
+<p class="legenda">1 · Guia na missão</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>
+</a>
+<div class="tit">
+<div class="tit-p">A Partilha · Missão 4</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="bsp" aria-label="Etapas da missão: 2 de 9">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h8M6 8h8M6 12h8"/><path d="M2 4h.5M2 8h.5M2 12h.5"/></svg>
+2/9</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq">Objetivo</span><span>Reparta as 5 broas entre as 4 mesas, sem sobrar nada.</span></div>
+<div class="gesto">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#2456e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5V3.8a1.3 1.3 0 0 1 2.6 0V8"/><path d="M9.6 7.5a1.3 1.3 0 0 1 2.6 0V9"/><path d="M12.2 8.5a1.3 1.3 0 0 1 2.6 0v2.8c0 3-2 5-4.8 5H9.2c-1.7 0-2.6-.8-3.6-2.2L3.4 10.8a1.3 1.3 0 0 1 2-1.6L7 11"/></svg>
+Agora: escolha em quantas partes cortar a broa.</div>
+</div>
+
+<section class="ficha maq" aria-label="Bancada de partilha" style="height: 340px">
+<svg width="358" height="336" viewBox="0 0 358 336" style="display: block" role="img" aria-label="Quatro mesas com uma broa inteira cada. Na esteira sobrou uma broa, escolhida para cortar.">
+<g stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="16" y="26" width="7" height="50" rx="2" fill="#8fb0ff"/>
+<rect x="53" y="26" width="7" height="50" rx="2" fill="#8fb0ff"/>
+<path d="M23 30 H53 V42 L23 54 Z" fill="#ffffff"/>
+<rect x="12" y="18" width="52" height="10" rx="4" fill="#2456e6"/>
+<rect x="70" y="76" width="272" height="14" rx="7" fill="#ffffff"/>
+<circle cx="104" cy="51" r="18" fill="#f7c66f"/>
+<path d="M93 46 q11 -7 22 0 M96 54 q8 -5 16 0" fill="none" stroke-width="2"/>
+</g>
+<circle cx="104" cy="51" r="25" fill="none" stroke="#2456e6" stroke-width="2.6"/>
+<ellipse cx="104" cy="76" rx="14" ry="2.5" fill="#1b2440" opacity="0.15"/>
+<g fill="#1b2440"><circle cx="82" cy="83" r="1.6"/><circle cx="144" cy="83" r="1.6"/><circle cx="206" cy="83" r="1.6"/><circle cx="268" cy="83" r="1.6"/><circle cx="330" cy="83" r="1.6"/></g>
+<g stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="20" y="110" width="318" height="8" rx="4" fill="#dfe7f5"/>
+<rect x="52" y="130" width="8" height="7" fill="#8fb0ff"/><rect x="48" y="116" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="134" y="130" width="8" height="7" fill="#8fb0ff"/><rect x="130" y="116" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="216" y="130" width="8" height="7" fill="#8fb0ff"/><rect x="212" y="116" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="298" y="130" width="8" height="7" fill="#8fb0ff"/><rect x="294" y="116" width="16" height="15" rx="3" fill="#2456e6"/>
+</g>
+<defs>
+<g id="mesa-inteira">
+<g stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<circle cx="44" cy="214" r="25" fill="#f7c66f"/>
+<path d="M31 209 q13 -8 26 0 M34 218 q10 -6 20 0" fill="none" stroke-width="2"/>
+<rect x="84" y="176" width="10" height="72" rx="5" fill="#ffffff"/>
+<path d="M84 190 H94 V243 A5 5 0 0 1 84 243 Z" fill="#ffe45c"/>
+<rect x="20" y="252" width="72" height="9" rx="3" fill="#8fb0ff"/>
+<path d="M30 261 V278 M82 261 V278" fill="none"/>
+</g>
+<text x="56" y="304" text-anchor="middle" font-size="18" font-weight="800" fill="#1b2440">1</text>
+<text x="56" y="324" text-anchor="middle" font-size="12" font-weight="500" fill="#56607d">1 inteira</text>
+</g>
+</defs>
+<use href="#mesa-inteira" x="0"/>
+<use href="#mesa-inteira" x="82"/>
+<use href="#mesa-inteira" x="164"/>
+<use href="#mesa-inteira" x="246"/>
+</svg>
+<div class="pop" style="left: 140px; top: 8px">
+<div class="pop-r">Cortar em</div>
+<div style="display: flex; gap: 6px">
+<button type="button" class="pop-b">2</button>
+<button type="button" class="pop-b">3</button>
+<button type="button" class="pop-b">4</button>
+<button type="button" class="pop-b">8</button>
+</div>
+</div>
+<svg width="12" height="16" viewBox="0 0 12 16" style="position: absolute; left: 130px; top: 34px" aria-hidden="true"><path d="M12 1 L2 8 L12 15" fill="#ffffff" stroke="#1b2440" stroke-width="2" stroke-linejoin="round"/></svg>
+</section>
+
+<div class="guia">
+<svg width="58" height="54" viewBox="-6 -46 68 64" style="flex: none" aria-hidden="true" stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="28" y2="-38"/>
+<circle cx="28" cy="-41" r="4" fill="#ffe45c"/>
+<rect x="15" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<rect x="36" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="#2456e6"/>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="#ffffff"/>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="#8fb0ff"/>
+<circle cx="22" cy="-8.5" r="2.3" fill="#1b2440" stroke="none"/>
+<circle cx="34" cy="-8.5" r="2.3" fill="#1b2440" stroke="none"/>
+</svg>
+<div class="balao">
+<div class="nome">Nônio</div>
+<p class="fala">Sobrou uma broa. Pão a gente corta: em quantas partes, para as quatro mesas ficarem iguais?</p>
+<div class="acoes">
+<button type="button" class="bsp">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 10.5a4.5 4.5 0 1 1 5 0V12h-5Z"/><path d="M6 14.5h4"/></svg>
+Me ajuda</button>
+<button type="button" class="bsp">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 3.5h11v7h-6l-3 3v-3h-2Z"/></svg>
+Perguntar</button>
+</div>
+</div>
+</div>
+
+<div class="banc">
+<div class="lin">
+<div class="rot" style="width: 38px">Lote</div>
+<button type="button" class="passo" aria-label="Diminuir o lote">−</button>
+<div class="val">1</div>
+<button type="button" class="passo" aria-label="Aumentar o lote">+</button>
+<button type="button" class="bp" style="flex: 1; margin-left: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; line-height: 1.1">Repartir<span style="font-size: 12.5px; font-weight: 600">1 para cada mesa</span></button>
+</div>
+<div class="lin">
+<button type="button" class="bs" style="flex: 1">Fechar a partilha</button>
+<button type="button" class="bd">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#56607d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6.5a3.5 3.5 0 0 1 0 7H6"/><path d="M6 3 3 6l3 3"/></svg>
+Desfazer</button>
+</div>
+</div>
+</div>
+</section>
+<section class="t2">
+<p class="legenda">2 · Acertou</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>
+</a>
+<div class="tit">
+<div class="tit-p">A Partilha · Missão 4</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="bsp" aria-label="Etapas da missão: 3 de 9">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h8M6 8h8M6 12h8"/><path d="M2 4h.5M2 8h.5M2 12h.5"/></svg>
+3/9</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq" style="background: #177a5b">
+<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3"/></svg>
+Feito</span><span>Reparta as 5 broas entre as 4 mesas, sem sobrar nada.</span></div>
+<div class="gesto" style="color: #177a5b">Fechou: uma broa e mais um quarto em cada mesa.</div>
+</div>
+
+<section class="ficha maq" aria-label="Bancada de partilha, fechada" style="height: 340px; border-color: #1f9d6f; box-shadow: 0 4px 0 #177a5b">
+<svg width="358" height="336" viewBox="0 0 358 336" style="display: block" role="img" aria-label="Partilha fechada: cada uma das 4 mesas tem uma broa inteira e um quarto. A esteira está vazia.">
+<g stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="16" y="26" width="7" height="50" rx="2" fill="#8fb0ff"/>
+<rect x="53" y="26" width="7" height="50" rx="2" fill="#8fb0ff"/>
+<path d="M23 30 H53 V42 L23 54 Z" fill="#ffffff"/>
+<rect x="12" y="18" width="52" height="10" rx="4" fill="#2456e6"/>
+<rect x="14" y="64" width="48" height="22" rx="6" fill="#ffe45c"/>
+<rect x="70" y="76" width="272" height="14" rx="7" fill="#ffffff"/>
+</g>
+<text x="38" y="80" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1b2440">em 4</text>
+<g fill="#1b2440"><circle cx="82" cy="83" r="1.6"/><circle cx="144" cy="83" r="1.6"/><circle cx="206" cy="83" r="1.6"/><circle cx="268" cy="83" r="1.6"/><circle cx="330" cy="83" r="1.6"/></g>
+<text x="330" y="52" text-anchor="end" font-family="'Caveat', cursive" font-size="34" font-weight="700" fill="#177a5b" transform="rotate(-6 330 52)">fechou</text>
+<g stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="20" y="110" width="318" height="8" rx="4" fill="#dfe7f5"/>
+<rect x="52" y="130" width="8" height="7" fill="#8fb0ff"/><rect x="48" y="116" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="134" y="130" width="8" height="7" fill="#8fb0ff"/><rect x="130" y="116" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="216" y="130" width="8" height="7" fill="#8fb0ff"/><rect x="212" y="116" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="298" y="130" width="8" height="7" fill="#8fb0ff"/><rect x="294" y="116" width="16" height="15" rx="3" fill="#2456e6"/>
+</g>
+<defs>
+<g id="mesa-fechada">
+<g stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<circle cx="38" cy="218" r="21" fill="#f7c66f"/>
+<path d="M27 214 q11 -7 22 0 M30 222 q8 -5 16 0" fill="none" stroke-width="2"/>
+<path d="M62 238 H80 A18 18 0 0 0 62 220 Z" fill="#ffe7b0"/>
+<path d="M80 238 A18 18 0 0 0 62 220" fill="none" stroke-width="3"/>
+<rect x="84" y="176" width="10" height="72" rx="5" fill="#ffe45c"/>
+<rect x="20" y="252" width="72" height="9" rx="3" fill="#8fb0ff"/>
+<path d="M30 261 V278 M82 261 V278" fill="none"/>
+</g>
+<circle cx="89" cy="164" r="10" fill="#1f9d6f" stroke="#1b2440" stroke-width="2"/>
+<path d="M84.5 164.5 l3 3 l6 -6.5" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="48" y="306" text-anchor="middle" font-size="18" font-weight="800" fill="#1b2440">1</text>
+<text x="64" y="297" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1b2440">1</text>
+<rect x="58" y="300" width="12" height="2.2" rx="1" fill="#1b2440"/>
+<text x="64" y="314" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1b2440">4</text></g>
+</defs>
+<use href="#mesa-fechada" x="0"/>
+<use href="#mesa-fechada" x="82"/>
+<use href="#mesa-fechada" x="164"/>
+<use href="#mesa-fechada" x="246"/>
+</svg>
+</section>
+
+<div class="guia">
+<svg width="66" height="58" viewBox="-12 -50 80 68" style="flex: none" aria-hidden="true" stroke="#1b2440" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+<path d="M-6 -34 v8 M-10 -30 h8" fill="none" stroke="#2456e6"/>
+<path d="M60 -24 v7 M56.5 -20.5 h7" fill="none" stroke="#2456e6"/>
+<line x1="28" y1="-28" x2="34" y2="-37"/>
+<circle cx="35" cy="-39" r="4" fill="#ffe45c"/>
+<rect x="15" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<rect x="36" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="#2456e6"/>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="#ffffff"/>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="#8fb0ff"/>
+<path d="M19 -8 q2.5 -3.2 5 0" fill="none" stroke-width="1.7"/>
+<path d="M32 -8 q2.5 -3.2 5 0" fill="none" stroke-width="1.7"/>
+<path d="M24.5 -5.5 Q28 -1 31.5 -5.5 Z" fill="#1b2440" stroke-width="1.2"/>
+</svg>
+<div class="balao">
+<span class="chip" style="background: #d3f2e3; color: #135a43">
+<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#135a43" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3"/></svg>
+Acertou</span>
+<p class="fala">Uma broa e mais um quarto em cada mesa. A broa que sobrou virou pedaço, e nada ficou na esteira.</p>
+</div>
+</div>
+
+<div class="banc">
+<button type="button" class="bp" style="width: 100%">Continuar</button>
+<button type="button" class="bs" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.8 9.8 5.6l4 .5-3 2.8.8 4L8 11l-3.6 1.9.8-4-3-2.8 4-.5Z"/></svg>
+Desafio: fechar em menos voltas</button>
+</div>
+</div>
+</section>
+<section class="t3">
+<p class="legenda">3 · Ainda não</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>
+</a>
+<div class="tit">
+<div class="tit-p">A Partilha · Missão 4</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="bsp" aria-label="Etapas da missão: 5 de 9">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h8M6 8h8M6 12h8"/><path d="M2 4h.5M2 8h.5M2 12h.5"/></svg>
+5/9</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq">Pergunta</span><span>2 broas, 3 mesas: que pedaço cada mesa recebe?</span></div>
+<div class="gesto">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#2456e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5V3.8a1.3 1.3 0 0 1 2.6 0V8"/><path d="M9.6 7.5a1.3 1.3 0 0 1 2.6 0V9"/><path d="M12.2 8.5a1.3 1.3 0 0 1 2.6 0v2.8c0 3-2 5-4.8 5H9.2c-1.7 0-2.6-.8-3.6-2.2L3.4 10.8a1.3 1.3 0 0 1 2-1.6L7 11"/></svg>
+Agora: troque as fichas e confira de novo.</div>
+</div>
+
+<section class="ficha maq" aria-label="A máquina antes de repartir" style="height: 206px">
+<svg width="358" height="202" viewBox="0 0 358 202" style="display: block" role="img" aria-label="Duas broas na esteira e três mesas vazias.">
+<g stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="40" y="58" width="278" height="14" rx="7" fill="#ffffff"/>
+<circle cx="156" cy="40" r="17" fill="#f7c66f"/>
+<path d="M146 36 q10 -6 20 0 M148 43 q8 -5 16 0" fill="none" stroke-width="2"/>
+<circle cx="200" cy="40" r="17" fill="#f7c66f"/>
+<path d="M190 36 q10 -6 20 0 M192 43 q8 -5 16 0" fill="none" stroke-width="2"/>
+<rect x="20" y="88" width="318" height="8" rx="4" fill="#dfe7f5"/>
+<rect x="62" y="94" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="171" y="94" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="280" y="94" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="34" y="166" width="72" height="9" rx="3" fill="#8fb0ff"/>
+<path d="M44 175 V192 M96 175 V192" fill="none"/>
+<rect x="143" y="166" width="72" height="9" rx="3" fill="#8fb0ff"/>
+<path d="M153 175 V192 M205 175 V192" fill="none"/>
+<rect x="252" y="166" width="72" height="9" rx="3" fill="#8fb0ff"/>
+<path d="M262 175 V192 M314 175 V192" fill="none"/>
+</g>
+<g fill="#f3f6fc" stroke="#9aa5bf" stroke-width="2.2">
+<circle cx="70" cy="138" r="24"/>
+<circle cx="179" cy="138" r="24"/>
+<circle cx="288" cy="138" r="24"/>
+</g>
+<g font-family="'Caveat', cursive" font-size="28" font-weight="700" fill="#9aa5bf" text-anchor="middle">
+<text x="70" y="147">?</text><text x="179" y="147">?</text><text x="288" y="147">?</text>
+</g>
+</svg>
+</section>
+
+<section class="ficha" aria-label="Sua resposta" style="flex: none; margin: 14px 14px 0; padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="font-size: 15px; font-weight: 600">Cada mesa recebe</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div class="caixa">3</div>
+<div style="width: 58px; height: 3px; border-radius: 2px; background: #1b2440"></div>
+<div class="caixa">2</div>
+</div>
+<div style="font-size: 15px; font-weight: 600">de broa</div>
+</div>
+<div style="display: flex; gap: 8px">
+<button type="button" class="fichanum">1</button>
+<button type="button" class="fichanum">2</button>
+<button type="button" class="fichanum">3</button>
+<button type="button" class="fichanum">4</button>
+<button type="button" class="fichanum">6</button>
+<button type="button" class="bd" style="margin-left: auto; height: 44px; padding: 0 4px">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#56607d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6.5a3.5 3.5 0 0 1 0 7H6"/><path d="M6 3 3 6l3 3"/></svg>
+Limpar</button>
+</div>
+</section>
+
+<div class="guia">
+<svg width="58" height="54" viewBox="-6 -46 68 64" style="flex: none" aria-hidden="true" stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="21" y2="-36"/>
+<circle cx="20" cy="-39" r="4" fill="#ffe45c"/>
+<rect x="15" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<rect x="36" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="#2456e6"/>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="#ffffff"/>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="#8fb0ff"/>
+<circle cx="19.5" cy="-8" r="1.6" fill="#1b2440" stroke="none"/>
+<circle cx="31.5" cy="-8" r="1.6" fill="#1b2440" stroke="none"/>
+<circle cx="25.5" cy="-4" r="1.3" fill="#1b2440" stroke="none"/>
+</svg>
+<div class="balao">
+<span class="chip" style="border-color: #e5484d; background: #ffffff">
+<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4" fill="#e5484d"/></svg>
+Ainda não</span>
+<p class="fala">Assim cada mesa ganharia mais de uma broa, e só há duas para três. Quem vai em cima: as broas ou as mesas?</p>
+</div>
+</div>
+
+<div class="banc">
+<div class="lin">
+<button type="button" class="bp" style="flex: 1">Conferir de novo</button>
+<button type="button" class="bs">Me ajuda</button>
+</div>
+</div>
+</div>
+</section>
+<section class="t4">
+<p class="legenda">4 · Pergunte ao Nônio</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>
+</a>
+<div class="tit">
+<div class="tit-p">A Partilha · Missão 4</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="bsp" aria-label="Etapas da missão: 2 de 9">2/9</button>
+</header>
+<div class="obj">
+<div class="obj-l"><span class="etq">Objetivo</span><span>Reparta as 5 broas entre as 4 mesas, sem sobrar nada.</span></div>
+</div>
+
+<div style="position: absolute; inset: 0; background: rgba(27, 36, 64, 0.32)"></div>
+
+<section class="folha" role="dialog" aria-label="Pergunte ao Nônio">
+<div style="align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #c9d5ea"></div>
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="50" height="46" viewBox="-6 -46 68 64" style="flex: none" aria-hidden="true" stroke="#1b2440" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="28" y2="-38"/>
+<circle cx="28" cy="-41" r="4" fill="#ffe45c"/>
+<rect x="15" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<rect x="36" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="#2456e6"/>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="#ffffff"/>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="#8fb0ff"/>
+<circle cx="22" cy="-8.5" r="2.3" fill="#1b2440" stroke="none"/>
+<circle cx="34" cy="-8.5" r="2.3" fill="#1b2440" stroke="none"/>
+</svg>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<div style="font-size: 18px; font-weight: 800">Pergunte ao Nônio</div>
+<div style="font-size: 12.5px; font-weight: 600; color: #56607d">Sobre esta missão</div>
+</div>
+<button type="button" class="qd" aria-label="Fechar a conversa">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+</button>
+</div>
+
+<div style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 9px">
+<div class="eu">Por que não dá para dar as 5 broas direto para as 4 mesas?</div>
+<div class="ele"><span class="nome">Nônio</span>Dá, até onde cabe: uma para cada. A quinta não fecha uma volta inteira.</div>
+<div class="ele">E um pão que não dá para entregar inteiro, o que dá para fazer com ele?</div>
+<div class="eu">cortar?</div>
+<div class="ele"><span class="nome">Nônio</span>Isso. Em quantas partes, para as quatro mesas ficarem iguais? Teste na máquina.</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 7px">
+<div style="font-size: 12.5px; font-weight: 600; color: #56607d">Pergunte também</div>
+<div style="display: flex; gap: 8px; overflow: hidden">
+<button type="button" class="bsp">O que é fração?</button>
+<button type="button" class="bsp">Por que sobrou uma?</button>
+<button type="button" class="bsp">Me dá uma medida</button>
+</div>
+</div>
+
+<form style="display: flex; gap: 8px; margin: 0">
+<label style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)" for="pergunta">Sua pergunta</label>
+<input id="pergunta" type="text" placeholder="Escreva sua pergunta" style="flex: 1; min-width: 0; height: 48px; box-sizing: border-box; padding: 0 12px; border: 2px solid #1b2440; border-radius: 12px; background: #fff; color: #1b2440; font: 500 15px 'Rubik', system-ui, sans-serif">
+<button type="submit" aria-label="Enviar a pergunta" style="width: 48px; height: 48px; flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid #1b2440; border-radius: 12px; background: #2456e6; box-shadow: 0 3px 0 #1b2440; padding: 0; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 15V3M4 8l5-5 5 5"/></svg>
+</button>
+</form>
+<div style="text-align: center; font-size: 12px; font-weight: 500; color: #56607d">Respostas livres escritas por IA. As contas e as correções do jogo, não.</div>
+</section>
+</div>
+</section>
+<section class="t5">
+<p class="legenda">5 · Aposta do Nônio</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>
+</a>
+<div class="tit">
+<div class="tit-p">A Partilha · Missão 4</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="bsp" aria-label="Etapas da missão: 7 de 9">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1b2440" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h8M6 8h8M6 12h8"/><path d="M2 4h.5M2 8h.5M2 12h.5"/></svg>
+7/9</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq" style="background: #ffe45c; color: #1b2440; box-shadow: inset 0 0 0 2px #1b2440">Aposta do Nônio</span><span>Mostre na máquina se ele tem razão.</span></div>
+<div class="gesto">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#2456e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px" aria-hidden="true"><path d="M7 9.5V3.8a1.3 1.3 0 0 1 2.6 0V8"/><path d="M9.6 7.5a1.3 1.3 0 0 1 2.6 0V9"/><path d="M12.2 8.5a1.3 1.3 0 0 1 2.6 0v2.8c0 3-2 5-4.8 5H9.2c-1.7 0-2.6-.8-3.6-2.2L3.4 10.8a1.3 1.3 0 0 1 2-1.6L7 11"/></svg>
+Corte uma broa em 8 e outra em 4. Arraste 2 oitavos para a mesa A e 1 quarto para a mesa B.</div>
+</div>
+
+<div style="flex: none; margin: 16px 18px 0; display: flex; align-items: flex-end; gap: 10px">
+<svg width="58" height="54" viewBox="-6 -46 68 64" style="flex: none" aria-hidden="true" stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="34" y2="-37"/>
+<circle cx="35" cy="-39" r="4" fill="#ffe45c"/>
+<rect x="15" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<rect x="36" y="6" width="5" height="9" rx="2.5" fill="#8fb0ff"/>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="#2456e6"/>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="#ffffff"/>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="#8fb0ff"/>
+<circle cx="22" cy="-8" r="1.6" fill="#1b2440" stroke="none"/>
+<circle cx="34" cy="-8" r="1.6" fill="#1b2440" stroke="none"/>
+<path d="M25 -4.5 Q28 -2 31 -4.5" fill="none" stroke-width="1.8"/>
+</svg>
+<div style="flex: 1; min-width: 0; box-sizing: border-box; padding: 10px 14px 12px; border: 2px solid #1b2440; border-radius: 4px; background: #ffef8a; box-shadow: 0 3px 0 #1b2440; transform: rotate(-2deg)">
+<div style="font-family: 'Caveat', cursive; font-size: 25px; font-weight: 700; line-height: 1.1; color: #1a3fb0">Aposto que 2/8 é mais que 1/4. Afinal, dois é mais que um.</div>
+<div style="margin-top: 4px; text-align: right; font-family: 'Caveat', cursive; font-size: 21px; font-weight: 700; color: #1a3fb0">— Nônio</div>
+</div>
+</div>
+
+<section class="ficha maq" aria-label="Bancada com duas mesas" style="height: 252px">
+<svg width="358" height="248" viewBox="0 0 358 248" style="display: block" role="img" aria-label="Duas broas inteiras na esteira e duas mesas vazias, A e B.">
+<g stroke="#1b2440" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="40" y="58" width="278" height="14" rx="7" fill="#ffffff"/>
+<circle cx="156" cy="40" r="17" fill="#f7c66f"/>
+<path d="M146 36 q10 -6 20 0 M148 43 q8 -5 16 0" fill="none" stroke-width="2"/>
+<circle cx="200" cy="40" r="17" fill="#f7c66f"/>
+<path d="M190 36 q10 -6 20 0 M192 43 q8 -5 16 0" fill="none" stroke-width="2"/>
+<rect x="20" y="88" width="318" height="8" rx="4" fill="#dfe7f5"/>
+<rect x="88" y="94" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="254" y="94" width="16" height="15" rx="3" fill="#2456e6"/>
+<rect x="138" y="140" width="10" height="64" rx="5" fill="#ffffff"/>
+<rect x="304" y="140" width="10" height="64" rx="5" fill="#ffffff"/>
+<rect x="60" y="208" width="72" height="9" rx="3" fill="#8fb0ff"/>
+<path d="M70 217 V234 M122 217 V234" fill="none"/>
+<rect x="226" y="208" width="72" height="9" rx="3" fill="#8fb0ff"/>
+<path d="M236 217 V234 M288 217 V234" fill="none"/>
+</g>
+<g fill="#f3f6fc" stroke="#9aa5bf" stroke-width="2.2">
+<circle cx="96" cy="174" r="26"/>
+<circle cx="262" cy="174" r="26"/>
+</g>
+<g font-family="'Caveat', cursive" font-size="21" font-weight="700" fill="#56607d" text-anchor="middle">
+<text x="96" y="181">2/8?</text>
+<text x="262" y="181">1/4?</text>
+</g>
+<g font-size="14" font-weight="800" fill="#1b2440" text-anchor="middle">
+<text x="40" y="160">A</text>
+<text x="206" y="160">B</text>
+</g>
+</svg>
+</section>
+
+<div class="banc">
+<div style="font-size: 14px; font-weight: 600; color: #56607d">Depois de repartir: quem ficou com mais pão?</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<button type="button" class="op">Mesa A</button>
+<button type="button" class="op">Empate</button>
+<button type="button" class="op">Mesa B</button>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" class="bp" style="flex: 1">Mostrar ao Nônio</button>
+<button type="button" class="bd">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#56607d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6.5a3.5 3.5 0 0 1 0 7H6"/><path d="M6 3 3 6l3 3"/></svg>
+Desfazer</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</body>
+</html>

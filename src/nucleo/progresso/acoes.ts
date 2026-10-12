@@ -141,3 +141,14 @@ export function encerrarRevisita(p: Progresso, agora: number): Progresso {
 export function adiantarRelogio(p: Progresso, ms: number, agora: number): Progresso {
   return tocar({ ...p, relogio: { deslocamentoMs: p.relogio.deslocamentoMs + Math.max(0, ms) } }, agora);
 }
+
+/** A apresentação de uma ferramenta foi vista: não aparece de novo. */
+export function marcarApresentacao(p: Progresso, id: string, agora: number): Progresso {
+  if (id in p.apresentacoes) return p;
+  return tocar({ ...p, apresentacoes: { ...p.apresentacoes, [id]: agora } }, agora);
+}
+
+/** O laboratório zera as apresentações, para vê-las de novo. */
+export function zerarApresentacoes(p: Progresso, agora: number): Progresso {
+  return tocar({ ...p, apresentacoes: {} }, agora);
+}

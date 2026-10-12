@@ -125,6 +125,8 @@ export interface PassoOperar extends PassoBase {
   readonly rotuloFechar?: string;
   /** Se a partilha aceita usar só pedaços de numerador 1 sem repetir, guarda esta marca. */
   readonly marcaUnitaria?: string;
+  /** false: só a alavanca neste passo (sem pôr e tirar peças à mão). */
+  readonly maoLivre?: false;
   /** Convite opcional depois de vencido (ex.: "dá para fazer numa volta só?"). */
   readonly convite?: { readonly texto: string; readonly objetivo: Objetivo; readonly evidencias?: readonly EvidenciaDeclarada[] };
 }

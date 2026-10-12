@@ -6,17 +6,20 @@
 import type { IdConceito } from "../curriculo/curriculo";
 import type { Evidencia, ResultadoEvidencia } from "../dominio/evidencias";
 
-export const VERSAO_PROGRESSO = 1;
+export const VERSAO_PROGRESSO = 2;
 
 export type Postura = "quieto" | "disponivel" | "presente";
 export type Cotas = "visiveis" | "escondidas";
 export type Animacoes = "completas" | "leves";
+export type Conversa = "ligada" | "desligada";
 
 export interface Preferencias {
   /** quieto: só quando chamado; disponível: oferece depois de duas tentativas travadas; presente: comenta. */
   readonly postura: Postura;
   readonly cotas: Cotas;
   readonly animacoes: Animacoes;
+  /** Perguntas por escrito ao Nônio (usa IA). Desligada, o botão "Perguntar" não aparece. */
+  readonly conversa: Conversa;
 }
 
 export interface RespostaCalibragem {
@@ -129,12 +132,15 @@ export interface Progresso {
   };
   /** Deslocamento do relógio (o laboratório adianta um dia). */
   readonly relogio: { readonly deslocamentoMs: number };
+  /** Apresentações de ferramenta já vistas (id → momento): cada uma aparece uma vez. */
+  readonly apresentacoes: Readonly<Record<string, number>>;
 }
 
 export const PREFERENCIAS_PADRAO: Preferencias = {
   postura: "disponivel",
   cotas: "visiveis",
   animacoes: "completas",
+  conversa: "ligada",
 };
 
 export function progressoNovo(agora: number): Progresso {
@@ -160,5 +166,6 @@ export function progressoNovo(agora: number): Progresso {
     cenas: {},
     revisitas: { geradas: 0, atual: null },
     relogio: { deslocamentoMs: 0 },
+    apresentacoes: {},
   };
 }

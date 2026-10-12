@@ -29,6 +29,7 @@ import type {
   Fase,
   MaquinaDoPasso,
   ModoExecucao,
+  Objetivo,
   Passo,
   PassoFrase,
   PassoOperar,
@@ -36,6 +37,12 @@ import type {
 } from "./tipos";
 
 export type SituacaoPasso = "ativo" | "conferindo" | "vencido" | "convite";
+
+/**
+ * O retorno do último pedido de conferência. "acertou" fica enquanto o passo está vencido;
+ * "ainda-nao" é passageiro: some no primeiro gesto seguinte (máquina, resposta, ficha).
+ */
+export type Retorno = "acertou" | "ainda-nao";
 
 export interface EstadoPasso {
   readonly situacao: SituacaoPasso;
@@ -55,10 +62,17 @@ export interface EstadoPasso {
   readonly convite: "aberto" | "feito" | null;
   /** A máquina como estava no começo do passo (para resolver junto e conferir). */
   readonly inicio: Bancada | null;
+  readonly retorno: Retorno | null;
+  /** Respostas dadas a uma previsão ou aposta (a máquina confere depois da segunda). */
+  readonly respostas: number;
+  /** O objetivo de um passo conferido a cada gesto já está cumprido (mão, aposta). */
+  readonly cumprido: boolean;
 }
 
 export interface Execucao {
-  readonly versao: 1;
+  readonly versao: typeof VERSAO_EXECUCAO;
+  /** Ids e tipos dos passos do modo quando a execução começou: conteúdo mudou, a execução recomeça. */
+  readonly assinatura: string;
   readonly atividade: string;
   readonly modo: ModoExecucao;
   readonly indice: number;
@@ -90,6 +104,9 @@ export interface ContextoMotor {
 
 const TETO_HISTORICO_SALVO = 24;
 
+/** v2 (v0.3): mão livre, retorno passageiro, aposta. Execuções v1 de missão recomeçam. */
+export const VERSAO_EXECUCAO = 2;
+
 /* ---------- Passos ---------- */
 
 export function passosDoModo(a: Atividade, modo: ModoExecucao): readonly Passo[] {
@@ -117,6 +134,9 @@ function passoNovo(inicio: Bancada | null): EstadoPasso {
     equivocosRegistrados: [],
     convite: null,
     inicio,
+    retorno: null,
+    respostas: 0,
+    cumprido: false,
   };
 }
 
@@ -125,11 +145,30 @@ export function montarMaquina(m: MaquinaDoPasso): Bancada {
   return { atual: { ...b.atual, evento: null }, passado: [] };
 }
 
+/** Desliga (ou religa) a mão livre na máquina inteira, histórico incluído. */
+export function comMaoLivre(b: Bancada, ligada: boolean): Bancada {
+  const ajustar = (e: EstadoBancada): EstadoBancada =>
+    (e.config.maoLivre !== false) === ligada ? e : { ...e, config: { ...e.config, maoLivre: ligada } };
+  return { atual: ajustar(b.atual), passado: b.passado.map(ajustar) };
+}
+
+/** O desafio é sobre a alavanca quando o objetivo limita as voltas: a mão fica de fora. */
+function objetivoPedeAlavanca(o: Objetivo | undefined): boolean {
+  return o?.params?.voltasMax !== undefined;
+}
+
+/** O passo deixa usar a mão? (a configuração da máquina também pode desligar) */
+export function maoLivreNoPasso(p: Passo): boolean {
+  if (p.tipo !== "operar") return true;
+  return p.maoLivre !== false && !objetivoPedeAlavanca(p.objetivo);
+}
+
 /** Máquina com que um passo começa: a dele, ou a que vem do passo anterior. */
 function maquinaDoPasso(passos: readonly Passo[], indice: number, anterior: Bancada | null): Bancada | null {
   const p = passos[indice];
-  if (p?.maquina) return montarMaquina(p.maquina);
-  return anterior;
+  const b = p?.maquina ? montarMaquina(p.maquina) : anterior;
+  if (!b || !p) return b;
+  return comMaoLivre(b, maoLivreNoPasso(p) && b.atual.config.maoLivre !== false);
 }
 
 function prepararPasso(a: Atividade, e: Execucao, indice: number): Execucao {
@@ -138,10 +177,18 @@ function prepararPasso(a: Atividade, e: Execucao, indice: number): Execucao {
   return { ...e, indice, bancada, passo: passoNovo(bancada) };
 }
 
+/** Ids e tipos dos passos do modo, na ordem. */
+export function assinaturaDosPassos(a: Atividade, modo: ModoExecucao): string {
+  return passosDoModo(a, modo)
+    .map((p) => `${p.id}:${p.tipo}`)
+    .join("|");
+}
+
 /** Começa uma execução. No modo registro, o primeiro passo de formalização traz a própria máquina. */
 export function iniciarExecucao(a: Atividade, modo: ModoExecucao): Execucao {
   const base: Execucao = {
-    versao: 1,
+    versao: VERSAO_EXECUCAO,
+    assinatura: assinaturaDosPassos(a, modo),
     atividade: a.id,
     modo,
     indice: 0,
@@ -337,7 +384,8 @@ function entradaOperar(
   if (entrada.tipo === "convite") {
     if (sit !== "vencido" || !p.convite || e.passo.convite !== null) return { exec: e, efeitos };
     if (!entrada.aceitar) return avancar(a, e, efeitos);
-    return { exec: { ...comPasso(e, { situacao: "convite", convite: "aberto", ultimo: null }), bancada: e.passo.inicio }, efeitos };
+    const inicio = e.passo.inicio && objetivoPedeAlavanca(p.convite.objetivo) ? comMaoLivre(e.passo.inicio, false) : e.passo.inicio;
+    return { exec: { ...comPasso(e, { situacao: "convite", convite: "aberto", ultimo: null }), bancada: inicio }, efeitos };
   }
   if (!e.bancada) return { exec: e, efeitos };
 
@@ -353,7 +401,7 @@ function entradaOperar(
       exec = registrarEquivoco(a, exec, p, "lote-maior-que-cabe", faseRegistraExploracao(p.fase), ctx, efeitos);
       exec = comPasso(exec, { tentativas: exec.passo.tentativas + 1 });
     }
-    if (ev?.tipo === "fatia" && aindaFecha(antes.atual) === true && aindaFecha(depois.atual) === false) {
+    if ((ev?.tipo === "fatia" || ev?.tipo === "cortou") && aindaFecha(antes.atual) === true && aindaFecha(depois.atual) === false) {
       const medidas = { partes: String(ev.partes), pedacos: String(ev.quantidade * ev.partes), bicas: String(bicasEmUso(depois.atual).length) };
       efeitos.push({ tipo: "equivoco", id: "corte-que-nao-fecha", medidas });
       exec = registrarEquivoco(a, exec, p, "corte-que-nao-fecha", faseRegistraExploracao(p.fase), ctx, efeitos);

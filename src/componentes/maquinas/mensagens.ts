@@ -27,6 +27,10 @@ const RECUSAS: Record<Extract<Evento, { tipo: "recusa" }>["motivo"], string> = {
   "bicas-travadas": "Nesta máquina as bicas ficam como estão.",
   fechada: "Partilha fechada. Desfaça ou recomece para mexer.",
   "fora-do-limite": "Esse valor não cabe no seletor.",
+  "sem-mao-livre": "Neste passo, só a alavanca. Use o lote e Repartir.",
+  "bica-fechada": "Essa bica está fechada: nada entra nela.",
+  "sem-peca": "Essa peça não está ali.",
+  "passou-do-teto": "Essa bica já está no teto.",
 };
 
 export function mensagemDoEvento(e: EstadoBancada, pele: Pele): { texto: string; tom: TomTira } | null {
@@ -47,6 +51,15 @@ export function mensagemDoEvento(e: EstadoBancada, pele: Pele): { texto: string;
         texto: `Cortou ${ev.quantidade === 1 ? "uma peça" : `${ev.quantidade} peças`} em ${ev.partes}: ${ev.quantidade * ev.partes} pedaços de ${formatar(comoRacional(ev.novo))}.`,
         tom: "normal",
       };
+    case "cortou":
+      return {
+        texto: `Cortou ${ev.quantidade === 1 ? "uma peça" : `${ev.quantidade} peças`} em ${ev.partes}: ${ev.quantidade * ev.partes} pedaços de ${formatar(comoRacional(ev.novo))}.`,
+        tom: "normal",
+      };
+    case "colocou":
+      return { texto: `${nomePeca(pele, ev.tamanho, 1)} na ${pele.receptor.singular} ${ev.bica + 1}.`, tom: "normal" };
+    case "devolveu":
+      return { texto: `${nomePeca(pele, ev.tamanho, 1)} de volta à esteira.`, tom: "normal" };
     case "fechou":
       return { texto: "Partilha fechada.", tom: "feito" };
     case "bica":

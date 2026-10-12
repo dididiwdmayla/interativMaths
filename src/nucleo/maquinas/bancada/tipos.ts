@@ -42,6 +42,11 @@ export interface ConfigBancada {
   readonly teto?: number;
   /** Máximo de voltas (ex.: "numa volta só"). */
   readonly voltasMax?: number;
+  /**
+   * Mão livre: pôr e tirar peças à mão (colocar, devolver). Ligada por padrão; desligada quando
+   * há `voltasMax` (o desafio é sobre a alavanca) ou quando o passo disser.
+   */
+  readonly maoLivre?: boolean;
 }
 
 export interface Pilha {
@@ -65,7 +70,11 @@ export type MotivoRecusa =
   | "carga-travada"
   | "bicas-travadas"
   | "fechada"
-  | "fora-do-limite";
+  | "fora-do-limite"
+  | "sem-mao-livre"
+  | "bica-fechada"
+  | "sem-peca"
+  | "passou-do-teto";
 
 export type Evento =
   | { readonly tipo: "volta"; readonly tamanho: string; readonly lote: number; readonly bicas: readonly number[] }
@@ -86,6 +95,16 @@ export type Evento =
       readonly quantidade: number;
       readonly novo: string;
     }
+  | {
+      /** Um corte feito pelo menu, na peça tocada. */
+      readonly tipo: "cortou";
+      readonly tamanho: string;
+      readonly partes: number;
+      readonly quantidade: number;
+      readonly novo: string;
+    }
+  | { readonly tipo: "colocou"; readonly tamanho: string; readonly bica: number }
+  | { readonly tipo: "devolveu"; readonly tamanho: string; readonly bica: number }
   | { readonly tipo: "fechou"; readonly sobra: readonly Pilha[] }
   | { readonly tipo: "bica"; readonly indice: number; readonly aberta: boolean }
   | { readonly tipo: "carga"; readonly quantidade: number }
@@ -121,6 +140,12 @@ export type AcaoBancada =
   | { readonly tipo: "partes"; readonly valor: number }
   | { readonly tipo: "repartir" }
   | { readonly tipo: "fatiar"; readonly quantidade: number | "todas" }
+  /** Mão livre: tira uma peça daquele tamanho da esteira e põe na bica aberta. */
+  | { readonly tipo: "colocar"; readonly tamanho: string; readonly bica: number }
+  /** Mão livre: devolve uma peça daquele tamanho da bica para a esteira. */
+  | { readonly tipo: "devolver"; readonly bica: number; readonly tamanho: string }
+  /** Menu de corte: corta uma peça (ou todas) daquele tamanho em partes iguais, num passo só. */
+  | { readonly tipo: "cortar"; readonly tamanho: string; readonly partes: number; readonly quantidade?: number | "todas" }
   | { readonly tipo: "fechar" }
   | { readonly tipo: "desfazer" }
   | { readonly tipo: "recomecar" };
