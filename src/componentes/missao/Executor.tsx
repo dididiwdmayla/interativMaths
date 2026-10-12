@@ -78,7 +78,8 @@ export function ExecutorAtividade({
 }: {
   a: Atividade;
   modo?: ModoExecucao;
-  voltar: { href: string; rotulo: string };
+  /** Sem voltar (null): a degustação embutida, que não tem para onde voltar. */
+  voltar: { href: string; rotulo: string } | null;
   /** Tela própria de fim (a sondagem usa para oferecer o desvio). */
   aoTerminar?: () => React.ReactNode;
 }) {
@@ -91,7 +92,7 @@ export function ExecutorAtividade({
   const [comprimida, setComprimida] = useState<string | null>(null);
 
   if (!pronto) return <Carregando />;
-  if (fim) return aoTerminar ? <>{aoTerminar()}</> : <TelaFim a={a} fim={fim} voltar={voltar} desvio={progresso.campanha.desvio} />;
+  if (fim) return aoTerminar ? <>{aoTerminar()}</> : <TelaFim a={a} fim={fim} voltar={voltar ?? { href: "/mapa", rotulo: "Mapa" }} desvio={progresso.campanha.desvio} />;
 
   const salva = restaurarExecucao(progresso.campanha.execucoes[chaveExecucao(a, modo)], a, (m) => passosDoModo(a, m).length);
   const exec: Execucao = salva && salva.modo === modo ? salva : iniciarExecucao(a, modo);
@@ -295,7 +296,7 @@ export function ExecutorAtividade({
       controles = (
         <PainelVencido
           falas={passo.aoConcluir}
-          palpite={palpiteId && exec.indice <= 3 && passosDoModo(a, modo).find((p) => p.id === palpiteId)?.tipo === "palpite" ? { valor: exec.palpites[palpiteId], certo: certoDoPalpite(a, palpiteId) } : null}
+          palpite={palpiteId && exec.indice <= 3 && passosDoModo(a, modo).find((p) => p.id === palpiteId)?.tipo === "palpite" ? palpiteParaMostrar(a, palpiteId, exec.palpites[palpiteId]) : null}
           convite={passo.convite && exec.passo.convite === null ? passo.convite.texto : null}
           onConvite={(aceitar) => enviar({ tipo: "convite", aceitar })}
           onSeguir={() => enviar({ tipo: "seguir" })}
@@ -394,9 +395,13 @@ function textoComMedidas(modelo: string, vivas: Record<string, string>): string 
   return modelo.replace(/\{(\w+)\}/g, (_, k: string) => vivas[k] ?? "");
 }
 
-function certoDoPalpite(a: Atividade, passoId: string): string {
+/** O palpite e o que a máquina deu; num palpite de opções, o texto da opção no lugar do id. */
+function palpiteParaMostrar(a: Atividade, passoId: string, valor: string | null): { valor: string | null; certo: string } {
   const p = a.passos.find((x) => x.id === passoId);
-  return p && p.tipo === "palpite" ? p.certo : "";
+  if (!p || p.tipo !== "palpite") return { valor, certo: "" };
+  const opcoes = p.resposta.tipo === "opcoes" ? p.resposta.opcoes : null;
+  const texto = (v: string) => opcoes?.find((o) => o.id === v)?.texto ?? v;
+  return { valor: valor === null ? null : texto(valor), certo: texto(p.certo) };
 }
 
 function avisoDe(efeitos: readonly Efeito[], exec: Execucao, pele: Pele | null): Aviso | null {
@@ -416,6 +421,7 @@ function avisoDe(efeitos: readonly Efeito[], exec: Execucao, pele: Pele | null):
 /** Onde a atividade acontece, para a linha de cima do cabeçalho. */
 function lugarDe(a: Atividade, modo: ModoExecucao): string {
   const distrito = a.tipo === "exposicao" ? "Museu" : a.tipo === "cena" ? "A Rua" : "A Partilha";
+  if (a.tipo === "degustacao") return `${distrito} · Degustação`;
   const tipo =
     modo === "prova"
       ? "Prova direta"

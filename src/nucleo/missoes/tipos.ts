@@ -189,7 +189,7 @@ export type Passo =
 
 export type TipoPasso = Passo["tipo"];
 
-export type TipoAtividade = "missao" | "eco" | "revisita" | "exposicao" | "cena" | "sondagem";
+export type TipoAtividade = "missao" | "eco" | "revisita" | "exposicao" | "cena" | "sondagem" | "degustacao";
 
 export type ModoExecucao = "guiada" | "prova" | "registro";
 
