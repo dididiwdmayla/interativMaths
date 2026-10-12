@@ -113,16 +113,19 @@ export function CabecalhoLugar({
   titulo,
   direita,
 }: {
-  voltar: { href: string; rotulo: string };
+  /** Sem voltar (null): a tela não tem para onde voltar (a degustação embutida). */
+  voltar: { href: string; rotulo: string } | null;
   lugar: string;
   titulo: string;
   direita?: ReactNode;
 }) {
   return (
     <header className="cabecalho area-segura relative z-20">
-      <Link href={voltar.href} className="botao-icone" aria-label={`Voltar para ${voltar.rotulo}`} data-acao="voltar">
-        <IconeVoltar />
-      </Link>
+      {voltar && (
+        <Link href={voltar.href} className="botao-icone" aria-label={`Voltar para ${voltar.rotulo}`} data-acao="voltar">
+          <IconeVoltar />
+        </Link>
+      )}
       <div className="flex min-w-0 flex-1 flex-col gap-px">
         <p className="m-0 truncate text-[12px] font-semibold text-tinta-suave">{lugar}</p>
         <h1 className="m-0 truncate text-[17px] font-extrabold leading-[1.15]">{titulo}</h1>
