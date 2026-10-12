@@ -3,6 +3,7 @@
 /**
  * Estados de falha do progresso, ditos com clareza e sem susto.
  */
+import { usePathname } from "next/navigation";
 import { dispensarAviso } from "./loja";
 import { useProgresso } from "./useProgresso";
 
@@ -14,7 +15,10 @@ const TEXTOS = {
 
 export function AvisoProgresso() {
   const { pronto, aviso } = useProgresso();
-  if (!pronto || aviso === null) return null;
+  // A degustação não usa o progresso do jogo: o aviso dele não diz nada lá (nem dentro de um
+  // iframe que bloqueia o armazenamento).
+  const degustacao = usePathname()?.startsWith("/degustacao") ?? false;
+  if (!pronto || aviso === null || degustacao) return null;
   return (
     <div role="alert" className="ficha fixed inset-x-[14px] top-3 z-50 flex items-start gap-3 p-3 area-segura-topo lg:left-auto lg:right-7 lg:w-[440px]" data-aviso={aviso}>
       <p className="m-0 flex-1 text-[15px] font-medium">{TEXTOS[aviso]}</p>
