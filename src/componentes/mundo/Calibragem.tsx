@@ -151,7 +151,7 @@ export function Calibragem() {
                 <FiguraMedidas {...item.figura} />
               </div>
             )}
-            {controlesAnotado || <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Pronto" />}
+            {controlesAnotado || <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Responder" />}
           </section>
         </div>
       </main>
@@ -178,7 +178,7 @@ export function Calibragem() {
             pele={pele}
             onAcao={(a) => setBancada(operar(b, a))}
             onFechar={() => responder(validarBancada(item.objetivo.validador, item.objetivo.params ?? {}, b.atual).ok ? "sucesso" : "falha")}
-            rotuloFechar="Pronto"
+            rotuloFechar="Fechar a partilha"
             extra={
               <button type="button" className="botao-secundario w-full" onClick={() => responder("nao_sei")} data-acao="nao-sei">
                 Não sei ainda
@@ -188,7 +188,7 @@ export function Calibragem() {
         ) : (
           <div className="flex flex-col gap-3">
             <p className="m-0 text-[16px] font-medium">{item.fala}</p>
-            <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Pronto" />
+            <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Responder" />
           </div>
         ))
       }

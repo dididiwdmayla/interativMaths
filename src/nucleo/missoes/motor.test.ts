@@ -175,6 +175,7 @@ describe("previsão com segunda chance", () => {
         tipo: "prever",
         fase: "descoberta",
         pedido: "p",
+        instrucao: "Responda quantas sacas vão em cada carroça.",
         maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 12 }, bicas: { quantidade: 3, ajustavel: false } } },
         pergunta: "?",
         resposta: { tipo: "numero", minimo: 0, maximo: 12 },

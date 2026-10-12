@@ -594,6 +594,122 @@
   background: var(--folha);
 }
 
+/* ---------- A faixa do objetivo ---------- */
+
+.objetivo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.objetivo-linha {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.objetivo-etiqueta {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+  padding: 2px 8px;
+  border-radius: 7px;
+  background: var(--tinta);
+  color: var(--folha);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.objetivo-etiqueta[data-etiqueta="Feito"] {
+  background: var(--verde-escuro);
+}
+
+.objetivo-etiqueta[data-etiqueta="Aposta do Nônio"] {
+  background: var(--marca-texto);
+  box-shadow: inset 0 0 0 2px var(--tinta);
+  color: var(--tinta);
+}
+
+.objetivo-etiqueta[data-etiqueta="Desafio"] {
+  background: var(--caneta);
+}
+
+.objetivo-gesto {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  color: var(--caneta);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.objetivo-gesto > svg {
+  margin-top: 0;
+}
+
+.objetivo-gesto[data-tom="resumo"] {
+  color: var(--verde-escuro);
+}
+
+/* ---------- Etapas da missão ---------- */
+
+.etapa {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  list-style: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.etapa-marca {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--tinta);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.etapa[data-estado="feito"] .etapa-marca {
+  border-color: var(--tinta);
+  background: var(--verde);
+  color: var(--folha);
+}
+
+.etapa[data-estado="atual"] {
+  background: var(--caneta-palida);
+  color: var(--caneta-escura);
+}
+
+.etapa[data-estado="atual"] .etapa-marca {
+  background: var(--caneta);
+  color: var(--folha);
+}
+
+.etapa[data-estado="depois"] {
+  color: var(--tinta-suave);
+}
+
+.etapa[data-estado="depois"] .etapa-marca {
+  border: 2px dashed var(--grafite);
+  background: var(--grafite-claro);
+}
+
 /* A alça das folhas que sobem. */
 .alca-folha {
   align-self: center;
@@ -858,6 +974,13 @@ html[data-animacoes="leves"] .folha-sobe {
   padding: 6px max(14px, env(safe-area-inset-right)) 6px max(14px, env(safe-area-inset-left));
   border-bottom: 2px solid var(--tinta);
   background: var(--folha);
+}
+
+/* A faixa do objetivo ocupa o lugar do pedido, em coluna. */
+.palco-pedido:has(> .objetivo) {
+  display: block;
+  padding-top: 9px;
+  padding-bottom: 10px;
 }
 
 .palco-maquina {

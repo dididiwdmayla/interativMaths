@@ -72,6 +72,7 @@ export interface TextosReacao {
     readonly caso: string;
     readonly junto: string;
     readonly semDica: string;
+    readonly lembrete: string;
   };
 }
 
@@ -561,4 +562,14 @@ export function falaDoEstado(
     return fala(passo, `acertou:${passo.id}`, preencherFala(textos.frase.acertou, m), { categoria: "retorno", selo: "acertou", expressao: "satisfeito" });
   }
   return falaDeAbertura(a, passo, e, textos, pele);
+}
+
+/** O lembrete de 25 s sem gesto: o Nônio repete o gesto com as palavras dele (automático). */
+export function falaDeLembrete(passo: Passo, gesto: string, textos: TextosReacao, vez: number): FalaFaixa {
+  const semAgora = gesto.replace(/^Agora:\s*/, "");
+  return fala(passo, `lembrete:${vez}`, preencherFala(textos.ajuda.lembrete, { gesto: semAgora }), {
+    categoria: "lembrete",
+    prioridade: "automatica",
+    expressao: "atento",
+  });
 }

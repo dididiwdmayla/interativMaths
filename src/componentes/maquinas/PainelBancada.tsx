@@ -158,8 +158,17 @@ export function PainelBancada({ estado, pele, onAcao, onFechar, rotuloFechar = "
           onMudar={(v) => onAcao({ tipo: "lote", valor: v })}
           idTeste="lote"
         />
-        <button type="button" className="botao-principal ml-1 min-w-0 flex-1 px-2" disabled={travado || !pilhaAtual} onClick={() => onAcao({ tipo: "repartir" })} data-acao="repartir">
+        <button
+          type="button"
+          className="botao-principal ml-1 min-w-0 flex-1 flex-col gap-0 px-2 leading-[1.1]"
+          disabled={travado || !pilhaAtual}
+          onClick={() => onAcao({ tipo: "repartir" })}
+          data-acao="repartir"
+        >
           {pele.repartir}
+          <span className="text-[12.5px] font-semibold">
+            {estado.lote} para cada {pele.receptor.singular}
+          </span>
         </button>
       </div>
 

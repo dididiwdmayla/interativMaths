@@ -7,6 +7,7 @@ import { aplicarEntrada, iniciarExecucao, passosDoModo, type Efeito, type Execuc
 import type { Atividade, Entrada, ModoExecucao } from "@/nucleo/missoes/tipos";
 import { situacaoConceito, type Evidencia } from "@/nucleo/dominio";
 import { VALIDADORES_BANCADA } from "@/nucleo/maquinas/bancada/validadores";
+import { problemasDaInstrucao } from "@/nucleo/missoes/instrucao";
 import { CONCEITOS, CONCEITOS_DO_ARCO_1 } from "./conceitos";
 import { EQUIVOCOS } from "./equivocos";
 import { MOTIVOS } from "./reacoes";
@@ -60,6 +61,10 @@ describe.each(TODAS.map((a) => [a.id, a] as const))("atividade %s", (_, a) => {
         expect(p.dicas?.[2].texto.length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it("todo passo diz, com verbo, o que fazer agora", () => {
+    for (const p of [...a.passos, ...(a.prova ?? [])]) expect(problemasDaInstrucao(p.instrucao), `${a.id}#${p.id}: "${p.instrucao}"`).toEqual([]);
   });
 
   it("o pedido de cada passo cabe numa linha do celular", () => {

@@ -223,6 +223,27 @@ svg [data-focavel]:focus-visible .anel-foco {
   animation: oferta 2.4s ease-in-out infinite;
 }
 
+/* Lembrete: a linha do gesto pulsa uma vez. Nenhum relógio aparece. */
+@keyframes lembrete {
+  0%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  35% {
+    opacity: 0.45;
+    transform: translateX(4px);
+  }
+  70% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.anima-lembrete {
+  animation: lembrete 900ms var(--curva-firme) 1;
+}
+
 /* A faixa amarela cresce da esquerda para a direita. */
 .anima-marca-texto {
   transform-box: fill-box;
@@ -350,5 +371,8 @@ html[data-animacoes="leves"] .anima-lamina {
   }
   .anima-marca-texto {
     animation: esmaecer-entrar 320ms linear both;
+  }
+  .anima-lembrete {
+    animation: oferta 900ms linear 1;
   }
 }

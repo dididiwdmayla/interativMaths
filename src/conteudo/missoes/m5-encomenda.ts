@@ -52,6 +52,7 @@ export const MISSAO_5: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Leia a encomenda.",
+      instrucao: "Leia a encomenda.",
       falas: [
         { quem: "dalia", texto: "Encomenda do outro lado do vale, e desta vez não tem manual nenhum. Só o pedido." },
         { quem: "dalia", texto: "O Nônio fica quieto. Se precisar, chame: ele mede, não resolve." },
@@ -63,6 +64,7 @@ export const MISSAO_5: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "3 broas, 4 mesas, de dois jeitos.",
+      instrucao: "Reparta 3 broas entre 4 mesas de dois jeitos diferentes.",
       maquina: { config: TRES },
       objetivo: { validador: "partilha.solucoes-distintas", params: { n: 2 } },
       resolucao: [{ tipo: "partes", valor: 4 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 3 }, { tipo: "repartir" }],
@@ -88,6 +90,7 @@ export const MISSAO_5: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "3 mesas com 2/3 cada: quantas broas?",
+      instrucao: "Mostre quantas broas saíram: 3 mesas, 2/3 em cada, nada sobrando.",
       falas: [{ quem: "dalia", texto: "Bilhete do forno: cada uma das três mesas recebeu dois terços de broa e não sobrou nada. Quantas broas saíram? Mostre na máquina." }],
       maquina: { config: FORNO },
       objetivo: { validador: "partilha.carga-exata", params: { carga: "2/3" } },
@@ -112,6 +115,7 @@ export const MISSAO_5: Atividade = {
       tipo: "registro",
       fase: "formalizacao",
       pedido: "Guarde a página no Caderno.",
+      instrucao: "Guarde a página no Caderno.",
       pagina: {
         id: "partilha.arco1.encomenda",
         titulo: "Encomenda sem manual",
@@ -125,6 +129,7 @@ export const MISSAO_5: Atividade = {
       tipo: "narrativa",
       fase: "retencao",
       pedido: "A Partilha voltou a caneta.",
+      instrucao: "Leia o que mudou no mapa e guarde a joia.",
       falas: [
         { quem: "dalia", texto: "Olha o mapa: a Partilha está a caneta de novo. Fazia trinta anos." },
         { quem: "nonio", texto: "Achei isto no fundo da bandeja da sobra. Uma joia bruta. Relógios usam joias nos mancais para girar com menos atrito." },

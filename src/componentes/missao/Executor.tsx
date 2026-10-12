@@ -31,10 +31,12 @@ import type { AlvoMaquina, Atividade, Entrada, FaixasExposicao, ModoExecucao, Pa
 import { definirDesvio, iniciarAtividade, type Desvio } from "@/nucleo/progresso";
 import { situacaoConceito } from "@/nucleo/dominio/dominio";
 import { falaDoPasso, PERMANENCIA_MINIMA_MS, type FalaFaixa } from "@/nucleo/tutor/fila";
-import { falaDeOferta, falaDoEstado, reagir, seloVisivel } from "@/nucleo/tutor/reacoes";
+import { falaDeLembrete, falaDeOferta, falaDoEstado, reagir, seloVisivel } from "@/nucleo/tutor/reacoes";
+import { passoDeMaquina, proximoGesto } from "@/nucleo/missoes/gesto";
 import { CATEGORIAS_RUA } from "@/conteudo/rua";
 import { PELES, type Pele } from "@/conteudo/peles";
 import { AJUDA } from "@/conteudo/reacoes";
+import { GESTOS } from "@/conteudo/gestos";
 import { Bancada, type MarcasBancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
@@ -48,7 +50,9 @@ import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
+import { BotaoEtapas } from "./Etapas";
 import { Falas } from "./Falas";
+import { Objetivo, type Etiqueta } from "./Objetivo";
 import { ManualRasgado } from "./Manual";
 import { EntradaResposta, type MarcaResposta } from "./Respostas";
 import { descreverAcao, NOME_DA_FASE } from "./textos";
@@ -103,6 +107,14 @@ export function ExecutorAtividade({
   const pele = exec.bancada ? PELES[exec.bancada.atual.config.pele] : null;
   const oferta = pronto && !fim && passo ? falaDeOferta(passo, exec, postura, TEXTOS_REACAO) : null;
   useFalaQuandoCalmo(oferta, fila, oferecerFala, PERMANENCIA_MINIMA_MS + 3500);
+  const gesto = passo ? proximoGesto(passo, exec, { textos: GESTOS, reacoes: TEXTOS_REACAO, pele }) : null;
+  const lembrete = useLembrete(
+    pronto && !fim && passo !== null && passoDeMaquina(passo) && exec.passo.situacao !== "vencido" ? `${passo.id}:${exec.bancada?.atual.seq ?? 0}:${exec.passo.situacao}` : null,
+    (n) => {
+      if (!passo || !gesto || postura === "quieto" || passo.fase === "aplicacao") return;
+      oferecerFala(falaDeLembrete(passo, gesto.texto, TEXTOS_REACAO, n));
+    },
+  );
 
   if (!pronto) return <Carregando />;
   if (fim) return aoTerminar ? <>{aoTerminar()}</> : <TelaFim a={a} fim={fim} voltar={voltar} desvio={progresso.campanha.desvio} />;
@@ -234,18 +246,31 @@ export function ExecutorAtividade({
     "data-retorno": retorno,
   };
 
-  const cabecalho = <CabecalhoLugar voltar={voltar} lugar={`${lugarDe(a, modo)} · ${NOME_DA_FASE[passo.fase]}`} titulo={a.titulo} />;
-
-  const pedido = (
-    <>
-      <span className="contador-passo" aria-label={`Passo ${exec.indice + 1} de ${total}`}>
-        {exec.indice + 1}/{total}
-      </span>
-      <p className="m-0 min-w-0 flex-1 text-[15px] font-semibold leading-snug" data-pedido="">
-        {passo.pedido}
-      </p>
-    </>
+  const cabecalho = (
+    <CabecalhoLugar
+      voltar={voltar}
+      lugar={`${lugarDe(a, modo)} · ${NOME_DA_FASE[passo.fase]}`}
+      titulo={a.titulo}
+      direita={total > 1 ? <BotaoEtapas passos={passosDoModo(a, modo)} atual={exec.indice} /> : undefined}
+    />
   );
+
+  const desafio = passo.tipo === "operar" && sit === "convite" && passo.convite;
+  const etiqueta: Etiqueta =
+    selo === "acertou" && (sit === "vencido" || sit === "conferindo")
+      ? "Feito"
+      : desafio
+        ? "Desafio"
+        : passo.tipo === "prever"
+          ? "Pergunta"
+          : passo.tipo === "palpite"
+            ? "Palpite"
+            : passo.tipo === "aposta"
+              ? "Aposta do Nônio"
+              : passo.tipo === "frase" || passo.tipo === "notacao" || passo.tipo === "registro"
+                ? "Registro"
+                : "Objetivo";
+  const pedido = <Objetivo etiqueta={etiqueta} instrucao={desafio ? passo.convite.texto : passo.instrucao} gesto={gesto} lembrete={lembrete} />;
 
   if (passo.tipo === "narrativa" || !exec.bancada) {
     const exposicao = a.tipo === "exposicao" && passo.tipo === "narrativa" && passo.faixas !== undefined;
@@ -470,6 +495,30 @@ function bicasDoAlvo(alvo: AlvoMaquina | null, e: EstadoMaquina): number[] {
   const maior = ordenadas[ordenadas.length - 1];
   if (compara(quantidadeNaBica(e.bicas[menor]), quantidadeNaBica(e.bicas[maior])) === 0) return [];
   return [menor, maior];
+}
+
+/**
+ * 25 s sem gesto num passo de máquina: a linha do gesto pulsa uma vez (devolve um número novo) e
+ * o Nônio pode repetir o gesto. Qualquer gesto (a chave muda) recomeça a conta. Nenhum relógio
+ * aparece na tela.
+ */
+const LEMBRETE_MS = 25_000;
+
+function useLembrete(chave: string | null, aoLembrar: (vez: number) => void): number {
+  const [vez, setVez] = useState<{ chave: string | null; n: number }>({ chave: null, n: 0 });
+  useEffect(() => {
+    // Uma vez por parada: depois do lembrete, só um gesto novo (chave nova) arma outro.
+    if (!chave || vez.chave === chave) return;
+    const t = setTimeout(() => {
+      const n = vez.n + 1;
+      setVez({ chave, n });
+      aoLembrar(n);
+    }, LEMBRETE_MS);
+    return () => clearTimeout(t);
+    // O lembrete só recomeça quando a chave (passo, máquina, situação) muda.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chave, vez]);
+  return vez.chave === chave ? vez.n : 0;
 }
 
 /* ---------- Peças da tela ---------- */

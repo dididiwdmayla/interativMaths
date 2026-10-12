@@ -74,8 +74,20 @@ export interface MaquinaDoPasso {
 interface PassoBase {
   readonly id: string;
   readonly fase: Fase;
-  /** O pedido atual, que cabe numa linha. */
+  /** Rótulo curto do passo (a lista de etapas), que cabe numa linha. */
   readonly pedido: string;
+  /**
+   * O que fazer agora, com verbo no imperativo primeiro, até 80 caracteres, terminando em ponto:
+   * "Reparta as 5 broas entre as 4 mesas, sem sobrar nada."
+   */
+  readonly instrucao: string;
+  /** Perguntas sugeridas para a conversa com o Nônio (sem elas, um padrão por tipo de passo). */
+  readonly perguntas?: readonly string[];
+  /**
+   * A máquina nova continua a história (chegaram sacas, abriu uma bica): a tela anima a
+   * diferença em relação à máquina anterior antes de o passo começar, com a fala da Dália.
+   */
+  readonly chegada?: { readonly fala: string; readonly texto: string };
   readonly falas?: readonly Fala[];
   /** A fala do Nônio na faixa quando o passo começa (sem ela, um modelo do tipo de passo). */
   readonly nonio?: string;
@@ -175,6 +187,8 @@ export interface PassoAposta extends PassoBase {
   readonly explicacao: string;
   /** A resposta certa confirma o bilhete: o Nônio tinha razão. */
   readonly nonioTemRazao: boolean;
+  /** O gesto que tira a prova (sem ele, um modelo genérico). Sem a resposta. */
+  readonly gesto?: string;
 }
 
 export interface LacunaFrase {

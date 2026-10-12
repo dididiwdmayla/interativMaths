@@ -151,6 +151,8 @@ export const AJUDA = {
   /** Degrau 4. */
   junto: "Vamos passo a passo. Esta não entra na conta; a próxima parecida entra.",
   semDica: "Aqui não há o que medir. Leia e siga quando quiser.",
+  /** 25 s sem gesto num passo de máquina (disponível e presente): o gesto, com as palavras dele. */
+  lembrete: "Sem pressa. Um gesto de cada vez: {gesto}",
 } as const;
 
 /** Rótulos dos degraus da escada (olhar, medir, caso parecido, resolver junto). */

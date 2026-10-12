@@ -25,9 +25,9 @@ export function atividadeRevisita(conceitos: readonly IdConceito[], semente: num
     ideia: textos.ideia,
     conceitos: [...new Set(conceitos)],
     passos: [
-      { id: "abertura", tipo: "narrativa", fase: "retencao", pedido: "Um dia depois.", falas: textos.abertura, botao: "Começar" },
+      { id: "abertura", tipo: "narrativa", fase: "retencao", pedido: "Um dia depois.", instrucao: "Leia e comece a revisita.", falas: textos.abertura, botao: "Começar" },
       ...conceitos.map((c, i) => gerarQuestao(c, semente + i * 101, "revisita", `pergunta-${i + 1}`)),
-      { id: "fecho", tipo: "narrativa", fase: "retencao", pedido: "Revisita feita.", falas: textos.fecho, botao: "Voltar" },
+      { id: "fecho", tipo: "narrativa", fase: "retencao", pedido: "Revisita feita.", instrucao: "Leia e volte ao distrito.", falas: textos.fecho, botao: "Voltar" },
     ],
     solucoesDeTeste: [],
     sabotagens: [],
@@ -47,7 +47,7 @@ export function atividadeSondagem(conceito: IdConceito, semente: number, textos:
     ideia: textos.ideia,
     conceitos: [conceito],
     passos: [
-      { id: "abertura", tipo: "narrativa", fase: "problema", pedido: "Uma pergunta só.", falas: textos.abertura, botao: "Responder" },
+      { id: "abertura", tipo: "narrativa", fase: "problema", pedido: "Uma pergunta só.", instrucao: "Leia e responda a pergunta.", falas: textos.abertura, botao: "Responder" },
       gerarQuestao(conceito, semente, "sondagem", "pergunta"),
     ],
     solucoesDeTeste: [],

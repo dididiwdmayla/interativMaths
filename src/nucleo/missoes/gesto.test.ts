@@ -1,0 +1,137 @@
+import { describe, expect, it } from "vitest";
+import { MISSAO_1 } from "@/conteudo/missoes/m1-carga-igual";
+import { MISSAO_3 } from "@/conteudo/missoes/m3-sobrou";
+import { MISSAO_4 } from "@/conteudo/missoes/m4-pao-nao-e-saca";
+import { GESTOS } from "@/conteudo/gestos";
+import { PELES } from "@/conteudo/peles";
+import { TEXTOS_REACAO } from "@/conteudo/reacoes";
+import { proximoGesto } from "./gesto";
+import { segredos } from "./segredos";
+import { aplicarEntrada, iniciarExecucao, passoAtual, type Execucao } from "./motor";
+import type { Atividade, Entrada } from "./tipos";
+
+const ctxMotor = { agora: 1, conceitoDoEquivoco: () => null };
+
+/** Vence os passos até chegar ao pedido, pelo caminho do motor. */
+function ate(a: Atividade, idPasso: string, depois: Entrada[] = []): Execucao {
+  let e = iniciarExecucao(a, "guiada");
+  const enviar = (x: Entrada) => (e = aplicarEntrada(a, e, x, ctxMotor).exec);
+  for (let i = 0; i < 40 && passoAtual(a, e)?.id !== idPasso; i++) {
+    const p = passoAtual(a, e);
+    if (p?.tipo === "palpite") enviar({ tipo: "responder", valor: null });
+    else if (p?.tipo === "operar") {
+      for (const acao of p.resolucao) enviar({ tipo: "maquina", acao });
+      if (!p.automatico) enviar({ tipo: "fechar" });
+      enviar({ tipo: "seguir" });
+    } else if (p?.tipo === "prever") {
+      enviar({ tipo: "responder", valor: null });
+      enviar({ tipo: "seguir" });
+    } else if (p?.tipo === "frase") {
+      enviar({ tipo: "junto" });
+      enviar({ tipo: "conferir" });
+      enviar({ tipo: "seguir" });
+    } else enviar({ tipo: "seguir" });
+  }
+  for (const d of depois) e = aplicarEntrada(a, e, d, ctxMotor).exec;
+  return e;
+}
+
+function gesto(a: Atividade, e: Execucao) {
+  const p = passoAtual(a, e);
+  if (!p) throw new Error("sem passo");
+  return proximoGesto(p, e, { textos: GESTOS, reacoes: TEXTOS_REACAO, pele: e.bancada ? PELES[e.bancada.atual.config.pele] : null });
+}
+
+const maq = (acao: Extract<Entrada, { tipo: "maquina" }>["acao"]): Entrada => ({ tipo: "maquina", acao });
+
+describe("próximo gesto", () => {
+  it("nada nas mesas e as inteiras dão uma volta: a mão ou a alavanca", () => {
+    expect(gesto(MISSAO_4, ate(MISSAO_4, "cinco-broas")).texto).toBe("Agora: ponha uma broa em cada mesa, ou use Repartir.");
+  });
+
+  it("sobrou peça que não dá volta inteira, e há fatiador: escolher em quantas partes (sem dizer quantas)", () => {
+    const g = gesto(MISSAO_4, ate(MISSAO_4, "cinco-broas", [maq({ tipo: "repartir" })]));
+    expect(g.texto).toBe("Agora: escolha em quantas partes cortar a broa.");
+    expect(g.alvo).toBe("fatiador");
+  });
+
+  it("pedaços na esteira: pôr nas mesas ou repartir", () => {
+    const e = ate(MISSAO_4, "cinco-broas", [maq({ tipo: "repartir" }), maq({ tipo: "cortar", tamanho: "1/1", partes: 4 })]);
+    expect(gesto(MISSAO_4, e).texto).toBe("Agora: ponha os pedaços nas mesas, ou use Repartir.");
+  });
+
+  it("esteira vazia e partilha não fechada: fechar", () => {
+    const e = ate(MISSAO_1, "repartir", [maq({ tipo: "lote", valor: 6 }), maq({ tipo: "repartir" })]);
+    expect(gesto(MISSAO_1, e).texto).toBe("Agora: feche a partilha.");
+  });
+
+  it("sobra que não dá volta e sem fatiador: fechar", () => {
+    const e = ate(MISSAO_3, "repartir", [maq({ tipo: "lote", valor: 6 }), maq({ tipo: "repartir" })]);
+    expect(gesto(MISSAO_3, e).texto).toBe("Agora: feche a partilha.");
+  });
+
+  it("ainda cabe volta: repartir de novo", () => {
+    const e = ate(MISSAO_1, "repartir", [maq({ tipo: "repartir" })]);
+    expect(gesto(MISSAO_1, e).texto).toBe("Agora: reparta de novo, ou ponha mais uma em cada carroça.");
+  });
+
+  it("engasgo: diminuir o lote, com a medida", () => {
+    const e = ate(MISSAO_1, "repartir", [maq({ tipo: "lote", valor: 7 }), maq({ tipo: "repartir" })]);
+    expect(gesto(MISSAO_1, e).texto).toBe("Agora: diminua o lote. A volta pede 28; há 24.");
+  });
+
+  it("corte que não fecha mais: desfazer", () => {
+    const e = ate(MISSAO_4, "cinco-broas", [maq({ tipo: "repartir" }), maq({ tipo: "cortar", tamanho: "1/1", partes: 3 })]);
+    expect(gesto(MISSAO_4, e).texto).toBe("Esse corte não fecha. Desfaça e tente outro.");
+  });
+
+  it("depois do ainda não, diz o que tentar", () => {
+    const e = ate(MISSAO_1, "repartir", [maq({ tipo: "lote", valor: 5 }), maq({ tipo: "repartir" }), { tipo: "fechar" }]);
+    expect(gesto(MISSAO_1, e)).toMatchObject({ tom: "tentar", texto: "Agora: reparta o que ainda está na esteira." });
+  });
+
+  it("depois do acerto, vira o resumo verde com os números", () => {
+    const e = ate(MISSAO_4, "cinco-broas", [maq({ tipo: "repartir" }), maq({ tipo: "cortar", tamanho: "1/1", partes: 4 }), maq({ tipo: "repartir" }), { tipo: "fechar" }]);
+    expect(gesto(MISSAO_4, e)).toMatchObject({ tom: "resumo", texto: "Fechou: uma broa e mais um quarto em cada mesa." });
+  });
+
+  it("previsão: escolher e conferir; depois do ainda não, trocar e conferir de novo", () => {
+    expect(gesto(MISSAO_1, ate(MISSAO_1, "trinta")).texto).toBe("Agora: ajuste o número e toque em Conferir.");
+    const fracao = ate(MISSAO_4, "duas-tres");
+    expect(gesto(MISSAO_4, fracao).texto).toBe("Agora: monte a fração com as fichas e toque em Conferir.");
+    const depois = aplicarEntrada(MISSAO_4, fracao, { tipo: "responder", valor: "3/2" }, ctxMotor).exec;
+    expect(gesto(MISSAO_4, depois).texto).toBe("Agora: troque as fichas e confira de novo.");
+  });
+
+  it("frase: levar um número para a primeira lacuna vazia; completa, conferir", () => {
+    const e = ate(MISSAO_1, "frase");
+    expect(gesto(MISSAO_1, e).texto).toBe("Agora: leve um número da máquina para a primeira lacuna vazia.");
+    const cheia = [{ l: "a", v: "24" }, { l: "b", v: "4" }, { l: "c", v: "6" }].reduce((x, { l, v }) => aplicarEntrada(MISSAO_1, x, { tipo: "lacuna", lacuna: l, valor: v }, ctxMotor).exec, e);
+    expect(gesto(MISSAO_1, cheia).texto).toBe("Agora: toque em Conferir com a máquina.");
+  });
+
+  it("caminho de volta: a carga primeiro", () => {
+    expect(gesto(MISSAO_1, ate(MISSAO_1, "volta")).texto).toBe("Agora: ponha na esteira o primeiro número da conta.");
+  });
+});
+
+describe("segredos do passo", () => {
+  it("operar esconde o quanto em cada e o corte; o que está no enunciado não é segredo", () => {
+    const s = segredos(passoAtual(MISSAO_4, ate(MISSAO_4, "cinco-broas"))!, ate(MISSAO_4, "cinco-broas"));
+    expect(s.map((x) => `${x.tipo}:${x.valor.n}/${x.valor.d}`).sort()).toEqual(["partes:4/1", "quantidade:5/4"]);
+    const m1 = ate(MISSAO_1, "repartir");
+    expect(segredos(passoAtual(MISSAO_1, m1)!, m1).map((x) => `${x.tipo}:${x.valor.n}`)).toEqual(["quantidade:6"]);
+  });
+
+  it("previsão esconde o esperado; passo conferido não esconde mais nada", () => {
+    const e = ate(MISSAO_1, "trinta");
+    expect(segredos(passoAtual(MISSAO_1, e)!, e).map((x) => x.valor.n)).toEqual([6]);
+    const depois = aplicarEntrada(MISSAO_1, e, { tipo: "responder", valor: "6" }, ctxMotor).exec;
+    expect(segredos(passoAtual(MISSAO_1, depois)!, depois)).toEqual([]);
+  });
+
+  it("frase esconde as lacunas vazias", () => {
+    const e = ate(MISSAO_1, "frase");
+    expect(segredos(passoAtual(MISSAO_1, e)!, e).map((x) => x.valor.n)).toEqual([24, 4, 6]);
+  });
+});
