@@ -658,6 +658,91 @@
   color: var(--verde-escuro);
 }
 
+/* ---------- Mão livre: menu de corte, peça escolhida, mesa que recebe ---------- */
+
+.menu-corte {
+  position: absolute;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px 9px 9px;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--tinta);
+}
+
+.menu-corte-seta {
+  position: absolute;
+  top: 18px;
+}
+
+.menu-corte[data-lado="esquerda"] .menu-corte-seta {
+  left: -11px;
+}
+
+.menu-corte[data-lado="direita"] .menu-corte-seta {
+  right: -11px;
+}
+
+.menu-corte[data-lado="cima"] .menu-corte-seta {
+  top: -11px;
+}
+
+.menu-corte-rotulo {
+  color: var(--tinta-suave);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.menu-corte-botao,
+.menu-corte-quantas {
+  position: relative;
+  border: 2px solid var(--tinta);
+  border-radius: 9px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-weight: 700;
+  transition: transform 90ms var(--curva-firme);
+}
+
+.menu-corte-botao {
+  width: 40px;
+  height: 38px;
+  font-size: 16px;
+}
+
+.menu-corte-quantas {
+  height: 34px;
+  padding: 0 9px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* O alvo de toque passa de 44 px, maior que o desenho. */
+.menu-corte-botao::after,
+.menu-corte-quantas::after {
+  content: "";
+  position: absolute;
+  inset: -4px -2px;
+}
+
+.menu-corte-quantas[aria-checked="true"] {
+  background: var(--caneta);
+  color: var(--folha);
+}
+
+.menu-corte-botao:active,
+.menu-corte-quantas:active {
+  transform: translateY(2px);
+}
+
+/* Só as peças da esteira prendem o dedo: a página continua rolando no resto. */
+[data-peca] {
+  touch-action: none;
+}
+
 /* ---------- Etapas da missão ---------- */
 
 .etapa {

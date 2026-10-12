@@ -87,6 +87,7 @@
   }
 }
 
+svg :focus,
 svg :focus-visible {
   outline: none;
 }
@@ -338,6 +339,27 @@ html[data-animacoes="leves"] .anima-oferta {
   animation: voo 560ms var(--curva-firme) forwards;
 }
 
+/* A mão: a peça desliza até a mesa (ou volta para a esteira). */
+.anima-pousa {
+  animation: voo 220ms var(--curva-firme) forwards;
+}
+
+/* O corte separa a peça em fatias, com um pequeno escalonamento. */
+@keyframes fatia-sai {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.anima-fatia {
+  animation: fatia-sai 260ms var(--curva-saida) both;
+}
+
 .anima-engasgo {
   animation: engasgo 460ms var(--curva-firme);
 }
@@ -352,8 +374,12 @@ html[data-animacoes="leves"] .anima-lamina {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anima-voo {
+  .anima-voo,
+  .anima-pousa {
     animation: voo-leve 400ms linear forwards;
+  }
+  .anima-fatia {
+    animation: esmaecer-entrar 260ms linear both;
   }
   .anima-engasgo,
   .anima-lamina,

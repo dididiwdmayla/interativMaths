@@ -6,11 +6,11 @@
  * Bica fechada fica a lápis; abrir é passar a caneta. A sobra cai numa bandeja a lápis e ganha um
  * círculo vermelho. Partilha aceita ganha marca-texto nos números.
  */
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
-import { formatar, paraNumero, racional } from "@/nucleo/racional/racional";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent as EventoPonteiro } from "react";
+import { comoRacional, divide, formatar, inteiro, paraNumero, racional } from "@/nucleo/racional/racional";
 import { racionalPorExtenso, inteiroPorExtenso } from "@/nucleo/racional/extenso";
-import { bicasEmUso, contarPecas, quantidadeDe, quantidadeNaBica } from "@/nucleo/maquinas/bancada/bancada";
-import type { AcaoBancada, EstadoBancada } from "@/nucleo/maquinas/bancada/tipos";
+import { bicasEmUso, contarPecas, maoLivreLigada, pilhaDe, quantidadeDe, quantidadeNaBica } from "@/nucleo/maquinas/bancada/bancada";
+import type { AcaoBancada, Bica as EstadoBica, EstadoBancada } from "@/nucleo/maquinas/bancada/tipos";
 import type { Pele } from "@/conteudo/peles";
 import { Anotacao, Bica, CirculoVermelho, Esteira, FaixaMarcaTexto, Medidor, NumeroAnotado, PassarACaneta, SetaCurva, TRACO, Trilho } from "@/componentes/mundo/kit";
 import { CotaCaneta, NumeroSvg } from "./cota";
@@ -18,6 +18,7 @@ import { comporUnidades, grade } from "./geometria";
 import { calcularLayout, LARGURA, type LayoutBancada } from "./layout";
 import { Saco, Unidade } from "./pecas";
 import { Receptor } from "./receptores";
+import { MenuCorte, type PosicaoMenu } from "./MenuCorte";
 
 export type AlvoBancada = "esteira" | "pilha" | "bicas" | "bandeja" | "fatiador" | `bica:${number}`;
 
@@ -58,6 +59,28 @@ function nomeQuantidade(pele: Pele, tamanho: { n: number; d: number }, k: number
     return `${inteiroPorExtenso(k, pele.peca.genero)} ${k === 1 ? pele.peca.singular : pele.peca.plural}`;
   }
   return `${inteiroPorExtenso(k, pele.pedaco.genero)} ${k === 1 ? pele.pedaco.singular : pele.pedaco.plural} de ${racionalPorExtenso(racional(tamanho.n, tamanho.d))}`;
+}
+
+/** "Broa inteira", "Pedaço de um quarto". */
+function nomeDaPeca(pele: Pele, tamanho: { n: number; d: number }): string {
+  if (tamanho.d === 1 && tamanho.n === 1) return `${pele.peca.singular[0].toUpperCase()}${pele.peca.singular.slice(1)} ${pele.peca.genero === "f" ? "inteira" : "inteiro"}`;
+  return `${pele.pedaco.singular[0].toUpperCase()}${pele.pedaco.singular.slice(1)} de ${racionalPorExtenso(racional(tamanho.n, tamanho.d))}`;
+}
+
+/** As partes em que o fatiador corta esta peça (o pedaço não pode passar do menor permitido). */
+function partesValidas(e: EstadoBancada, tamanho: string): number[] {
+  const f = e.config.fatiador;
+  if (!f) return [];
+  const t = comoRacional(tamanho);
+  return f.partes.filter((p) => divide(t, inteiro(p)).d <= f.denominadorMaximo);
+}
+
+/** Qual peça devolver de uma mesa: a do tamanho escolhido, se ela tiver; senão, a menor. */
+function pecaParaDevolver(b: EstadoBica, escolhida: string | null): string | null {
+  if (b.pecas.length === 0) return null;
+  if (escolhida && pilhaDe(b.pecas, escolhida)) return escolhida;
+  const menor = b.pecas[b.pecas.length - 1].tamanho;
+  return `${menor.n}/${menor.d}`;
 }
 
 /** Resumo do estado para leitor de tela. */
@@ -121,9 +144,124 @@ export function Bancada({
   const engasgo = ev?.tipo === "engasgo" ? ev : null;
   const realcar = (alvo: AlvoBancada) => realce === alvo;
 
+  /* ---------- Mão livre: escolher a peça, pôr na mesa, devolver, arrastar, cortar ---------- */
+  const mao = mexivel && maoLivreLigada(estado.config) && !estado.fechada;
+  const [armada, setArmada] = useState(false);
+  const [menu, setMenu] = useState<string | null>(null);
+  const [arraste, setArraste] = useState<{ chave: string; x: number; y: number } | null>(null);
+  const toque = useRef<{ chave: string; x: number; y: number; ativo: boolean } | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const pilhaArmada = armada && mao && pilhaSel ? pilhaSel : null;
+  const menuPilha = menu !== null && mexivel && !estado.fechada ? (L.pilhas.find((p) => p.chave === menu) ?? null) : null;
+
+  const paraSvg = (cx: number, cy: number): { x: number; y: number } | null => {
+    const svg = svgRef.current;
+    const m = svg?.getScreenCTM();
+    if (!svg || !m) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = cx;
+    pt.y = cy;
+    const r = pt.matrixTransform(m.inverse());
+    return { x: r.x, y: r.y };
+  };
+  const bicaEm = (x: number, y: number): number | null => {
+    const lb = L.bicas.find((b) => Math.abs(x - b.cx) <= b.largura / 2 && y >= b.bicaY - 10 && y <= b.rotuloY + 24);
+    return lb ? lb.indice : null;
+  };
+  /**
+   * Primeiro toque: escolhe a peça (anel azul). Se ela não dá uma volta inteira e há fatiador, o
+   * menu de corte já abre. Segundo toque na mesma peça: abre o menu; terceiro: solta.
+   */
+  const tocarPilha = (chave: string) => {
+    if (!onAcao) return;
+    if (estado.pilha !== chave) onAcao({ tipo: "pilha", tamanho: chave });
+    const cortavel = partesValidas(estado, chave).length > 0;
+    const jaEscolhida = mao ? armada && estado.pilha === chave : menu === chave;
+    if (!jaEscolhida) {
+      if (mao) setArmada(true);
+      const p = pilhaDe(estado.esteira, chave);
+      const naoDaVolta = p !== null && p.quantidade < Math.max(1, estado.bicas.filter((b) => b.aberta).length);
+      setMenu(cortavel && (naoDaVolta || !mao) ? chave : null);
+      return;
+    }
+    if (cortavel && menu !== chave) {
+      setMenu(chave);
+      return;
+    }
+    soltar();
+  };
+  const tocarMesa = (i: number) => {
+    if (!onAcao || !mao) return;
+    setMenu(null);
+    if (pilhaArmada) {
+      onAcao({ tipo: "colocar", tamanho: pilhaArmada.chave, bica: i });
+      return;
+    }
+    const t = pecaParaDevolver(estado.bicas[i], null);
+    if (t) onAcao({ tipo: "devolver", bica: i, tamanho: t });
+  };
+  const soltar = () => {
+    setArmada(false);
+    setMenu(null);
+  };
+  const ponteiroDesce = (e: EventoPonteiro<SVGGElement>, chave: string) => {
+    if (!mexivel) return;
+    toque.current = { chave, x: e.clientX, y: e.clientY, ativo: false };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const ponteiroMove = (e: EventoPonteiro<SVGGElement>) => {
+    const t = toque.current;
+    if (!t || !mao) return;
+    if (!t.ativo && Math.hypot(e.clientX - t.x, e.clientY - t.y) > 8) t.ativo = true;
+    if (t.ativo) {
+      const p = paraSvg(e.clientX, e.clientY);
+      if (p) setArraste({ chave: t.chave, x: p.x, y: p.y });
+    }
+  };
+  const ponteiroSobe = (e: EventoPonteiro<SVGGElement>) => {
+    const t = toque.current;
+    toque.current = null;
+    setArraste(null);
+    if (!t) return;
+    if (!t.ativo) {
+      tocarPilha(t.chave);
+      return;
+    }
+    const p = paraSvg(e.clientX, e.clientY);
+    const destino = p ? bicaEm(p.x, p.y) : null;
+    if (destino === null || !onAcao) return;
+    if (estado.pilha !== t.chave) onAcao({ tipo: "pilha", tamanho: t.chave });
+    onAcao({ tipo: "colocar", tamanho: t.chave, bica: destino });
+    setMenu(null);
+  };
+  const posicaoMenu = (lp: LayoutBancada["pilhas"][number]): PosicaoMenu => {
+    const W = medida.largura;
+    const H = medida.largura * (proporcao ?? medida.proporcao);
+    const s = Math.min(W / LARGURA, H / L.altura);
+    const offX = (W - LARGURA * s) / 2;
+    const offY = (H - L.altura * s) / 2;
+    const n = partesValidas(estado, lp.chave).length;
+    const larguraMenu = n * 40 + (n - 1) * 6 + 22;
+    const direita = offX + (lp.caixa.x + lp.caixa.largura + 10) * s;
+    const top = Math.max(2, offY + (lp.topo - 30) * s);
+    if (direita + larguraMenu <= W - 2) return { left: direita, top, lado: "esquerda" };
+    const esquerda = offX + (lp.caixa.x - 10) * s - larguraMenu;
+    if (esquerda >= 2) return { left: esquerda, top, lado: "direita" };
+    // Sem lugar ao lado: o menu desce para baixo da peça, sem cobri-la.
+    const centro = offX + (lp.caixa.x + lp.caixa.largura / 2) * s;
+    return { left: Math.min(Math.max(2, centro - 24), W - larguraMenu - 2), top: offY + (L.esteira.y + 12) * s, lado: "cima", seta: centro - Math.min(Math.max(2, centro - 24), W - larguraMenu - 2) - 8 };
+  };
+
   return (
-    <div ref={caixaRef} className={`bancada-caixa ${className ?? ""}`}>
+    <div
+      ref={caixaRef}
+      className={`bancada-caixa relative ${className ?? ""}`}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") soltar();
+      }}
+    >
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${LARGURA} ${L.altura}`}
         role="group"
         aria-label={rotulo ?? "Bancada de partilha"}
@@ -134,36 +272,62 @@ export function Bancada({
       >
         <desc id={`${id}-desc`}>{descreverBancada(estado, pele)}</desc>
 
-        {L.fatiador && <Fatiador L={L} partes={estado.partes} seq={ev?.tipo === "fatia" ? estado.seq : null} realcado={realcar("fatiador")} />}
+        {L.fatiador && <Fatiador L={L} partes={estado.partes} seq={ev?.tipo === "fatia" || ev?.tipo === "cortou" ? estado.seq : null} realcado={realcar("fatiador")} />}
 
         <Esteira id={`${id}-esteira`} x0={L.esteira.x0} x1={L.esteira.x1} y={L.esteira.y} />
 
         {/* Pilhas na esteira */}
         {L.pilhas.map((lp) => {
           const sel = lp.chave === estado.pilha;
-          const acao = () => onAcao?.({ tipo: "pilha", tamanho: lp.chave });
-          const rotuloPilha = `Pilha: ${nomeQuantidade(pele, lp.pilha.tamanho, lp.pilha.quantidade)}${sel ? ", escolhida" : ""}`;
+          const escolhida = pilhaArmada?.chave === lp.chave;
+          const k = lp.pilha.quantidade;
+          const rotuloPilha = mao
+            ? `${nomeDaPeca(pele, lp.pilha.tamanho)}, na esteira${k > 1 ? ` (${k})` : ""}${escolhida ? ", escolhida" : ""}`
+            : `Pilha: ${nomeQuantidade(pele, lp.pilha.tamanho, k)}${sel ? ", escolhida" : ""}`;
           const cx = lp.caixa.x + lp.caixa.largura / 2;
           const tremor = engasgo && sel;
+          const cortou = (ev?.tipo === "cortou" || ev?.tipo === "fatia") && ev.novo === lp.chave;
           return (
             <g
               key={lp.chave}
               role={mexivel ? "button" : undefined}
               tabIndex={mexivel ? 0 : undefined}
               aria-label={rotuloPilha}
-              aria-pressed={mexivel ? sel : undefined}
+              aria-pressed={mexivel ? (mao ? escolhida : sel) : undefined}
               data-focavel={mexivel ? "" : undefined}
               data-pilha={lp.chave}
-              onClick={mexivel ? acao : undefined}
-              onKeyDown={mexivel ? (e) => ativarComTeclado(e, acao) : undefined}
+              data-peca={mexivel ? lp.chave : undefined}
+              data-escolhida={escolhida ? "sim" : undefined}
+              onPointerDown={mexivel ? (e) => ponteiroDesce(e, lp.chave) : undefined}
+              onPointerMove={mexivel ? ponteiroMove : undefined}
+              onPointerUp={mexivel ? ponteiroSobe : undefined}
+              onPointerCancel={() => {
+                toque.current = null;
+                setArraste(null);
+              }}
+              onKeyDown={mexivel ? (e) => ativarComTeclado(e, () => tocarPilha(lp.chave)) : undefined}
               style={{ cursor: mexivel ? "pointer" : undefined }}
             >
               <rect x={lp.caixa.x - 4} y={lp.topo - 26} width={lp.caixa.largura + 8} height={L.esteira.y - lp.topo + 44} rx={8} fill="transparent" stroke="none" />
               <rect className="anel-foco" x={lp.caixa.x - 4} y={lp.topo - 6} width={lp.caixa.largura + 8} height={L.esteira.y - lp.topo + 24} rx={8} />
-              <g key={tremor ? `tremor-${estado.seq}` : "parada"} className={tremor ? "anima-engasgo" : undefined}>
+              <g key={tremor ? `tremor-${estado.seq}` : cortou ? `corte-${estado.seq}` : "parada"} className={tremor ? "anima-engasgo" : cortou ? "anima-fatia" : undefined}>
                 <PilhaDesenho lp={lp} forma={forma} raio={L.raioPilha} />
               </g>
-              {sel && mexivel && <line x1={lp.caixa.x - 2} x2={lp.caixa.x + lp.caixa.largura + 2} y1={L.esteira.y + 19} y2={L.esteira.y + 19} stroke="var(--caneta)" strokeWidth={3} strokeLinecap="round" />}
+              {sel && mexivel && !mao && <line x1={lp.caixa.x - 2} x2={lp.caixa.x + lp.caixa.largura + 2} y1={L.esteira.y + 19} y2={L.esteira.y + 19} stroke="var(--caneta)" strokeWidth={3} strokeLinecap="round" />}
+              {escolhida && (
+                <rect
+                  x={lp.caixa.x - 7}
+                  y={lp.topo - 7}
+                  width={lp.caixa.largura + 14}
+                  height={L.esteira.y - lp.topo + 10}
+                  rx={14}
+                  fill="none"
+                  stroke="var(--caneta)"
+                  strokeWidth={2.6}
+                  aria-hidden="true"
+                  data-anel=""
+                />
+              )}
               {cotas && (
                 <CotaCaneta x1={lp.caixa.x + 2} x2={lp.caixa.x + lp.caixa.largura - 2} y={lp.topo - 4} rotuloY={lp.pilha.tamanho.d === 1 && lp.pilha.tamanho.n === 1 ? lp.topo - 21 : lp.topo - 30}>
                   <RotuloPilha k={lp.pilha.quantidade} tamanho={lp.pilha.tamanho} pele={pele} palavra={letraDeMao && L.pilhas.length === 1} />
@@ -245,11 +409,42 @@ export function Bancada({
                   cx={lb.cx}
                   y={lb.rotuloY}
                   valor={q}
-                  pecas={forma !== "saco" && pecas > 0 ? pecas : null}
+                  pecas={forma !== "saco" && pecas > 0 && !(b.pecas.some((x) => x.tamanho.d === 1) && b.pecas.some((x) => x.tamanho.d !== 1)) ? pecas : null}
                   estreita={lb.largura < 44}
                   marcado={marcas.aceita === true && emUso}
                   fracionaria={forma !== "saco"}
+                  inteiras={b.pecas.length === 1 && b.pecas[0].tamanho.n === 1 && b.pecas[0].tamanho.d === 1 ? b.pecas[0].quantidade : null}
+                  generoInteira={pele.peca.genero === "f" ? "inteira" : "inteiro"}
                 />
+              )}
+              {mao && (
+                <g
+                  role="button"
+                  tabIndex={0}
+                  aria-label={rotuloMesa(pele, lb.indice, q, pilhaArmada ? nomeDaPeca(pele, pilhaArmada.pilha.tamanho).toLowerCase() : null, b)}
+                  data-focavel=""
+                  data-receptor={lb.indice}
+                  onClick={() => tocarMesa(lb.indice)}
+                  onKeyDown={(e) => ativarComTeclado(e, () => tocarMesa(lb.indice))}
+                  style={{ cursor: pilhaArmada || b.pecas.length > 0 ? "pointer" : undefined }}
+                >
+                  <rect x={lb.cx - lb.largura / 2 + 2} y={lb.conteudo.y - 6} width={lb.largura - 4} height={lb.rotuloY + 18 - lb.conteudo.y} rx={10} fill="transparent" stroke="none" />
+                  <rect className="anel-foco" x={lb.cx - lb.largura / 2 + 4} y={lb.conteudo.y - 4} width={lb.largura - 8} height={lb.rotuloY + 14 - lb.conteudo.y} rx={10} />
+                  {pilhaArmada && b.aberta && (
+                    <rect
+                      x={lb.cx - lb.largura / 2 + 5}
+                      y={lb.conteudo.y - 3}
+                      width={lb.largura - 10}
+                      height={lb.receptorY + 8 - lb.conteudo.y}
+                      rx={10}
+                      fill="none"
+                      stroke="var(--caneta)"
+                      strokeWidth={2}
+                      strokeDasharray="6 5"
+                      aria-hidden="true"
+                    />
+                  )}
+                </g>
               )}
               {atencao && <CirculoVermelho cx={lb.cx} cy={(lb.conteudo.y + lb.rotuloY + 30) / 2} rx={lb.largura / 2 - 1} ry={(lb.rotuloY + 30 - lb.conteudo.y) / 2 + 6} semente={lb.indice + 5} />}
               {marcas.aceita === true && emUso && lb.largura >= 40 && <VistoVerde x={lb.medidor.x + lb.medidor.largura / 2} y={lb.medidor.y - 12} />}
@@ -301,6 +496,25 @@ export function Bancada({
           </g>
         )}
 
+        {/* A mão: a peça desliza da esteira até a mesa, ou volta */}
+        {(ev?.tipo === "colocou" || ev?.tipo === "devolveu") && L.bicas[ev.bica] && (
+          <VooDaMao
+            key={`mao-${estado.seq}`}
+            forma={forma}
+            tamanho={ev.tamanho}
+            de={ev.tipo === "colocou" ? origemNaEsteira(L, ev.tamanho) : centroDaBica(L, ev.bica)}
+            para={ev.tipo === "colocou" ? centroDaBica(L, ev.bica) : origemNaEsteira(L, ev.tamanho)}
+          />
+        )}
+        {arraste && (
+          <g transform={`translate(${arraste.x} ${arraste.y})`} opacity={0.85} style={{ pointerEvents: "none" }} aria-hidden="true">
+            {forma === "saco" ? (
+              <Saco x={0} y={0} r={9} />
+            ) : (
+              <Unidade forma={forma} x={0} y={0} r={14} unidade={comporUnidades([{ tamanho: comoRacional(arraste.chave), quantidade: 1 }])[0]} contorno={false} />
+            )}
+          </g>
+        )}
         {cotaExtra && <CotaExtra L={L} alvo={cotaExtra.alvo} texto={cotaExtra.texto} pilha={pilhaSel} />}
         {marcas.fechou && letraDeMao && (
           <g className="anima-esmaecer" aria-hidden="true">
@@ -310,7 +524,62 @@ export function Bancada({
           </g>
         )}
       </svg>
+      {menuPilha && (
+        <MenuCorte
+          key={menuPilha.chave}
+          posicao={posicaoMenu(menuPilha)}
+          partes={partesValidas(estado, menuPilha.chave)}
+          quantidade={menuPilha.pilha.quantidade}
+          nomePeca={nomeDaPeca(pele, menuPilha.pilha.tamanho).toLowerCase()}
+          onCortar={(partes, todas) => {
+            onAcao?.({ tipo: "cortar", tamanho: menuPilha.chave, partes, quantidade: todas ? "todas" : 1 });
+            setMenu(null);
+          }}
+          onFechar={soltar}
+        />
+      )}
     </div>
+  );
+}
+
+function rotuloMesa(pele: Pele, i: number, q: ReturnType<typeof quantidadeNaBica>, escolhida: string | null, b: EstadoBica): string {
+  const nome = `${pele.receptor.singular[0].toUpperCase()}${pele.receptor.singular.slice(1)} ${i + 1}`;
+  const tem = q.n === 0 ? (pele.receptor.genero === "f" ? "vazia" : "vazio") : quantidadeComNomeDaPele(q, pele);
+  if (escolhida) return `${nome}: ${tem}. Pôr ${escolhida} aqui.`;
+  if (b.pecas.length > 0) return `${nome}: ${tem}. Devolver uma peça à esteira.`;
+  return `${nome}: ${tem}.`;
+}
+
+function quantidadeComNomeDaPele(q: ReturnType<typeof quantidadeNaBica>, pele: Pele): string {
+  if (q.d === 1) return `${inteiroPorExtenso(q.n, pele.peca.genero)} ${q.n === 1 ? pele.peca.singular : pele.peca.plural}`;
+  return racionalPorExtenso(q, { misto: true });
+}
+
+function origemNaEsteira(L: LayoutBancada, tamanho: string): [number, number] {
+  const lp = L.pilhas.find((p) => p.chave === tamanho) ?? L.pilhas[0];
+  if (!lp) return [L.esteira.x0 + 30, L.esteira.y - 18];
+  return [lp.caixa.x + lp.caixa.largura / 2, lp.topo + (L.esteira.y - lp.topo) / 2];
+}
+
+function centroDaBica(L: LayoutBancada, i: number): [number, number] {
+  const lb = L.bicas[i];
+  return [lb.conteudo.x + lb.conteudo.largura / 2, lb.conteudo.y + lb.conteudo.altura - 16];
+}
+
+/** Uma peça que desliza (só transform), em 220 ms. */
+function VooDaMao({ forma, tamanho, de, para }: { forma: Pele["peca"]["forma"]; tamanho: string; de: [number, number]; para: [number, number] }) {
+  return (
+    <g aria-hidden="true" style={{ pointerEvents: "none" }}>
+      <g className="anima-pousa" style={{ ["--dx" as string]: `${para[0] - de[0]}px`, ["--dy" as string]: `${para[1] - de[1]}px` }}>
+        <g transform={`translate(${de[0]} ${de[1]})`}>
+          {forma === "saco" ? (
+            <Saco x={0} y={0} r={7} />
+          ) : (
+            <Unidade forma={forma} x={0} y={0} r={10} unidade={comporUnidades([{ tamanho: comoRacional(tamanho), quantidade: 1 }])[0]} contorno={false} />
+          )}
+        </g>
+      </g>
+    </g>
   );
 }
 
@@ -366,6 +635,8 @@ function RotuloBica({
   estreita,
   marcado,
   fracionaria,
+  inteiras = null,
+  generoInteira = "inteira",
 }: {
   cx: number;
   y: number;
@@ -374,18 +645,22 @@ function RotuloBica({
   estreita: boolean;
   marcado: boolean;
   fracionaria: boolean;
+  /** Só peças inteiras na bica: a legenda conta inteiras, como na referência. */
+  inteiras?: number | null;
+  generoInteira?: "inteira" | "inteiro";
 }) {
   const tamanho = estreita ? 13 : 18;
   const centro = valor.d === 1 ? y + 12 : y + 22;
+  const legenda = pecas === null ? null : inteiras !== null ? (inteiras === 1 ? `1 ${generoInteira}` : `${inteiras} ${generoInteira}s`) : pecas === 1 ? "1 pedaço" : `${pecas} pedaços`;
   const alturaFaixa = valor.d === 1 ? tamanho + 8 : tamanho * 2 + 8;
   const larguraFaixa = estreita ? 26 : 40;
   return (
     <g aria-hidden="true">
       {marcado && <FaixaMarcaTexto x={cx - larguraFaixa / 2} y={centro - alturaFaixa / 2} largura={larguraFaixa} altura={alturaFaixa} cresce />}
       <NumeroSvg valor={valor} x={cx} y={centro} tamanho={tamanho} escalaFracao={1} />
-      {fracionaria && pecas !== null && !estreita && (
+      {fracionaria && legenda !== null && !estreita && (
         <text x={cx} y={y + 52} textAnchor="middle" fontSize={12} fontWeight={500} fill="var(--tinta-suave)" stroke="none" className="algarismos">
-          {pecas === 1 ? "1 pedaço" : `${pecas} pedaços`}
+          {legenda}
         </text>
       )}
     </g>

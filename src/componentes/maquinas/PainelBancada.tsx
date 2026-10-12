@@ -1,17 +1,16 @@
 "use client";
 
 /**
- * A bancada de controles, na zona do polegar. Só aparece o que a máquina tem: nenhum controle
- * sugere uma ação que não existe. Um botão principal só: o de repartir.
+ * A bancada de controles, na zona do polegar, enxuta: só o que o passo usa. A carga e as bicas
+ * (quando ajustáveis), o lote com Repartir (o botão principal), Fechar a partilha e Desfazer.
+ * Escolher a peça e cortar acontecem na máquina: tocar a peça abre o menu de corte.
  */
 import type { ReactNode } from "react";
-import type { Racional } from "@/nucleo/racional/racional";
 import { bicasAbertas, loteMaximo, pilhaDe, totalGeral } from "@/nucleo/maquinas/bancada/bancada";
 import type { AcaoBancada, EstadoBancada } from "@/nucleo/maquinas/bancada/tipos";
 import type { Pele } from "@/conteudo/peles";
 import { IconeDesfazer } from "@/componentes/icones/IconeDesfazer";
 import { IconeRecomecar } from "@/componentes/icones/IconeRecomecar";
-import { Numero } from "@/componentes/notacao/Numero";
 import { Seletor } from "@/componentes/ui/Seletor";
 
 export interface PropsPainel {
@@ -27,28 +26,11 @@ export interface PropsPainel {
   extra?: ReactNode;
 }
 
-function nomeDaPilha(pele: Pele, tamanho: Racional, k: number): ReactNode {
-  if (tamanho.n === 1 && tamanho.d === 1) {
-    return (
-      <>
-        <span className="algarismos">{k}</span> {k === 1 ? pele.peca.singular : pele.peca.plural}
-      </>
-    );
-  }
-  return (
-    <>
-      <span className="algarismos">{k}</span> de <Numero valor={tamanho} pequena />
-    </>
-  );
-}
-
 export function PainelBancada({ estado, pele, onAcao, onFechar, rotuloFechar = "Fechar a partilha", parada = false, extra }: PropsPainel) {
   const c = estado.config;
   const fechada = estado.fechada;
   const travado = parada || fechada;
   const pilhaAtual = pilhaDe(estado.esteira, estado.pilha);
-  // Com uma pilha só não há o que escolher: a linha não aparece.
-  const temVariasPilhas = estado.esteira.length > 1;
   const abertas = bicasAbertas(estado).length;
 
   return (
@@ -65,70 +47,6 @@ export function PainelBancada({ estado, pele, onAcao, onFechar, rotuloFechar = "
             onMudar={(v) => onAcao({ tipo: "carga", quantidade: v })}
             idTeste="carga"
           />
-        </div>
-      )}
-
-      {temVariasPilhas && (
-        <div className="flex items-center gap-2.5">
-          <span className="rotulo w-[76px] shrink-0">Pilha</span>
-          <div className="-my-1 flex min-w-0 flex-1 gap-2 overflow-x-auto py-1" role="radiogroup" aria-label="Pilha escolhida">
-            {estado.esteira.map((p) => {
-              const k = `${p.tamanho.n}/${p.tamanho.d}`;
-              const sel = estado.pilha === k;
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  role="radio"
-                  aria-checked={sel}
-                  className="opcao shrink-0 text-[15px]"
-                  disabled={travado}
-                  onClick={() => onAcao({ tipo: "pilha", tamanho: k })}
-                  data-escolher-pilha={k}
-                >
-                  {nomeDaPilha(pele, p.tamanho, p.quantidade)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {c.fatiador && (
-        <div className="flex flex-col gap-2" data-painel="fatiador">
-          <div className="flex items-center gap-2.5">
-            <span className="rotulo w-[76px] shrink-0">Cortar em</span>
-            <div className="opcoes min-w-0 flex-1" role="radiogroup" aria-label="Cortar em quantas partes">
-              {c.fatiador.partes.map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  role="radio"
-                  aria-checked={estado.partes === p}
-                  className="opcao"
-                  disabled={travado}
-                  onClick={() => onAcao({ tipo: "partes", valor: p })}
-                  data-partes={p}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex gap-2 pl-[86px]">
-            <button type="button" className="botao-secundario flex-1" disabled={travado || !pilhaAtual} onClick={() => onAcao({ tipo: "fatiar", quantidade: 1 })} data-acao="cortar-uma">
-              Cortar 1
-            </button>
-            <button
-              type="button"
-              className="botao-secundario flex-1"
-              disabled={travado || !pilhaAtual || pilhaAtual.quantidade < 2}
-              onClick={() => onAcao({ tipo: "fatiar", quantidade: "todas" })}
-              data-acao="cortar-todas"
-            >
-              Cortar todas
-            </button>
-          </div>
         </div>
       )}
 
@@ -173,20 +91,19 @@ export function PainelBancada({ estado, pele, onAcao, onFechar, rotuloFechar = "
       </div>
 
       <div className="flex items-center gap-2">
-        {onFechar && (
+        {onFechar ? (
           <button type="button" className="botao-secundario min-w-0 flex-1" disabled={parada || fechada} onClick={onFechar} data-acao="fechar">
             {rotuloFechar}
           </button>
+        ) : (
+          <span className="flex-1" />
         )}
-        <button type="button" className="botao-discreto shrink-0" disabled={parada} onClick={() => onAcao({ tipo: "desfazer" })} data-acao="desfazer">
+        <button type="button" className="botao-discreto shrink-0 px-2.5" disabled={parada} onClick={() => onAcao({ tipo: "desfazer" })} data-acao="desfazer">
           <IconeDesfazer />
           Desfazer
         </button>
-      </div>
-      <div className="-mt-2 flex justify-end">
-        <button type="button" className="botao-discreto" disabled={parada} onClick={() => onAcao({ tipo: "recomecar" })} data-acao="recomecar">
+        <button type="button" className="botao-discreto shrink-0 px-2" disabled={parada} onClick={() => onAcao({ tipo: "recomecar" })} data-acao="recomecar" aria-label="Recomeçar do início">
           <IconeRecomecar />
-          Recomeçar do início
         </button>
       </div>
       {extra}
