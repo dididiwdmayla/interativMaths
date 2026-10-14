@@ -96,7 +96,7 @@ export function VitrineGuia({ Secao }: { Secao: (p: { titulo: string; children: 
           <Selo tipo="acertou" />
           <Selo tipo="ainda-nao" />
         </div>
-        <div className="flex flex-col gap-3 rounded-xl border-2 border-tinta bg-folha" data-vitrine="objetivo">
+        <div className="flex flex-col gap-3 rounded-xl border-2 border-contorno bg-folha" data-vitrine="objetivo">
           <Objetivo etiqueta="Objetivo" instrucao="Reparta as 5 broas entre as 4 mesas, sem sobrar nada." gesto={{ texto: "Agora: ponha uma broa em cada mesa, ou use Repartir.", tom: "gesto" }} />
           <Objetivo etiqueta="Pergunta" instrucao="Monte com as fichas o pedaço que cada mesa recebe: 2 broas, 3 mesas." gesto={{ texto: "Agora: troque as fichas e confira de novo.", tom: "tentar" }} />
           <Objetivo etiqueta="Aposta do Nônio" instrucao="Mostre na máquina se ele tem razão." gesto={null} />

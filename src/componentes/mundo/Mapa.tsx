@@ -274,7 +274,7 @@ export function Mapa() {
               {chamado && (
                 <button
                   type="button"
-                  className="absolute left-[18px] top-[352px] min-h-[44px] rotate-[-4deg] rounded-md border-2 border-tinta bg-marca-texto px-3 py-1.5 text-left text-[14px] font-bold leading-tight anima-subir"
+                  className="absolute left-[18px] top-[352px] min-h-[44px] rotate-[-4deg] rounded-md border-2 border-contorno bg-marca-texto text-sobre-marca px-3 py-1.5 text-left text-[14px] font-bold leading-tight anima-subir"
                   onClick={irChamado}
                   id="chamado"
                   data-destino="chamado"
@@ -287,7 +287,7 @@ export function Mapa() {
               {bilhete && (
                 <p
                   role="status"
-                  className="absolute z-10 m-0 w-[220px] -translate-x-1/2 rotate-[-1.5deg] rounded-md border-2 border-tinta bg-marca-texto px-3 py-2 text-[14px] font-semibold anima-esmaecer"
+                  className="absolute z-10 m-0 w-[220px] -translate-x-1/2 rotate-[-1.5deg] rounded-md border-2 border-contorno bg-marca-texto text-sobre-marca px-3 py-2 text-[14px] font-semibold anima-esmaecer"
                   style={{ left: Math.min(W - 120, Math.max(120, ETIQUETAS[bilhete.id].x)), top: ETIQUETAS[bilhete.id].y + 54 }}
                   data-bilhete=""
                 >
@@ -360,7 +360,7 @@ function CartaoContinuar({ proxima, emAndamento }: { proxima: (typeof MISSOES_AR
   }
   return (
     <div className="ficha absolute inset-x-[14px] bottom-[18px] flex items-center gap-3 p-3 lg:left-auto lg:right-7 lg:w-[420px]" data-cartao="continuar">
-      <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-xl border-2 border-tinta bg-marca-texto-palido">
+      <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-xl border-2 border-contorno bg-marca-texto-palido">
         <MiniaturaMissao numero={proxima.numero ?? 1} tamanho={36} />
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-px">

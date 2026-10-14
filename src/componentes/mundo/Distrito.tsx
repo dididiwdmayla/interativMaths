@@ -78,7 +78,7 @@ export function Distrito() {
               <li key={c.id} className="list-none">
                 <Link
                   href={c.href}
-                  className="block max-w-[230px] rounded-md border-2 border-tinta bg-marca-texto px-3 py-2 anima-subir"
+                  className="block max-w-[230px] rounded-md border-2 border-contorno bg-marca-texto text-sobre-marca px-3 py-2 anima-subir"
                   style={{ transform: `rotate(${i % 2 === 0 ? -2 : 1.5}deg)` }}
                   data-chamado={c.id}
                 >
@@ -162,7 +162,7 @@ function Parada({ s, lado, atual }: { s: SituacaoMissao; lado: "esquerda" | "dir
   return (
     <li className={`flex w-full list-none items-center gap-3 lg:w-[640px] ${lado === "direita" ? "flex-row-reverse lg:self-end" : "lg:self-start"}`} data-estacao={m.id} data-status={s.status}>
       <div className="relative shrink-0" data-no="">
-        <div className={`relative z-[1] flex h-[72px] w-[72px] items-center justify-center rounded-2xl border-2 bg-folha ${porVir ? "border-dashed border-grafite" : "border-tinta bg-marca-texto-palido"}`}>
+        <div className={`relative z-[1] flex h-[72px] w-[72px] items-center justify-center rounded-2xl border-2 bg-folha ${porVir ? "border-dashed border-grafite" : "border-contorno bg-marca-texto-palido"}`}>
           <MiniaturaMissao numero={m.numero ?? 1} tamanho={46} lapis={porVir} />
         </div>
         {atual && (

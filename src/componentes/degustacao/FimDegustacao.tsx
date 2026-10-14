@@ -30,7 +30,7 @@ export function FimDegustacao({ recepcao, onDeNovo }: { recepcao: boolean; onDeN
         <Comemoracao />
         <Trailer />
       </div>
-      <div className="area-segura area-segura-base sticky bottom-0 z-20 flex-none border-t-2 border-tinta bg-papel pt-3">
+      <div className="area-segura area-segura-base sticky bottom-0 z-20 flex-none border-t-2 border-contorno bg-papel pt-3">
         <div className="mx-auto flex w-full max-w-[520px] flex-col gap-1.5 md:max-w-[640px] md:flex-row md:items-center md:gap-3">
           <a
             href={URL_ACESSO}
@@ -139,7 +139,7 @@ function Trailer() {
       <div className="-mx-2 flex items-center justify-center" role="group" aria-label="Cenas do trailer">
         {TRAILER.map((c, i) => (
           <button key={c.id} type="button" className="grid h-11 w-11 place-items-center" onClick={() => ir(i)} aria-label={c.lugar} aria-current={i === cena ? "true" : undefined} data-cena-trailer={c.id}>
-            <span className={`block h-3 w-3 rounded-full border-2 ${i === cena ? "border-tinta bg-caneta" : c.existe ? "border-tinta bg-folha" : "border-dashed border-grafite bg-folha"}`} />
+            <span className={`block h-3 w-3 rounded-full border-2 ${i === cena ? "border-contorno bg-caneta" : c.existe ? "border-contorno bg-folha" : "border-dashed border-grafite bg-folha"}`} />
           </button>
         ))}
       </div>
@@ -187,7 +187,7 @@ function DesenhoDaCena({ cena }: { cena: CenaTrailer }) {
 function DesenhoCaderno() {
   return (
     <svg viewBox="0 0 220 130" className="block h-full max-w-full">
-      <g stroke="var(--tinta)" strokeWidth={2.4} strokeLinejoin="round">
+      <g stroke="var(--contorno)" strokeWidth={2.4} strokeLinejoin="round">
         <rect x={20} y={10} width={180} height={112} rx={8} fill="var(--folha)" />
       </g>
       {[42, 62, 82, 102].map((y) => (

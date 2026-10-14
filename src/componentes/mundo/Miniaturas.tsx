@@ -2,7 +2,7 @@
  * Um desenho pequeno do que se reparte em cada missão do Arco 1, a traço de tinta.
  * Usado nas paradas do distrito e no cartão de continuar. A lápis quando a missão está por vir.
  */
-const T = { stroke: "var(--tinta)", strokeWidth: 2.2, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
+const T = { stroke: "var(--contorno)", strokeWidth: 2.2, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
 function Sacas({ pontos }: { pontos: [number, number][] }) {
   return (

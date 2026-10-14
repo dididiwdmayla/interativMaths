@@ -101,7 +101,7 @@ export function Planta() {
                   key={l.chave}
                   d={l.d}
                   fill="none"
-                  stroke={l.tinta ? "var(--tinta)" : "var(--grafite)"}
+                  stroke={l.tinta ? "var(--contorno)" : "var(--grafite)"}
                   strokeWidth={l.tinta ? 2.4 : 2.2}
                   strokeDasharray={l.tinta ? undefined : "6 6"}
                   strokeLinecap="round"
@@ -136,14 +136,14 @@ function Componente({ c, s, estado, selecionado, onAbrir }: { c: Conceito; s: Si
         data-conceito={c.id}
         data-estado={estado}
       >
-        {s.provavel && estado === "nao_avaliado" && <span className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-tinta bg-caneta" aria-hidden="true" />}
+        {s.provavel && estado === "nao_avaliado" && <span className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-contorno bg-caneta" aria-hidden="true" />}
         {(estado === "dominado" || estado === "consolidado") && (
-          <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-tinta bg-verde-palido text-verde-escuro" aria-hidden="true">
+          <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-contorno bg-verde-palido text-verde-escuro" aria-hidden="true">
             <IconeVisto />
           </span>
         )}
         {estado === "pede_ajuste" && (
-          <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-tinta bg-marca-texto-palido" aria-hidden="true">
+          <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-contorno bg-marca-texto-palido" aria-hidden="true">
             <IconeChave />
           </span>
         )}
@@ -178,7 +178,7 @@ function Legenda() {
           </li>
         ))}
         <li className="flex list-none items-center gap-2.5 text-[14px] font-medium text-tinta-suave">
-          <span className="ml-1 h-3 w-3 shrink-0 rounded-full border-2 border-tinta bg-caneta" aria-hidden="true" />
+          <span className="ml-1 h-3 w-3 shrink-0 rounded-full border-2 border-contorno bg-caneta" aria-hidden="true" />
           ponto azul: a calibragem acha provável
         </li>
       </ul>

@@ -6,12 +6,14 @@
 import type { IdConceito } from "../curriculo/curriculo";
 import type { Evidencia, ResultadoEvidencia } from "../dominio/evidencias";
 
-export const VERSAO_PROGRESSO = 2;
+export const VERSAO_PROGRESSO = 3;
 
 export type Postura = "quieto" | "disponivel" | "presente";
 export type Cotas = "visiveis" | "escondidas";
 export type Animacoes = "completas" | "leves";
 export type Conversa = "ligada" | "desligada";
+/** Automático segue o aparelho; claro e escuro fixam a luz do caderno. */
+export type Aparencia = "automatico" | "claro" | "escuro";
 
 export interface Preferencias {
   /** quieto: só quando chamado; disponível: oferece depois de duas tentativas travadas; presente: comenta. */
@@ -20,6 +22,8 @@ export interface Preferencias {
   readonly animacoes: Animacoes;
   /** Perguntas por escrito ao Nônio (usa IA). Desligada, o botão "Perguntar" não aparece. */
   readonly conversa: Conversa;
+  /** A luz do caderno (v3). Espelhada numa chave própria, lida antes da primeira pintura. */
+  readonly aparencia: Aparencia;
 }
 
 export interface RespostaCalibragem {
@@ -141,6 +145,7 @@ export const PREFERENCIAS_PADRAO: Preferencias = {
   cotas: "visiveis",
   animacoes: "completas",
   conversa: "ligada",
+  aparencia: "automatico",
 };
 
 export function progressoNovo(agora: number): Progresso {

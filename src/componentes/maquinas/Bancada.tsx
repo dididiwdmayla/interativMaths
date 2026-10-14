@@ -796,7 +796,7 @@ function Fatiador({ L, partes, seq, realcado }: { L: LayoutBancada; partes: numb
   const c = L.fatiador;
   if (!c) return null;
   const cx = c.x + c.largura / 2;
-  const t = { stroke: "var(--tinta)", strokeWidth: TRACO, strokeLinejoin: "round" as const };
+  const t = { stroke: "var(--contorno)", strokeWidth: TRACO, strokeLinejoin: "round" as const };
   return (
     <g aria-hidden="true">
       <rect x={c.x + 4} y={c.y + 6} width={7} height={c.altura - 24} rx={2} fill="var(--caneta-clara)" {...t} />
@@ -806,7 +806,7 @@ function Fatiador({ L, partes, seq, realcado }: { L: LayoutBancada; partes: numb
       </g>
       <rect x={c.x} y={c.y} width={c.largura} height={10} rx={4} fill="var(--caneta)" {...t} />
       <rect x={c.x + 2} y={c.y + c.altura - 22} width={c.largura - 4} height={22} rx={6} fill="var(--marca-texto)" {...t} />
-      <text x={cx} y={c.y + c.altura - 11} textAnchor="middle" dominantBaseline="central" fontSize={12.5} fontWeight={700} fill="var(--tinta)" stroke="none">
+      <text x={cx} y={c.y + c.altura - 11} textAnchor="middle" dominantBaseline="central" fontSize={12.5} fontWeight={700} fill="var(--sobre-marca)" stroke="none">
         {`em ${partes}`}
       </text>
       {realcado && <AnelRealce x={cx} y={c.y + c.altura / 2} rx={c.largura / 2 + 8} ry={c.altura / 2 + 8} />}
@@ -827,7 +827,7 @@ function Bandeja({ L, estado, pele, cotas, realcado }: { L: LayoutBancada; estad
   return (
     <g data-sobra={formatar(sobra)}>
       <g className="a-lapis" aria-hidden="true">
-        <path d={`M ${c.x + 48} ${fundo - 12} L ${c.x + 54} ${fundo} H ${c.x + c.largura - 6} L ${c.x + c.largura} ${fundo - 12} Z`} fill="var(--folha)" stroke="var(--tinta)" />
+        <path d={`M ${c.x + 48} ${fundo - 12} L ${c.x + 54} ${fundo} H ${c.x + c.largura - 6} L ${c.x + c.largura} ${fundo - 12} Z`} fill="var(--folha)" stroke="var(--contorno)" />
       </g>
       {cotas && (
         <text x={c.x + 2} y={c.y + 12} fontSize={12} fontWeight={600} fill="var(--tinta-suave)" stroke="none">
@@ -857,8 +857,8 @@ function AnelRealce({ x, y, rx, ry }: { x: number; y: number; rx: number; ry: nu
 function VistoVerde({ x, y }: { x: number; y: number }) {
   return (
     <g aria-hidden="true" className="anima-esmaecer" data-visto="">
-      <circle cx={x} cy={y} r={10} fill="var(--verde)" stroke="var(--tinta)" strokeWidth={2} />
-      <path d={`M ${x - 4.5} ${y + 0.5} l 3 3 l 6 -6.5`} fill="none" stroke="var(--folha)" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={x} cy={y} r={10} fill="var(--verde)" stroke="var(--contorno)" strokeWidth={2} />
+      <path d={`M ${x - 4.5} ${y + 0.5} l 3 3 l 6 -6.5`} fill="none" stroke="var(--sobre-verde)" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
     </g>
   );
 }

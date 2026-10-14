@@ -20,7 +20,7 @@ export function ManualRasgado({ titulo, linhas }: { titulo: string; linhas: read
           ))}
           <line x1={26} x2={26} y1={0} y2={140} stroke="var(--margem)" strokeWidth={1.6} />
         </g>
-        <path d={rasgo} fill="none" stroke="var(--tinta)" strokeWidth={2} strokeLinejoin="round" />
+        <path d={rasgo} fill="none" stroke="var(--contorno)" strokeWidth={2} strokeLinejoin="round" />
         <text x={34} y={30} fontSize={14} fontWeight={800} fill="var(--tinta)">
           {titulo}
         </text>

@@ -82,7 +82,7 @@ export function CabecalhoJogo({ atual }: { atual?: Lugar }) {
         <div className="flex items-center gap-2">
           <Link
             href="/relicario"
-            className="flex h-9 items-center gap-1.5 rounded-[10px] border-2 border-tinta bg-folha px-[11px] text-[15px] font-bold"
+            className="flex h-9 items-center gap-1.5 rounded-[10px] border-2 border-contorno bg-folha px-[11px] text-[15px] font-bold"
             aria-label={joias === 1 ? "1 joia encontrada" : `${joias} joias encontradas`}
             data-contador="joias"
           >
@@ -98,7 +98,7 @@ export function CabecalhoJogo({ atual }: { atual?: Lugar }) {
         <FilaLugares atual={atual} onFechado={setBilhete} />
       </nav>
       {bilhete && (
-        <p role="status" className="absolute right-[14px] top-full z-40 m-0 mt-2 max-w-[260px] rotate-[-1.5deg] rounded-md border-2 border-tinta bg-marca-texto px-3 py-2 text-[14px] font-semibold anima-esmaecer" data-bilhete="">
+        <p role="status" className="absolute right-[14px] top-full z-40 m-0 mt-2 max-w-[260px] rotate-[-1.5deg] rounded-md border-2 border-contorno bg-marca-texto text-sobre-marca px-3 py-2 text-[14px] font-semibold anima-esmaecer" data-bilhete="">
           {bilhete}
         </p>
       )}

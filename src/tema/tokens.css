@@ -20,9 +20,28 @@
   --pauta: #cfdcf3;
   --margem: #f0a8ab;
 
-  /* Tinta: o que existe e funciona */
+  /* Tinta: o que existe e funciona (o texto) */
   --tinta: #1b2440;
   --tinta-suave: #56607d;
+
+  /*
+   * Os outros papéis da tinta, separados na v0.4. No claro têm a cor da tinta; no escuro, não:
+   * a borda não pode berrar e a sombra dura fica mais escura que o papel.
+   */
+  --contorno: #1b2440; /* bordas e traços do desenho */
+  --sombra: #1b2440; /* a sombra dura das fichas e dos botões */
+
+  /* Texto sobre cor chapada */
+  --sobre-caneta: #ffffff;
+  --sobre-marca: #1b2440; /* sobre marca-texto e bilhete: o amarelo não muda, a letra também não */
+  --sobre-verde: #ffffff; /* sobre --verde e --verde-escuro */
+
+  /* O Nônio é objeto: mantém a cor própria nos dois modos (só o traço clareia no escuro) */
+  --nonio-cupula: #2456e6;
+  --nonio-rosto: #ffffff;
+  --nonio-aba: #8fb0ff;
+  --nonio-traco: #1b2440;
+  --nonio-olho: #1b2440;
 
   /* Lápis: o que ainda não */
   --grafite: #9aa5bf;
@@ -52,8 +71,9 @@
   --verde-tinta: #135a43; /* texto sobre --verde-palido (6,8:1) */
   --verde-palido: #d3f2e3;
 
-  /* O bilhete amarelo da aposta do Nônio */
+  /* O bilhete amarelo da aposta do Nônio, e a caneta com que ele escreve (objeto: não inverte) */
   --bilhete: #ffef8a;
+  --bilhete-tinta: #1a3fb0;
 
   /* Materiais das peles: chapados, sempre com contorno de tinta */
   --pao: #f7c66f;

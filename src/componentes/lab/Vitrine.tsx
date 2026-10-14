@@ -130,7 +130,7 @@ export function Vitrine() {
               <div className="flex flex-wrap gap-3">
                 {g.nomes.map((n) => (
                   <div key={n} className="flex w-[92px] flex-col gap-1">
-                    <span className="block h-11 w-full rounded-[10px] border-2 border-tinta" style={{ background: `var(--${n})` }} />
+                    <span className="block h-11 w-full rounded-[10px] border-2 border-contorno" style={{ background: `var(--${n})` }} />
                     <span className="text-[12px] font-semibold text-tinta-suave">{n}</span>
                   </div>
                 ))}
@@ -213,8 +213,8 @@ export function Vitrine() {
             <TiraMensagem texto="Partilha fechada." tom="feito" />
           </div>
           <Sub>Ficha de missão e cartão de continuar</Sub>
-          <div className="flex max-w-[420px] items-center gap-3 rounded-xl border-2 border-tinta bg-folha p-2.5">
-            <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[10px] border-2 border-tinta bg-marca-texto-palido">
+          <div className="flex max-w-[420px] items-center gap-3 rounded-xl border-2 border-contorno bg-folha p-2.5">
+            <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[10px] border-2 border-contorno bg-marca-texto-palido">
               <MiniaturaMissao numero={4} tamanho={30} />
             </div>
             <div className="min-w-0 flex-1">
@@ -224,7 +224,7 @@ export function Vitrine() {
             <span className="rotate-[-4deg] font-mao text-[22px] font-bold text-verde-escuro">feita!</span>
           </div>
           <div className="ficha flex max-w-[420px] items-center gap-3 p-3">
-            <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-xl border-2 border-tinta bg-marca-texto-palido">
+            <div className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-xl border-2 border-contorno bg-marca-texto-palido">
               <MiniaturaMissao numero={4} tamanho={36} />
             </div>
             <div className="min-w-0 flex-1">
@@ -316,7 +316,7 @@ export function Vitrine() {
           </div>
           <div className="flex flex-wrap gap-3">
             {[1, 2, 3, 4, 5].map((n) => (
-              <div key={n} className="flex h-[60px] w-[60px] items-center justify-center rounded-xl border-2 border-tinta bg-marca-texto-palido">
+              <div key={n} className="flex h-[60px] w-[60px] items-center justify-center rounded-xl border-2 border-contorno bg-marca-texto-palido">
                 <MiniaturaMissao numero={n} tamanho={40} />
               </div>
             ))}
@@ -351,7 +351,7 @@ export function Vitrine() {
           <Sub>A última joia mostra os dois estágios ainda não alcançados, a lápis.</Sub>
         </Secao>
 
-        <FolhaPautada titulo="Notação" margem={<NotaDalia>O traço é uma divisão: 3 ÷ 4 = 3/4.</NotaDalia>} className="rounded-[16px] shadow-[0_4px_0_var(--tinta)]">
+        <FolhaPautada titulo="Notação" margem={<NotaDalia>O traço é uma divisão: 3 ÷ 4 = 3/4.</NotaDalia>} className="rounded-[16px] shadow-[0_4px_0_var(--sombra)]">
           <div className="flex flex-col gap-[14px] pt-[14px]">
             <div className="quadro-notacao self-start">
               <BlocoNotacao linhas={["26 ÷ 4 = 6, resto 2", "26 = 4 × 6 + 2"]} />

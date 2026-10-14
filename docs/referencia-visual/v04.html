@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Referência · v0.4: Nônio flutuante, contas, Manual e modo escuro</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Rubik:wght@500;600;700;800&display=swap">
+<style>
+body{margin:0;padding:24px;background:#eef2f9;font-family:'Rubik',system-ui,sans-serif}
+.grade{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+.legenda{margin:0 0 10px;font-size:15px;font-weight:800;color:#1b2440}
+a{color:#2456e6}
+/* Tokens: o claro e o escuro. Papel e tinta invertem; objetos (Nônio, pão, saca, marca-texto) não. */
+.ref{--papel:#fbfcff;--grade:#dfe7f5;--grade-suave:#e9eef8;--folha:#ffffff;--contorno:#1b2440;--sombra:#1b2440;--tinta:#1b2440;--tinta-suave:#56607d;--grafite:#9aa5bf;--grafite-claro:#f3f6fc;--caneta:#2456e6;--sobre-caneta:#ffffff;--caneta-clara:#8fb0ff;--caneta-palida:#dfe8ff;--marca:#ffe45c;--sobre-marca:#1b2440;--verde:#1f9d6f;--verde-escuro:#177a5b;--verde-palido:#d3f2e3;--verde-tinta:#135a43;--vermelho:#e5484d;--pao:#f7c66f;--pao-miolo:#ffe7b0;--pauta:#cfdcf3;--veu:rgba(27,36,64,.32);--sobre-verde:#ffffff;--saca:#e3c193;--madeira:#d49a68;--nonio-cupula:#2456e6;--nonio-rosto:#ffffff;--nonio-aba:#8fb0ff;--nonio-traco:#1b2440;--nonio-olho:#1b2440;--vermelho-nevoa:#fff1f0;--bilhete:#ffef8a}
+.ref.escuro{--papel:#10162a;--grade:#1c2540;--grade-suave:#18203a;--folha:#182039;--contorno:#8792b3;--sombra:#05080f;--tinta:#e9edf7;--tinta-suave:#a9b2c9;--grafite:#5c6788;--grafite-claro:#1e2742;--caneta:#7fa3ff;--sobre-caneta:#0d1326;--caneta-clara:#3f5ba8;--caneta-palida:#25335e;--marca:#ffe45c;--sobre-marca:#1b2440;--verde:#3fc791;--verde-escuro:#62d6a7;--verde-palido:#163d31;--verde-tinta:#93e9c4;--vermelho:#ff6b70;--pao:#e8b35e;--pao-miolo:#f3d49b;--nonio-cupula:#3d6bff;--nonio-rosto:#ffffff;--nonio-aba:#8fb0ff;--nonio-traco:#c9d3ee;--nonio-olho:#1b2440;--madeira:#b98457;--pauta:#2a3554;--saca:#cfae80;--sobre-verde:#0d1a14;--veu:rgba(3,5,12,.6);--vermelho-nevoa:#3b1c26;--bilhete:#f1dc7c}
+.ref .tela{width:390px;height:844px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;position:relative;background-color:var(--papel);background-image:linear-gradient(var(--grade) 1px,transparent 1px),linear-gradient(90deg,var(--grade) 1px,transparent 1px);background-size:20px 20px;color:var(--tinta);font-family:'Rubik',system-ui,sans-serif}
+.ref .cab{height:60px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 14px;background:var(--folha);border-bottom:2px solid var(--contorno)}
+.ref .qd{width:44px;height:44px;flex:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);padding:0;text-decoration:none;cursor:pointer}
+.ref .tit{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;margin-left:2px}
+.ref .obj{height:104px;flex:none;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;padding:9px 14px 10px;background:var(--folha);border-bottom:2px solid var(--contorno)}
+.ref .obj-l{display:flex;align-items:flex-start;gap:8px;font-size:15.5px;font-weight:600;line-height:1.3}
+.ref .rasc{display:flex;flex-direction:column;gap:2px}
+.ref .rasc-l{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;line-height:1.3;color:var(--tinta-suave);white-space:nowrap}
+.ref .rasc-l span{border-bottom:1.5px dashed var(--grafite);padding-bottom:1px}
+.ref .lin{display:flex;align-items:center;gap:8px}
+.ref .passo{width:44px;height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:700 22px 'Rubik',system-ui,sans-serif;padding:0;cursor:pointer}
+.ref .val{width:48px;height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid var(--contorno);border-radius:12px;background:var(--marca);color:var(--sobre-marca);font:800 22px 'Rubik',system-ui,sans-serif}
+.ref .bp{height:50px;box-sizing:border-box;border:2px solid var(--contorno);border-radius:14px;background:var(--caneta);box-shadow:0 4px 0 var(--sombra);color:var(--sobre-caneta);font:700 18px 'Rubik',system-ui,sans-serif;padding:0 12px;cursor:pointer}
+.ref .bd{height:46px;border:0;background:transparent;color:var(--tinta-suave);font:600 15px 'Rubik',system-ui,sans-serif;display:flex;align-items:center;gap:6px;padding:0 6px;cursor:pointer}
+.ref .veu{position:absolute;inset:0;background:var(--veu)}
+.ref .balao{box-sizing:border-box;padding:10px 13px 12px;border:2px solid var(--contorno);border-radius:14px 14px 14px 4px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);font-size:15.5px;font-weight:500;line-height:1.38}
+.ref .antes{font-size:13px;font-weight:500;line-height:1.35;color:var(--tinta-suave)}
+.ref .degrau{font-size:12px;font-weight:600;color:var(--tinta-suave)}
+.ref .conta-rot{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--caneta)}
+.ref .eq{display:grid;grid-template-columns:repeat(5, auto);justify-content:start;column-gap:10px;align-items:end}
+.ref .n{font-size:30px;font-weight:800;line-height:1;text-align:center}
+.ref .nome{font-size:11.5px;font-weight:600;color:var(--tinta-suave);text-align:center;padding-top:3px}
+.ref .misto{display:inline-flex;align-items:center;gap:3px;background:var(--marca);color:var(--sobre-marca);border-radius:6px;padding:0 6px}
+.ref .fr{display:inline-flex;flex-direction:column;align-items:center;font-size:15px;font-weight:800;line-height:1.05}
+.ref .fr i{font-style:normal;display:block;border-top:2px solid currentColor;padding-top:1px}
+.ref .confere{font-size:13px;font-weight:500;color:var(--tinta-suave)}
+.ref .chave{display:grid;grid-template-columns:20px 54px 2px 74px;grid-auto-rows:25px;align-items:center;font-size:21px;font-weight:800;font-variant-numeric:tabular-nums}
+.ref .chave .r{text-align:right;padding-right:8px}
+.ref .chave .q{padding-left:10px}
+.ref .menos{color:var(--caneta);font-weight:700;text-align:right}
+.ref .traco{border-bottom:2px solid var(--tinta)}
+.ref .lado{font-size:13px;font-weight:600;color:var(--tinta-suave);line-height:1.35}
+.ref .marca{background:var(--marca);color:var(--sobre-marca);border-radius:5px;padding:0 5px}
+.ref .nomes{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;font-weight:600;color:var(--tinta-suave)}
+.ref .ponto{position:absolute;left:-2px;top:-2px;width:14px;height:14px;box-sizing:border-box;border:2px solid var(--contorno);border-radius:50%;background:var(--marca)}
+.ref .topo{height:58px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 14px;background:var(--folha);border-bottom:2px solid var(--contorno)}
+.ref .logo{flex:1;display:flex;align-items:center;gap:8px;font-size:17px;font-weight:800}
+.ref .nav{height:56px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 14px;overflow:hidden;border-bottom:2px solid var(--contorno);background:var(--papel)}
+.ref .aba{height:38px;box-sizing:border-box;display:flex;align-items:center;padding:0 12px;border:2px solid var(--contorno);border-radius:10px;background:var(--folha);color:var(--tinta);font:600 14.5px 'Rubik',system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+.ref .aba.ativa{background:var(--marca);color:var(--sobre-marca)}
+.ref .pag.rasgada{border-style:dashed;border-color:var(--grafite);box-shadow:none;background:var(--grafite-claro);color:var(--tinta-suave)}
+.ref .secao{display:flex;align-items:baseline;gap:8px;margin-top:6px}
+.ref .secao-t{font-size:16px;font-weight:800}
+.ref .secao-s{font-size:12.5px;font-weight:600;color:var(--tinta-suave)}
+.ref .pagina{margin:14px 14px 0;flex:1;min-height:0;box-sizing:border-box;display:flex;flex-direction:column;gap:13px;padding:14px 16px;border:2px solid var(--contorno);border-bottom:0;border-radius:16px 16px 0 0;background:var(--folha)}
+.ref .txt{margin:3px 0 0;font-size:15.5px;font-weight:500;line-height:1.4}
+.ref .termos{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:4px;text-align:center}
+.ref .termo-n{font-size:22px;font-weight:800;line-height:1.1}
+.ref .termo-t{font-size:11.5px;font-weight:600;color:var(--tinta-suave)}
+.ref .lista{margin:3px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.ref .lista li{display:flex;gap:8px;font-size:14.5px;font-weight:500;line-height:1.38}
+.ref .tag{display:inline-flex;align-items:center;height:28px;box-sizing:border-box;padding:0 9px;border:2px solid var(--contorno);border-radius:8px;font-size:13px;font-weight:700;white-space:nowrap}
+.ref .termo{display:grid;grid-template-columns:78px 1fr;gap:10px;align-items:baseline;font-size:14.5px;line-height:1.35}
+.ref .termo b{font-weight:800}
+.ref .termo span{font-weight:500;color:var(--tinta)}
+.ref .ficha-t{font-size:17px;font-weight:800}
+.ref .ficha-s{font-size:13.5px;font-weight:500;line-height:1.4;color:var(--tinta-suave)}
+.ref .opcoes{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:8px}
+.ref .op[aria-checked="true"]{background:var(--caneta);color:var(--sobre-caneta);box-shadow:0 3px 0 var(--sombra)}
+.ref .lapis{box-sizing:border-box;display:flex;gap:10px;padding:10px 12px;border:2px dashed var(--grafite);border-radius:12px;background:var(--grafite-claro);font-size:13.5px;font-weight:500;line-height:1.42;color:var(--tinta-suave)}
+.ref .lapis b{color:var(--tinta);font-weight:700}
+.t1 .tit-p{font-size:12px;font-weight:600;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t1 .tit-g{font-size:17px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t1 .bsp{height:44px;box-sizing:border-box;display:flex;align-items:center;gap:6px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:700 14px 'Rubik',system-ui,sans-serif;padding:0 10px;cursor:pointer;white-space:nowrap}
+.t1 .etq{flex:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:7px;background:var(--tinta);color:var(--folha);font-size:12.5px;font-weight:700;line-height:1.4}
+.t1 .gesto{display:flex;align-items:flex-start;gap:7px;font-size:14px;font-weight:600;line-height:1.35;color:var(--caneta)}
+.t1 .ficha{background:var(--folha);border:2px solid var(--contorno);border-radius:16px;box-shadow:0 4px 0 var(--sombra);box-sizing:border-box}
+.t1 .maq{position:absolute;left:14px;right:14px;top:176px;height:464px;overflow:hidden;background-color:var(--folha);background-image:linear-gradient(var(--grade-suave) 1px,transparent 1px),linear-gradient(90deg,var(--grade-suave) 1px,transparent 1px);background-size:20px 20px}
+.t1 .banc{position:absolute;left:0;right:0;bottom:0;height:192px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;padding:12px 14px 20px;background:var(--folha);border-top:2px solid var(--contorno);border-radius:18px 18px 0 0}
+.t1 .rot{font-size:14px;font-weight:600;color:var(--tinta-suave)}
+.t1 .bs{height:46px;box-sizing:border-box;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:600 15px 'Rubik',system-ui,sans-serif;padding:0 14px;cursor:pointer}
+.t1 .bolha{position:absolute;left:308px;top:572px;width:58px;height:58px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid var(--contorno);border-radius:50%;background:var(--folha);box-shadow:0 4px 0 var(--sombra);padding:0;cursor:pointer}
+.t1 .recado{position:absolute;right:86px;top:584px;white-space:nowrap;box-sizing:border-box;padding:8px 12px;border:2px solid var(--contorno);border-radius:14px 14px 4px 14px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);font-size:14px;font-weight:600;line-height:1.3}
+.t2 .tit-p{font-size:12px;font-weight:600;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t2 .tit-g{font-size:17px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t2 .bsp{height:44px;box-sizing:border-box;display:flex;align-items:center;gap:6px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:700 14px 'Rubik',system-ui,sans-serif;padding:0 10px;cursor:pointer;white-space:nowrap}
+.t2 .etq{flex:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:7px;background:var(--tinta);color:var(--folha);font-size:12.5px;font-weight:700;line-height:1.4}
+.t2 .gesto{display:flex;align-items:flex-start;gap:7px;font-size:14px;font-weight:600;line-height:1.35;color:var(--caneta)}
+.t2 .ficha{background:var(--folha);border:2px solid var(--contorno);border-radius:16px;box-shadow:0 4px 0 var(--sombra);box-sizing:border-box}
+.t2 .maq{position:absolute;left:14px;right:14px;top:176px;height:464px;overflow:hidden;background-color:var(--folha);background-image:linear-gradient(var(--grade-suave) 1px,transparent 1px),linear-gradient(90deg,var(--grade-suave) 1px,transparent 1px);background-size:20px 20px}
+.t2 .folha{position:absolute;left:0;right:0;bottom:0;top:340px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;padding:8px 16px 18px;background:var(--folha);border-top:2px solid var(--contorno);border-radius:22px 22px 0 0}
+.t2 .bs{height:46px;flex:none;white-space:nowrap;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:600 15px 'Rubik',system-ui,sans-serif;padding:0 14px;cursor:pointer}
+.t2 .chip{height:38px;box-sizing:border-box;display:flex;align-items:center;border:2px solid var(--contorno);border-radius:10px;background:var(--folha);color:var(--tinta);font:600 13px 'Rubik',system-ui,sans-serif;padding:0 8px;cursor:pointer;white-space:nowrap}
+.t2 .rot{font-size:12.5px;font-weight:700;color:var(--tinta-suave)}
+.t3 .tit-p{font-size:12px;font-weight:600;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t3 .tit-g{font-size:17px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t3 .bsp{height:44px;box-sizing:border-box;display:flex;align-items:center;gap:6px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:700 14px 'Rubik',system-ui,sans-serif;padding:0 10px;cursor:pointer;white-space:nowrap}
+.t3 .etq{flex:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:7px;background:var(--verde-escuro);color:var(--sobre-verde);font-size:12.5px;font-weight:700;line-height:1.4}
+.t3 .gesto{display:flex;align-items:flex-start;gap:7px;font-size:14px;font-weight:600;line-height:1.35;color:var(--verde-escuro)}
+.t3 .maq{position:absolute;left:14px;right:14px;top:176px;height:379px;box-sizing:border-box;overflow:hidden;border:2px solid var(--verde);border-radius:16px;box-shadow:0 4px 0 var(--verde-escuro);background-color:var(--folha);background-image:linear-gradient(var(--grade-suave) 1px,transparent 1px),linear-gradient(90deg,var(--grade-suave) 1px,transparent 1px);background-size:20px 20px}
+.t3 .banc{position:absolute;left:0;right:0;bottom:0;height:277px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;padding:12px 14px 20px;background:var(--folha);border-top:2px solid var(--contorno);border-radius:18px 18px 0 0}
+.t3 .conta{box-sizing:border-box;padding:9px 14px 10px;border:2px solid var(--contorno);border-radius:14px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);display:flex;flex-direction:column;gap:4px}
+.t3 .op{font-size:26px;font-weight:700;line-height:1;color:var(--caneta);text-align:center}
+.t3 .bs{height:50px;box-sizing:border-box;display:flex;align-items:center;gap:6px;border:2px solid var(--contorno);border-radius:14px;background:var(--folha);color:var(--tinta);font:600 15px 'Rubik',system-ui,sans-serif;padding:0 12px;cursor:pointer;white-space:nowrap}
+.t3 .bolha{position:absolute;left:308px;top:487px;width:58px;height:58px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid var(--contorno);border-radius:50%;background:var(--folha);box-shadow:0 4px 0 var(--sombra);padding:0;cursor:pointer}
+.t3 .recado{position:absolute;right:86px;top:494px;white-space:nowrap;display:flex;align-items:center;gap:7px;box-sizing:border-box;padding:7px 11px;border:2px solid var(--contorno);border-radius:14px 14px 4px 14px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);font-size:14px;font-weight:600;line-height:1.3}
+.t3 .selo{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:7px;background:var(--verde-palido);color:var(--verde-tinta);font-size:12.5px;font-weight:700}
+.t4 .tit-p{font-size:12px;font-weight:600;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t4 .tit-g{font-size:17px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t4 .bsp{height:44px;box-sizing:border-box;display:flex;align-items:center;gap:6px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:700 14px 'Rubik',system-ui,sans-serif;padding:0 10px;cursor:pointer;white-space:nowrap}
+.t4 .etq{flex:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:7px;background:var(--verde-escuro);color:var(--sobre-verde);font-size:12.5px;font-weight:700;line-height:1.4}
+.t4 .gesto{font-size:14px;font-weight:600;line-height:1.35;color:var(--verde-escuro)}
+.t4 .maq{position:absolute;left:14px;right:14px;top:176px;height:300px;box-sizing:border-box;overflow:hidden;border:2px solid var(--verde);border-radius:16px;box-shadow:0 4px 0 var(--verde-escuro);background-color:var(--folha);background-image:linear-gradient(var(--grade-suave) 1px,transparent 1px),linear-gradient(90deg,var(--grade-suave) 1px,transparent 1px);background-size:20px 20px}
+.t4 .banc{position:absolute;left:0;right:0;bottom:0;height:348px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;padding:12px 14px 20px;background:var(--folha);border-top:2px solid var(--contorno);border-radius:18px 18px 0 0}
+.t4 .conta{flex:1;box-sizing:border-box;padding:9px 14px 10px;border:2px solid var(--contorno);border-radius:14px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);display:flex;flex-direction:column;gap:6px}
+.t4 .forma{font-size:16px;font-weight:700}
+.t4 .bolha{position:absolute;left:308px;top:408px;width:58px;height:58px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid var(--contorno);border-radius:50%;background:var(--folha);box-shadow:0 4px 0 var(--sombra);padding:0;cursor:pointer}
+.t5 .corpo{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:16px 14px 0}
+.t5 .pag{min-height:60px;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:9px 12px;border:2px solid var(--contorno);border-radius:14px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);color:var(--tinta);text-decoration:none}
+.t5 .pag-t{font-size:15.5px;font-weight:700;line-height:1.2}
+.t5 .pag-s{font-size:12.5px;font-weight:600;color:var(--tinta-suave);margin-top:2px}
+.t5 .selo{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:7px;background:var(--verde-palido);color:var(--verde-tinta);font-size:12px;font-weight:700}
+.t6 .tit-p{font-size:12px;font-weight:600;color:var(--tinta-suave)}
+.t6 .tit-g{font-size:17px;font-weight:800;line-height:1.15}
+.t6 .rot{font-size:12.5px;font-weight:700;color:var(--tinta-suave)}
+.t6 .forma{box-sizing:border-box;padding:10px 12px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);display:flex;flex-direction:column;gap:8px}
+.t6 .chip{height:36px;box-sizing:border-box;display:inline-flex;align-items:center;padding:0 10px;border:2px solid var(--contorno);border-radius:10px;background:var(--folha);color:var(--tinta);font:600 13px 'Rubik',system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+.t7 .tit-p{font-size:12px;font-weight:600;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t7 .tit-g{font-size:17px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t7 .bsp{height:44px;box-sizing:border-box;display:flex;align-items:center;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:700 14px 'Rubik',system-ui,sans-serif;padding:0 10px;white-space:nowrap}
+.t7 .folha{position:absolute;left:0;right:0;bottom:0;top:236px;box-sizing:border-box;display:flex;flex-direction:column;gap:13px;padding:8px 16px 18px;background:var(--folha);border-top:2px solid var(--contorno);border-radius:22px 22px 0 0}
+.t7 .rot{font-size:12.5px;font-weight:700;color:var(--tinta-suave)}
+.t7 .pag{min-height:54px;box-sizing:border-box;display:flex;align-items:center;gap:11px;padding:8px 12px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);color:var(--tinta);text-decoration:none}
+.t7 .pag-t{font-size:15px;font-weight:700;line-height:1.2}
+.t7 .pag-s{font-size:12.5px;font-weight:600;color:var(--tinta-suave);margin-top:1px}
+.t7 .bs{height:46px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:600 15px 'Rubik',system-ui,sans-serif;padding:0 14px;cursor:pointer}
+.t8 .tit-p{font-size:12px;font-weight:600;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t8 .tit-g{font-size:17px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t8 .bsp{height:44px;box-sizing:border-box;display:flex;align-items:center;gap:6px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:700 14px 'Rubik',system-ui,sans-serif;padding:0 10px;cursor:pointer;white-space:nowrap}
+.t8 .etq{flex:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:7px;background:var(--tinta);color:var(--folha);font-size:12.5px;font-weight:700;line-height:1.4}
+.t8 .gesto{display:flex;align-items:flex-start;gap:7px;font-size:14px;font-weight:600;line-height:1.35;color:var(--caneta)}
+.t8 .ficha{background:var(--folha);border:2px solid var(--contorno);border-radius:16px;box-shadow:0 4px 0 var(--sombra);box-sizing:border-box}
+.t8 .maq{position:absolute;left:14px;right:14px;top:176px;height:464px;overflow:hidden;background-color:var(--folha);background-image:linear-gradient(var(--grade-suave) 1px,transparent 1px),linear-gradient(90deg,var(--grade-suave) 1px,transparent 1px);background-size:20px 20px}
+.t8 .banc{position:absolute;left:0;right:0;bottom:0;height:192px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;padding:12px 14px 20px;background:var(--folha);border-top:2px solid var(--contorno);border-radius:18px 18px 0 0}
+.t8 .rot{font-size:14px;font-weight:600;color:var(--tinta-suave)}
+.t8 .bs{height:46px;box-sizing:border-box;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:600 15px 'Rubik',system-ui,sans-serif;padding:0 14px;cursor:pointer}
+.t8 .bolha{position:absolute;left:308px;top:572px;width:58px;height:58px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:2px solid var(--contorno);border-radius:50%;background:var(--folha);box-shadow:0 4px 0 var(--sombra);padding:0;cursor:pointer}
+.t8 .recado{position:absolute;right:86px;top:584px;white-space:nowrap;box-sizing:border-box;padding:8px 12px;border:2px solid var(--contorno);border-radius:14px 14px 4px 14px;background:var(--folha);box-shadow:0 3px 0 var(--sombra);font-size:14px;font-weight:600;line-height:1.3}
+.t9 .corpo{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;padding:16px 14px 0}
+.t9 .ficha{box-sizing:border-box;display:flex;flex-direction:column;gap:10px;padding:14px;border:2px solid var(--contorno);border-radius:16px;background:var(--folha);box-shadow:0 4px 0 var(--sombra)}
+.t9 .op{min-height:66px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:700 14px 'Rubik',system-ui,sans-serif;padding:6px 4px;cursor:pointer}
+.t9 .bs{height:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--contorno);border-radius:12px;background:var(--folha);color:var(--tinta);font:600 15px 'Rubik',system-ui,sans-serif;padding:0 14px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="grade">
+<section class="ref t1">
+<p class="legenda">1 · Missão com o Nônio flutuante</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"></path></svg>
+</a>
+<div class="tit">
+<div class="tit-p">Missão 4 · Aritmética · Frações</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="qd" aria-label="Referência desta missão">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5.5C8.4 4.2 6 3.6 2.8 3.8v11.4c3.2-.2 5.6.4 7.2 1.7 1.6-1.3 4-1.9 7.2-1.7V3.8C14 3.6 11.6 4.2 10 5.5Z"></path><path d="M10 5.5v11.4"></path></svg>
+</button>
+<button type="button" class="bsp" aria-label="Etapas da missão: 2 de 9">2/9</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq">Objetivo</span><span>Reparta as 5 broas entre as 4 mesas, sem sobrar nada.</span></div>
+<div class="gesto">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px" aria-hidden="true"><path d="M7 9.5V3.8a1.3 1.3 0 0 1 2.6 0V8"></path><path d="M9.6 7.5a1.3 1.3 0 0 1 2.6 0V9"></path><path d="M12.2 8.5a1.3 1.3 0 0 1 2.6 0v2.8c0 3-2 5-4.8 5H9.2c-1.7 0-2.6-.8-3.6-2.2L3.4 10.8a1.3 1.3 0 0 1 2-1.6L7 11"></path></svg>
+Agora: toque na broa que sobrou e escolha em quantas partes cortar.</div>
+</div>
+
+<section class="ficha maq" aria-label="Bancada de partilha">
+<svg width="358" height="460" viewBox="0 0 358 460" style="display: block" role="img" aria-label="Cada uma das 4 mesas tem uma broa inteira. Na esteira sobrou uma broa.">
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="16" y="26" width="7" height="50" rx="2" fill="var(--caneta-clara)"></rect>
+<rect x="53" y="26" width="7" height="50" rx="2" fill="var(--caneta-clara)"></rect>
+<path d="M23 30 H53 V42 L23 54 Z" fill="var(--folha)"></path>
+<rect x="12" y="18" width="52" height="10" rx="4" fill="var(--caneta)"></rect>
+<rect x="14" y="64" width="48" height="22" rx="6" fill="var(--marca)"></rect>
+<rect x="70" y="80" width="272" height="14" rx="7" fill="var(--folha)"></rect>
+<circle cx="104" cy="60" r="19" fill="var(--pao)"></circle>
+<path d="M93 56 q11 -7 22 0 M96 64 q8 -5 16 0" fill="none" stroke-width="2"></path>
+</g>
+<text x="38" y="80" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--sobre-marca)">em 2</text>
+<g fill="var(--contorno)"><circle cx="82" cy="87" r="1.6"></circle><circle cx="144" cy="87" r="1.6"></circle><circle cx="206" cy="87" r="1.6"></circle><circle cx="268" cy="87" r="1.6"></circle><circle cx="330" cy="87" r="1.6"></circle></g>
+<path d="M90 34 q14 -6 28 0" fill="none" stroke="var(--caneta)" stroke-width="2" stroke-linecap="round"></path>
+<text x="104" y="27" text-anchor="middle" font-family="'Caveat', cursive" font-size="22" font-weight="700" fill="var(--caneta)">1 broa</text>
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="20" y="124" width="318" height="8" rx="4" fill="var(--grade)"></rect>
+<rect x="52" y="144" width="8" height="7" fill="var(--caneta-clara)"></rect><rect x="48" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="134" y="144" width="8" height="7" fill="var(--caneta-clara)"></rect><rect x="130" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="216" y="144" width="8" height="7" fill="var(--caneta-clara)"></rect><rect x="212" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="298" y="144" width="8" height="7" fill="var(--caneta-clara)"></rect><rect x="294" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+</g>
+<defs>
+<g id="mesa1-t1">
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<circle cx="46" cy="236" r="25" fill="var(--pao)"></circle>
+<path d="M33 231 q13 -8 26 0 M37 241 q9 -6 18 0" fill="none" stroke-width="2"></path>
+<rect x="80" y="176" width="11" height="88" rx="5.5" fill="var(--folha)"></rect>
+<rect x="21" y="266" width="72" height="10" rx="3" fill="var(--caneta-clara)"></rect>
+<path d="M31 276 V296 M83 276 V296" fill="none"></path>
+</g>
+<rect x="82.2" y="206" width="6.6" height="56" rx="3.3" fill="var(--marca)"></rect>
+<text x="56" y="326" text-anchor="middle" font-size="21" font-weight="800" fill="var(--tinta)">1</text>
+<text x="56" y="345" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--tinta-suave)">1 inteira</text>
+</g>
+</defs>
+<use href="#mesa1-t1" x="0"></use>
+<use href="#mesa1-t1" x="82"></use>
+<use href="#mesa1-t1" x="164"></use>
+<use href="#mesa1-t1" x="246"></use>
+<text x="70" y="386" font-size="13" font-weight="600" fill="var(--tinta-suave)">sobra</text>
+<text x="116" y="388" font-size="18" font-weight="800" fill="var(--tinta)">0</text>
+<path d="M136 372 H254 L246 390 H144 Z" fill="var(--folha)" stroke="var(--grafite)" stroke-width="2.2" stroke-linejoin="round"></path>
+</svg>
+</section>
+
+<div class="recado" role="status">Sobrou uma broa. Pão a gente corta.</div>
+<button type="button" class="bolha" aria-label="Nônio: abrir a janelinha para tirar dúvidas">
+<svg width="44" height="40" viewBox="-8 -48 72 64" aria-hidden="true" stroke="var(--contorno)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="16" y2="-41"></line>
+<circle cx="14" cy="-43" r="4.5" fill="var(--marca)"></circle>
+<rect x="15" y="6" width="5" height="8" rx="2.5" fill="var(--caneta-clara)"></rect>
+<rect x="36" y="6" width="5" height="8" rx="2.5" fill="var(--caneta-clara)"></rect>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--caneta)"></path>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--folha)"></path>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="var(--caneta-clara)"></rect>
+<path d="M18.5 -9 h6" fill="none" stroke-width="2.4"></path>
+<circle cx="34" cy="-8.5" r="2.4" fill="var(--contorno)" stroke="none"></circle>
+</svg>
+</button>
+
+<div class="banc">
+<div class="rasc" aria-label="Rascunho da máquina">
+<div class="rasc-l">
+<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--grafite)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l1-3.4L9.6 2a1.4 1.4 0 0 1 2 2L5 10.6Z"></path><path d="M8.4 3.2l2.4 2.4"></path></svg>
+<span>Volta 1: 1 broa em cada mesa · 4 × 1 = 4</span></div>
+<div class="rasc-l" style="padding-left: 20px"><span>Na esteira: 5 − 4 = 1 broa</span></div>
+</div>
+<div class="lin">
+<span class="rot">Lote</span>
+<button type="button" class="passo" aria-label="Lote menos um">−</button>
+<div class="val">1</div>
+<button type="button" class="passo" aria-label="Lote mais um">+</button>
+<button type="button" class="bp" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1">Repartir<span style="font-size: 12.5px; font-weight: 600">1 para cada mesa</span></button>
+</div>
+<div class="lin">
+<button type="button" class="bs" style="flex: 1">Fechar a partilha</button>
+<button type="button" class="bd">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6.5a3.5 3.5 0 0 1 0 7H6"></path><path d="M6 3 3 6l3 3"></path></svg>
+Desfazer</button>
+<button type="button" class="bd" aria-label="Recomeçar o passo">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.5-3.6"></path><path d="M12 2v3h-3"></path></svg>
+</button>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="ref t2">
+<p class="legenda">2 · A janelinha do Nônio</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"></path></svg>
+</a>
+<div class="tit">
+<div class="tit-p">Missão 4 · Aritmética · Frações</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="qd" aria-label="Referência desta missão">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5.5C8.4 4.2 6 3.6 2.8 3.8v11.4c3.2-.2 5.6.4 7.2 1.7 1.6-1.3 4-1.9 7.2-1.7V3.8C14 3.6 11.6 4.2 10 5.5Z"></path><path d="M10 5.5v11.4"></path></svg>
+</button>
+<button type="button" class="bsp" aria-label="Etapas da missão: 2 de 9">2/9</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq">Objetivo</span><span>Reparta as 5 broas entre as 4 mesas, sem sobrar nada.</span></div>
+<div class="gesto">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px" aria-hidden="true"><path d="M7 9.5V3.8a1.3 1.3 0 0 1 2.6 0V8"></path><path d="M9.6 7.5a1.3 1.3 0 0 1 2.6 0V9"></path><path d="M12.2 8.5a1.3 1.3 0 0 1 2.6 0v2.8c0 3-2 5-4.8 5H9.2c-1.7 0-2.6-.8-3.6-2.2L3.4 10.8a1.3 1.3 0 0 1 2-1.6L7 11"></path></svg>
+Agora: toque na broa que sobrou e escolha em quantas partes cortar.</div>
+</div>
+
+<section class="ficha maq" aria-hidden="true">
+<svg width="358" height="200" viewBox="0 0 358 200" style="display: block">
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="16" y="26" width="7" height="50" rx="2" fill="var(--caneta-clara)"></rect>
+<rect x="53" y="26" width="7" height="50" rx="2" fill="var(--caneta-clara)"></rect>
+<path d="M23 30 H53 V42 L23 54 Z" fill="var(--folha)"></path>
+<rect x="12" y="18" width="52" height="10" rx="4" fill="var(--caneta)"></rect>
+<rect x="14" y="64" width="48" height="22" rx="6" fill="var(--marca)"></rect>
+<rect x="70" y="80" width="272" height="14" rx="7" fill="var(--folha)"></rect>
+<circle cx="104" cy="60" r="19" fill="var(--pao)"></circle>
+<path d="M93 56 q11 -7 22 0 M96 64 q8 -5 16 0" fill="none" stroke-width="2"></path>
+<rect x="20" y="124" width="318" height="8" rx="4" fill="var(--grade)"></rect>
+<rect x="48" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="130" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="212" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="294" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+</g>
+<text x="38" y="80" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--sobre-marca)">em 2</text>
+</svg>
+</section>
+
+<div class="veu"></div>
+
+<svg width="80" height="80" viewBox="0 0 80 80" style="position: absolute; left: 80px; top: 198px" aria-hidden="true">
+<circle cx="40" cy="40" r="23" fill="var(--pao)" stroke="var(--contorno)" stroke-width="2.4"></circle>
+<path d="M28 36 q12 -8 24 0 M31 45 q9 -6 18 0" fill="none" stroke="var(--contorno)" stroke-width="2" stroke-linecap="round"></path>
+<circle cx="40" cy="40" r="31" fill="none" stroke="var(--caneta)" stroke-width="3"></circle>
+</svg>
+
+<section class="folha" role="dialog" aria-label="Nônio">
+<div style="align-self: center; width: 44px; height: 5px; border-radius: 3px; background: var(--pauta)"></div>
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="50" height="46" viewBox="-6 -46 68 64" style="flex: none" aria-hidden="true" stroke="var(--contorno)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="16" y2="-40"></line>
+<circle cx="14" cy="-42" r="4" fill="var(--marca)"></circle>
+<rect x="15" y="6" width="5" height="9" rx="2.5" fill="var(--caneta-clara)"></rect>
+<rect x="36" y="6" width="5" height="9" rx="2.5" fill="var(--caneta-clara)"></rect>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--caneta)"></path>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--folha)"></path>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="var(--caneta-clara)"></rect>
+<path d="M18.5 -9 h6" fill="none" stroke-width="2.2"></path>
+<circle cx="34" cy="-8.5" r="2.3" fill="var(--contorno)" stroke="none"></circle>
+</svg>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<div style="font-size: 18px; font-weight: 800">Nônio</div>
+<div style="font-size: 12.5px; font-weight: 600; color: var(--tinta-suave)">Apontando a broa na esteira</div>
+</div>
+<button type="button" class="qd" aria-label="Fechar a janelinha">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"></path></svg>
+</button>
+</div>
+
+<div class="balao">Sobrou uma broa. Pão a gente corta: em quantas partes, para as quatro mesas ficarem iguais?</div>
+<div class="antes">Antes, neste passo: “Pão não é saca: o que sobra dá para cortar. Comece como com as sacas.”</div>
+
+<div style="display: flex; align-items: center; gap: 10px">
+<button type="button" class="bs">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 13h4M6.5 11h3c0-1.6 2.5-2.6 2.5-5.2A4 4 0 0 0 4 5.8C4 8.4 6.5 9.4 6.5 11Z"></path></svg>
+Me ajuda</button>
+<div style="display: flex; flex-direction: column; gap: 3px">
+<div style="display: flex; gap: 5px" aria-hidden="true">
+<span style="width: 22px; height: 6px; border-radius: 3px; background: var(--grade)"></span>
+<span style="width: 22px; height: 6px; border-radius: 3px; background: var(--grade)"></span>
+<span style="width: 22px; height: 6px; border-radius: 3px; background: var(--grade)"></span>
+<span style="width: 22px; height: 6px; border-radius: 3px; background: var(--grade)"></span>
+</div>
+<div class="degrau">Olhar, medir, caso parecido, fazer junto</div>
+</div>
+</div>
+
+<div style="height: 2px; background: var(--grade)"></div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div class="rot">Pergunte por escrito</div>
+<div style="display: flex; gap: 8px; overflow: hidden">
+<button type="button" class="chip">O que é fração?</button>
+<button type="button" class="chip">Por que sobrou?</button>
+<button type="button" class="chip">Uma medida</button>
+</div>
+<form style="display: flex; gap: 8px; margin: 0">
+<label style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)" for="pergunta-t2">Sua pergunta</label>
+<input id="pergunta-t2" type="text" placeholder="Escreva sua pergunta" style="flex: 1; min-width: 0; height: 48px; box-sizing: border-box; padding: 0 12px; border: 2px solid var(--contorno); border-radius: 12px; background: var(--folha); color: var(--tinta); font: 500 15px 'Rubik', system-ui, sans-serif">
+<button type="submit" aria-label="Enviar a pergunta" style="width: 48px; height: 48px; flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid var(--contorno); border-radius: 12px; background: var(--caneta); box-shadow: 0 3px 0 var(--sombra); color: var(--sobre-caneta); padding: 0; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 15V3M4 8l5-5 5 5"></path></svg>
+</button>
+</form>
+<div style="text-align: center; font-size: 12px; font-weight: 500; color: var(--tinta-suave)">Respostas livres escritas por IA. As contas e as correções do jogo, não.</div>
+</div>
+</section>
+
+</div>
+</section>
+
+<section class="ref t3">
+<p class="legenda">3 · Acertou: a conta passada a caneta</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"></path></svg>
+</a>
+<div class="tit">
+<div class="tit-p">Missão 4 · Aritmética · Frações</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="qd" aria-label="Referência desta missão">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5.5C8.4 4.2 6 3.6 2.8 3.8v11.4c3.2-.2 5.6.4 7.2 1.7 1.6-1.3 4-1.9 7.2-1.7V3.8C14 3.6 11.6 4.2 10 5.5Z"></path><path d="M10 5.5v11.4"></path></svg>
+</button>
+<button type="button" class="bsp" aria-label="Etapas da missão: 2 de 9">2/9</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq">
+<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3"></path></svg>
+Feito</span><span>Reparta as 5 broas entre as 4 mesas, sem sobrar nada.</span></div>
+<div class="gesto">Fechou: uma broa e mais um quarto em cada mesa.</div>
+</div>
+
+<section class="maq" aria-label="Bancada de partilha, fechada">
+<svg width="354" height="375" viewBox="0 0 354 375" style="display: block" role="img" aria-label="Partilha fechada: cada uma das 4 mesas tem uma broa inteira e um quarto. A esteira está vazia.">
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="16" y="26" width="7" height="50" rx="2" fill="var(--caneta-clara)"></rect>
+<rect x="53" y="26" width="7" height="50" rx="2" fill="var(--caneta-clara)"></rect>
+<path d="M23 30 H53 V42 L23 54 Z" fill="var(--folha)"></path>
+<rect x="12" y="18" width="52" height="10" rx="4" fill="var(--caneta)"></rect>
+<rect x="14" y="64" width="48" height="22" rx="6" fill="var(--marca)"></rect>
+<rect x="70" y="80" width="272" height="14" rx="7" fill="var(--folha)"></rect>
+</g>
+<text x="38" y="80" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--sobre-marca)">em 4</text>
+<text x="160" y="70" text-anchor="middle" font-family="'Caveat', cursive" font-size="21" font-weight="700" fill="var(--tinta-suave)">esteira vazia</text>
+<text x="334" y="48" text-anchor="end" font-family="'Caveat', cursive" font-size="34" font-weight="700" fill="var(--verde-escuro)" transform="rotate(-6 334 48)">fechou</text>
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="20" y="106" width="314" height="8" rx="4" fill="var(--grade)"></rect>
+<rect x="48" y="112" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="130" y="112" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="212" y="112" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="294" y="112" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+</g>
+<defs>
+<g id="mesa-feita-t3">
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<circle cx="40" cy="200" r="23" fill="var(--pao)"></circle>
+<path d="M28 196 q12 -7 24 0 M31 204 q9 -5 18 0" fill="none" stroke-width="2"></path>
+<path d="M64 222 H82 A18 18 0 0 0 64 204 Z" fill="var(--pao-miolo)"></path>
+<path d="M82 222 A18 18 0 0 0 64 204" fill="none" stroke-width="3"></path>
+<rect x="84" y="146" width="10" height="84" rx="5" fill="var(--marca)"></rect>
+<rect x="20" y="234" width="72" height="9" rx="3" fill="var(--caneta-clara)"></rect>
+<path d="M30 243 V260 M82 243 V260" fill="none"></path>
+</g>
+<circle cx="89" cy="134" r="10" fill="var(--verde)" stroke="var(--contorno)" stroke-width="2"></circle>
+<path d="M84.5 134.5 l3 3 l6 -6.5" fill="none" stroke="var(--sobre-verde)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+<text x="46" y="289" text-anchor="middle" font-size="20" font-weight="800" fill="var(--tinta)">1</text>
+<text x="63" y="279" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--tinta)">1</text>
+<rect x="57" y="282" width="12" height="2.2" rx="1" fill="var(--tinta)"></rect>
+<text x="63" y="296" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--tinta)">4</text>
+</g>
+</defs>
+<use href="#mesa-feita-t3" x="0"></use>
+<use href="#mesa-feita-t3" x="82"></use>
+<use href="#mesa-feita-t3" x="164"></use>
+<use href="#mesa-feita-t3" x="246"></use>
+</svg>
+</section>
+
+<div class="recado" role="status"><span class="selo">
+<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3"></path></svg>
+Acertou</span>Fechou, sem sobra.</div>
+<button type="button" class="bolha" aria-label="Nônio: abrir a janelinha">
+<svg width="44" height="40" viewBox="-8 -48 72 64" aria-hidden="true" stroke="var(--contorno)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="34" y2="-40"></line>
+<circle cx="35" cy="-43" r="4.5" fill="var(--marca)"></circle>
+<rect x="15" y="6" width="5" height="8" rx="2.5" fill="var(--caneta-clara)"></rect>
+<rect x="36" y="6" width="5" height="8" rx="2.5" fill="var(--caneta-clara)"></rect>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--caneta)"></path>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--folha)"></path>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="var(--caneta-clara)"></rect>
+<path d="M19 -8 q2.5 -3.2 5 0 M32 -8 q2.5 -3.2 5 0" fill="none" stroke-width="2.2"></path>
+</svg>
+</button>
+
+<div class="banc">
+<div class="rasc" aria-label="Rascunho da máquina">
+<div class="rasc-l">
+<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--grafite)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l1-3.4L9.6 2a1.4 1.4 0 0 1 2 2L5 10.6Z"></path><path d="M8.4 3.2l2.4 2.4"></path></svg>
+<span>Volta 1: 1 broa em cada mesa · 4 × 1 = 4</span></div>
+<div class="rasc-l" style="padding-left: 20px"><span>Corte: 1 broa em 4 pedaços · 1 = 4 × 1/4</span></div>
+<div class="rasc-l" style="padding-left: 20px"><span>Volta 2: 1/4 em cada mesa · 4 × 1/4 = 1</span></div>
+</div>
+
+<div class="conta" aria-label="A conta: 5 dividido por 4 é igual a 1 inteiro e 1 quarto">
+<div class="conta-rot">
+<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l1-3.4L9.6 2a1.4 1.4 0 0 1 2 2L5 10.6Z"></path></svg>
+A conta, passada a caneta</div>
+<div class="eq">
+<div class="n">5</div><div class="op">÷</div><div class="n">4</div><div class="op">=</div>
+<div class="n"><span class="misto">1<span class="fr">1<i>4</i></span></span></div>
+<div class="nome">dividendo</div><div></div><div class="nome">divisor</div><div></div><div class="nome">quociente</div>
+</div>
+<div class="confere">Confere: 4 × 1 1/4 = 4 + 1 = 5</div>
+</div>
+
+<div style="display: flex; gap: 10px">
+<button type="button" class="bp" style="flex: 1">Continuar</button>
+<button type="button" class="bs">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.8 9.8 5.6l4 .5-3 2.8.8 4L8 11l-3.6 1.9.8-4-3-2.8 4-.5Z"></path></svg>
+Desafio</button>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="ref t4">
+<p class="legenda">4 · Missão 3: a conta armada</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"></path></svg>
+</a>
+<div class="tit">
+<div class="tit-p">Missão 3 · Divisão com resto</div>
+<div class="tit-g">Sobrou</div>
+</div>
+<button type="button" class="qd" aria-label="Referência desta missão">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5.5C8.4 4.2 6 3.6 2.8 3.8v11.4c3.2-.2 5.6.4 7.2 1.7 1.6-1.3 4-1.9 7.2-1.7V3.8C14 3.6 11.6 4.2 10 5.5Z"></path><path d="M10 5.5v11.4"></path></svg>
+</button>
+<button type="button" class="bsp" aria-label="Etapas da missão: 3 de 11">3/11</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq">
+<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3"></path></svg>
+Feito</span><span>Reparta as 26 sacas entre as 4 carroças, todas iguais.</span></div>
+<div class="gesto">Fechou: 6 sacas em cada carroça, e 2 ficaram na bandeja.</div>
+</div>
+
+<section class="maq" aria-label="Bancada de partilha, fechada">
+<svg width="354" height="296" viewBox="0 0 354 296" style="display: block" role="img" aria-label="Partilha fechada: cada uma das 4 carroças tem 6 sacas. Na bandeja ficaram 2 sacas.">
+<defs>
+<g id="saca-t4">
+<path d="M-3.5 -9 L-2 -5.5 H2 L3.5 -9 Z" fill="var(--saca)" stroke="var(--contorno)" stroke-width="1.8" stroke-linejoin="round"></path>
+<path d="M-2.5 -5.5 H2.5 Q8 -3 7.5 4 Q7 8.5 0 8.5 Q-7 8.5 -7.5 4 Q-8 -3 -2.5 -5.5 Z" fill="var(--saca)" stroke="var(--contorno)" stroke-width="1.8" stroke-linejoin="round"></path>
+</g>
+<g id="carroca-t4">
+<use href="#saca-t4" x="34" y="98"></use><use href="#saca-t4" x="52" y="98"></use><use href="#saca-t4" x="70" y="98"></use>
+<use href="#saca-t4" x="34" y="117"></use><use href="#saca-t4" x="52" y="117"></use><use href="#saca-t4" x="70" y="117"></use>
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="20" y="128" width="66" height="10" rx="2" fill="var(--madeira)"></rect>
+<circle cx="35" cy="143" r="6" fill="var(--folha)"></circle>
+<circle cx="71" cy="143" r="6" fill="var(--folha)"></circle>
+</g>
+<circle cx="78" cy="78" r="9" fill="var(--verde)" stroke="var(--contorno)" stroke-width="2"></circle>
+<path d="M74 78.5 l2.7 2.7 l5.4 -5.8" fill="none" stroke="var(--sobre-verde)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+<text x="53" y="180" text-anchor="middle" font-size="20" font-weight="800" fill="var(--tinta)">6</text>
+</g>
+</defs>
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="20" y="26" width="314" height="14" rx="7" fill="var(--folha)"></rect>
+<rect x="20" y="58" width="314" height="8" rx="4" fill="var(--grade)"></rect>
+<rect x="45" y="64" width="16" height="13" rx="3" fill="var(--caneta)"></rect>
+<rect x="127" y="64" width="16" height="13" rx="3" fill="var(--caneta)"></rect>
+<rect x="209" y="64" width="16" height="13" rx="3" fill="var(--caneta)"></rect>
+<rect x="291" y="64" width="16" height="13" rx="3" fill="var(--caneta)"></rect>
+</g>
+<text x="176" y="20" text-anchor="middle" font-family="'Caveat', cursive" font-size="20" font-weight="700" fill="var(--tinta-suave)">esteira vazia</text>
+<use href="#carroca-t4" x="0"></use>
+<use href="#carroca-t4" x="82"></use>
+<use href="#carroca-t4" x="164"></use>
+<use href="#carroca-t4" x="246"></use>
+<text x="22" y="236" font-size="13" font-weight="600" fill="var(--tinta-suave)">sobra</text>
+<text x="66" y="238" font-size="18" font-weight="800" fill="var(--tinta)">2</text>
+<path d="M88 222 H176 L168 242 H96 Z" fill="var(--folha)" stroke="var(--grafite)" stroke-width="2.2" stroke-linejoin="round"></path>
+<use href="#saca-t4" x="120" y="224"></use>
+<use href="#saca-t4" x="140" y="224"></use>
+<text x="196" y="242" font-family="'Caveat', cursive" font-size="24" font-weight="700" fill="var(--caneta)">resto</text>
+<path d="M194 230 q-8 -4 -14 -2" fill="none" stroke="var(--caneta)" stroke-width="2" stroke-linecap="round"></path>
+</svg>
+</section>
+
+<button type="button" class="bolha" aria-label="Nônio: abrir a janelinha, há uma fala nova">
+<svg width="44" height="40" viewBox="-8 -48 72 64" aria-hidden="true" stroke="var(--contorno)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="28" y2="-40"></line>
+<circle cx="28" cy="-43" r="4.5" fill="var(--marca)"></circle>
+<rect x="15" y="6" width="5" height="8" rx="2.5" fill="var(--caneta-clara)"></rect>
+<rect x="36" y="6" width="5" height="8" rx="2.5" fill="var(--caneta-clara)"></rect>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--caneta)"></path>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--folha)"></path>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="var(--caneta-clara)"></rect>
+<circle cx="22" cy="-8.5" r="2.4" fill="var(--contorno)" stroke="none"></circle>
+<circle cx="34" cy="-8.5" r="2.4" fill="var(--contorno)" stroke="none"></circle>
+</svg>
+<span class="ponto" aria-hidden="true"></span>
+</button>
+
+<div class="banc">
+<div class="rasc" aria-label="Rascunho da máquina">
+<div class="rasc-l">
+<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--grafite)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l1-3.4L9.6 2a1.4 1.4 0 0 1 2 2L5 10.6Z"></path><path d="M8.4 3.2l2.4 2.4"></path></svg>
+<span>Volta 1: 5 em cada · 4 × 5 = 20 · ficam 26 − 20 = 6</span></div>
+<div class="rasc-l" style="padding-left: 20px"><span>Volta 2: 1 em cada · 4 × 1 = 4 · ficam 6 − 4 = 2</span></div>
+</div>
+
+<div class="conta" aria-label="A conta armada: 26 dividido por 4 dá 6 e sobra 2">
+<div class="conta-rot">
+<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l1-3.4L9.6 2a1.4 1.4 0 0 1 2 2L5 10.6Z"></path></svg>
+A conta armada, volta por volta</div>
+<div style="display: flex; gap: 14px; align-items: flex-start">
+<div class="chave" aria-hidden="true">
+<div></div><div class="r">26</div><div style="border-left: 2px solid var(--tinta); height: 25px"></div><div class="q traco">4</div>
+<div class="menos">−</div><div class="r traco">20</div><div></div><div class="q">5</div>
+<div></div><div class="r">6</div><div></div><div class="q"><span style="color: var(--caneta)">+</span> 1</div>
+<div class="menos">−</div><div class="r traco">4</div><div></div><div class="q traco" style="margin-right: 30px"></div>
+<div></div><div class="r"><span class="marca">2</span></div><div></div><div class="q"><span class="marca">6</span></div>
+</div>
+<div class="lado" style="padding-top: 26px">Cada volta é uma linha: 5 para cada carroça tira 20; depois 1 para cada tira 4. Somando as voltas, 6 para cada.</div>
+</div>
+<div class="forma">26 = 4 × 6 + 2</div>
+<div class="nomes"><span>26 dividendo</span><span>4 divisor</span><span>6 quociente</span><span>2 resto</span></div>
+</div>
+
+<button type="button" class="bp" style="width: 100%">Continuar</button>
+</div>
+
+</div>
+</section>
+
+<section class="ref t5">
+<p class="legenda">5 · O Manual</p>
+<div class="tela">
+
+<header class="topo">
+<div class="logo">
+<svg width="30" height="24" viewBox="-6 -46 68 58" aria-hidden="true" stroke="var(--contorno)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><line x1="28" y1="-28" x2="28" y2="-38"></line><circle cx="28" cy="-41" r="4" fill="var(--marca)"></circle><path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--caneta)"></path><path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--folha)"></path><rect x="-3" y="0" width="62" height="8" rx="4" fill="var(--caneta-clara)"></rect></svg>
+<span>interativ<span style="background: var(--marca); color: var(--sobre-marca); padding: 0 3px; border-radius: 4px">Maths</span></span>
+</div>
+<button type="button" class="qd" aria-label="Mudar para o modo escuro">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 11.2A6.2 6.2 0 0 1 6.8 3.5a6.2 6.2 0 1 0 7.7 7.7Z"></path></svg>
+</button>
+<button type="button" class="qd" aria-label="Entrar em tela cheia">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5v-4h4M11.5 2.5h4v4M15.5 11.5v4h-4M6.5 15.5h-4v-4"></path></svg>
+</button>
+<button type="button" class="qd" aria-label="Menu">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h12M3 9h12M3 13h12"></path></svg>
+</button>
+</header>
+
+<nav class="nav" aria-label="Lugares">
+<a href="#" class="aba">Mapa</a>
+<a href="#" class="aba">Caderno</a>
+<a href="#" class="aba ativa" aria-current="page">Manual</a>
+<a href="#" class="aba">Planta</a>
+<a href="#" class="aba">Joias</a>
+</nav>
+
+<main class="corpo">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 10px">
+<div>
+<div style="font-size: 12.5px; font-weight: 600; color: var(--tinta-suave)">O que o Engenho sabe, passado a limpo</div>
+<h1 style="margin: 2px 0 0; font-size: 26px; font-weight: 800; line-height: 1.1">O Manual</h1>
+</div>
+<span style="padding: 2px 9px; border: 2px solid var(--contorno); border-radius: 8px; background: var(--marca); color: var(--sobre-marca); font-size: 13px; font-weight: 700">3 de 5 páginas</span>
+</div>
+<p style="margin: 0; font-size: 14px; font-weight: 500; line-height: 1.4; color: var(--tinta-suave)">Cada página volta a ficar inteira quando você descobre o porquê na máquina. Os nomes dos termos ficam sempre à mão.</p>
+
+<div class="secao"><span class="secao-t">Aritmética</span><span class="secao-s">A Partilha</span></div>
+
+<a href="#" class="pag">
+<svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M3 2h14l6 6v20H3Z"></path><path d="M7 13h12M7 18h12M7 23h8"></path></svg>
+<div style="flex: 1; min-width: 0"><div class="pag-t">Divisão exata: repartir em partes iguais</div><div class="pag-s">Missão 1 · Carga igual</div></div>
+<span class="selo">Restaurada</span>
+</a>
+<a href="#" class="pag">
+<svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M3 2h14l6 6v20H3Z"></path><path d="M7 13h12M7 18h12M7 23h8"></path></svg>
+<div style="flex: 1; min-width: 0"><div class="pag-t">Divisão exata: quantas vezes cabe</div><div class="pag-s">Missão 2 · Quantas carroças?</div></div>
+<span class="selo">Restaurada</span>
+</a>
+<a href="#" class="pag">
+<svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M3 2h14l6 6v20H3Z"></path><path d="M7 13h12M7 18h12M7 23h8"></path></svg>
+<div style="flex: 1; min-width: 0"><div class="pag-t">Divisão com resto</div><div class="pag-s">Missão 3 · Sobrou</div></div>
+<span class="selo">Restaurada</span>
+</a>
+<a href="#" class="pag rasgada">
+<svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M3 2h14l6 6v10l-4 3-4-3-4 3-4-3-4 3Z"></path><path d="M7 13h12"></path></svg>
+<div style="flex: 1; min-width: 0"><div class="pag-t">Fração como parte de um inteiro</div><div class="pag-s">Restaure na Missão 4</div></div>
+</a>
+<a href="#" class="pag rasgada">
+<svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M3 2h14l6 6v10l-4 3-4-3-4 3-4-3-4 3Z"></path><path d="M7 13h12"></path></svg>
+<div style="flex: 1; min-width: 0"><div class="pag-t">Fração como divisão</div><div class="pag-s">Restaure na Missão 4</div></div>
+</a>
+<div class="pag rasgada" style="opacity: .85">
+<svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5 25 7 19 19 7a2.1 2.1 0 0 1 3 3L10 22Z"></path><path d="M17 9l3 3"></path></svg>
+<div style="flex: 1; min-width: 0"><div class="pag-t">Frações equivalentes</div><div class="pag-s">Ainda a lápis: próximo arco</div></div>
+</div>
+
+<div class="secao"><span class="secao-t" style="color: var(--tinta-suave)">Álgebra</span><span class="secao-s">O Contrapeso, ainda a lápis</span></div>
+</main>
+
+</div>
+</section>
+
+<section class="ref t6">
+<p class="legenda">6 · Uma página do Manual</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao Manual">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"></path></svg>
+</a>
+<div class="tit">
+<div class="tit-p">O Manual · Aritmética · página 3</div>
+<div class="tit-g">Divisão com resto</div>
+</div>
+</header>
+
+<article class="pagina">
+<section>
+<div class="rot">Em uma frase</div>
+<p class="txt">Repartir igualmente quando a conta não fecha: cada parte recebe o mesmo, e o que não dá mais uma volta inteira fica de resto.</p>
+</section>
+
+<section class="forma" aria-label="Como se escreve">
+<div class="rot">Como se escreve</div>
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+<span style="font-size: 22px; font-weight: 800">26 ÷ 4 = 6, resto 2</span>
+<span style="font-size: 15px; font-weight: 700; color: var(--tinta-suave)">26 = 4 × 6 + 2</span>
+</div>
+<div class="termos">
+<div><div class="termo-n">26</div><div class="termo-t">dividendo</div></div>
+<div><div class="termo-n">4</div><div class="termo-t">divisor</div></div>
+<div><div class="termo-n">6</div><div class="termo-t">quociente</div></div>
+<div><div class="termo-n"><span style="background: var(--marca); color: var(--sobre-marca); border-radius: 5px; padding: 0 6px">2</span></div><div class="termo-t">resto</div></div>
+</div>
+</section>
+
+<section>
+<div class="rot">Na máquina</div>
+<svg width="326" height="96" viewBox="0 0 326 96" style="display: block; margin-top: 4px" role="img" aria-label="Quatro carroças com 6 sacas cada e 2 sacas na bandeja.">
+<defs>
+<g id="sc-t6">
+<path d="M-2.5 -6.5 L-1.5 -4 H1.5 L2.5 -6.5 Z" fill="var(--saca)" stroke="var(--contorno)" stroke-width="1.5" stroke-linejoin="round"></path>
+<path d="M-2 -4 H2 Q6 -2 5.5 3 Q5 6 0 6 Q-5 6 -5.5 3 Q-6 -2 -2 -4 Z" fill="var(--saca)" stroke="var(--contorno)" stroke-width="1.5" stroke-linejoin="round"></path>
+</g>
+<g id="cr-t6">
+<use href="#sc-t6" x="12" y="24"></use><use href="#sc-t6" x="25" y="24"></use><use href="#sc-t6" x="38" y="24"></use>
+<use href="#sc-t6" x="12" y="38"></use><use href="#sc-t6" x="25" y="38"></use><use href="#sc-t6" x="38" y="38"></use>
+<rect x="2" y="46" width="46" height="8" rx="2" fill="var(--madeira)" stroke="var(--contorno)" stroke-width="2"></rect>
+<circle cx="13" cy="58" r="4.5" fill="var(--folha)" stroke="var(--contorno)" stroke-width="2"></circle>
+<circle cx="37" cy="58" r="4.5" fill="var(--folha)" stroke="var(--contorno)" stroke-width="2"></circle>
+<text x="25" y="86" text-anchor="middle" font-size="16" font-weight="800" fill="var(--tinta)">6</text>
+</g>
+</defs>
+<use href="#cr-t6" x="0"></use>
+<use href="#cr-t6" x="56"></use>
+<use href="#cr-t6" x="112"></use>
+<use href="#cr-t6" x="168"></use>
+<path d="M236 40 H310 L304 56 H242 Z" fill="var(--folha)" stroke="var(--grafite)" stroke-width="2" stroke-linejoin="round"></path>
+<use href="#sc-t6" x="263" y="42"></use>
+<use href="#sc-t6" x="281" y="42"></use>
+<text x="273" y="86" text-anchor="middle" font-size="16" font-weight="800" fill="var(--tinta)">2</text>
+<text x="273" y="28" text-anchor="middle" font-family="'Caveat', cursive" font-size="20" font-weight="700" fill="var(--caneta)">resto</text>
+</svg>
+</section>
+
+<section>
+<div class="rot">Vale sempre</div>
+<ul class="lista">
+<li><span aria-hidden="true" style="color: var(--caneta); font-weight: 800">·</span><span>O resto é sempre menor que o divisor. Com 4 carroças, sobram no máximo 3 sacas.</span></li>
+<li><span aria-hidden="true" style="color: var(--caneta); font-weight: 800">·</span><span>Dividendo = divisor × quociente + resto.</span></li>
+</ul>
+</section>
+
+<section>
+<div class="rot" style="display: flex; align-items: center; gap: 6px">
+<svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="var(--vermelho)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7.5C2.6 3.8 6 1.6 9.2 2.2c3.6.7 5.3 4 3.8 7-1.5 3-6 3.6-8.6 2"></path></svg>
+Cuidado com</div>
+<p class="txt" style="font-size: 14.5px"><b>Parar antes da hora.</b> Se ainda dá uma volta inteira, não é resto: a conta não acabou.</p>
+</section>
+
+<section>
+<div class="rot">Onde você viu</div>
+<div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap">
+<a href="#" class="chip">Missão 3 · Sobrou</a>
+<a href="#" class="chip">Caderno: O que sobra</a>
+</div>
+</section>
+</article>
+
+</div>
+</section>
+
+<section class="ref t7">
+<p class="legenda">7 · Referência da missão</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"></path></svg>
+</a>
+<div class="tit">
+<div class="tit-p">Missão 4 · Aritmética · Frações</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<span class="qd" aria-hidden="true">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.5C8.4 4.2 6 3.6 2.8 3.8v11.4c3.2-.2 5.6.4 7.2 1.7 1.6-1.3 4-1.9 7.2-1.7V3.8C14 3.6 11.6 4.2 10 5.5Z"></path><path d="M10 5.5v11.4"></path></svg>
+</span>
+<span class="bsp" aria-hidden="true">2/9</span>
+</header>
+
+<div class="veu"></div>
+
+<section class="folha" role="dialog" aria-label="Referência desta missão">
+<div style="align-self: center; width: 44px; height: 5px; border-radius: 3px; background: var(--pauta)"></div>
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="30" height="30" viewBox="0 0 20 20" fill="none" stroke="var(--caneta)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M10 5.5C8.4 4.2 6 3.6 2.8 3.8v11.4c3.2-.2 5.6.4 7.2 1.7 1.6-1.3 4-1.9 7.2-1.7V3.8C14 3.6 11.6 4.2 10 5.5Z"></path><path d="M10 5.5v11.4"></path></svg>
+<div style="flex: 1; min-width: 0">
+<div style="font-size: 18px; font-weight: 800">Referência desta missão</div>
+<div style="font-size: 12.5px; font-weight: 600; color: var(--tinta-suave)">Com os nomes de escola</div>
+</div>
+<button type="button" class="qd" aria-label="Fechar a referência">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"></path></svg>
+</button>
+</div>
+
+<div style="display: flex; gap: 6px; flex-wrap: wrap">
+<span class="tag">Missão 4</span>
+<span class="tag">Aritmética</span>
+<span class="tag" style="background: var(--marca); color: var(--sobre-marca)">Frações: parte e divisão</span>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 8px">
+<div class="rot">Os nomes</div>
+<div style="display: flex; align-items: stretch; flex-direction: column; gap: 6px">
+<!--
+  O apêndice recebido terminou neste ponto, no meio do atributo acima ("display: flex; align-").
+  Daqui até o fim, o arquivo foi reconstruído pela sessão da v0.4 a partir da descrição das telas
+  7, 8 e 9 no pedido e das classes .t7, .t8 e .t9 que vieram completas no <style>.
+  A tela 8 é a tela 1 com a classe .escuro; a tela 9 segue a descrição: Automático, Claro e
+  Escuro; tela cheia; o aviso do iPhone (os dois juntos só aqui, para referência).
+-->
+<div class="termo"><b>Fração</b><span>Um número que diz quantos pedaços de um inteiro cortado em partes iguais.</span></div>
+<div class="termo"><b>Denominador</b><span>Embaixo do traço: em quantas partes iguais o inteiro foi cortado.</span></div>
+<div class="termo"><b>Numerador</b><span>Em cima do traço: quantos desses pedaços.</span></div>
+<div class="termo"><b>Número misto</b><span>Inteiros e uma fração juntos: 1 1/4.</span></div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 8px">
+<div class="rot">Páginas do Manual que ajudam aqui</div>
+<a href="#" class="pag">
+<svg width="22" height="26" viewBox="0 0 26 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M3 2h14l6 6v20H3Z"></path><path d="M7 13h12M7 18h12M7 23h8"></path></svg>
+<div style="flex: 1; min-width: 0"><div class="pag-t">Divisão com resto</div><div class="pag-s">Restaurada na Missão 3</div></div>
+</a>
+<div class="pag" style="border-style: dashed; border-color: var(--grafite); box-shadow: none; background: var(--grafite-claro); color: var(--tinta-suave)">
+<svg width="22" height="26" viewBox="0 0 26 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M3 2h14l6 6v10l-4 3-4-3-4 3-4-3-4 3Z"></path><path d="M7 13h12"></path></svg>
+<div style="flex: 1; min-width: 0"><div class="pag-t">Fração como divisão</div><div class="pag-s">Você restaura nesta missão</div></div>
+</div>
+</section>
+
+<button type="button" class="bs">Abrir o Manual inteiro</button>
+</section>
+
+</div>
+</section>
+
+<section class="ref escuro t8">
+<p class="legenda">8 · Modo escuro: a missão</p>
+<div class="tela">
+
+<header class="cab">
+<a href="#" class="qd" aria-label="Voltar ao distrito">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"></path></svg>
+</a>
+<div class="tit">
+<div class="tit-p">Missão 4 · Aritmética · Frações</div>
+<div class="tit-g">O pão não é saca</div>
+</div>
+<button type="button" class="qd" aria-label="Referência desta missão">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5.5C8.4 4.2 6 3.6 2.8 3.8v11.4c3.2-.2 5.6.4 7.2 1.7 1.6-1.3 4-1.9 7.2-1.7V3.8C14 3.6 11.6 4.2 10 5.5Z"></path><path d="M10 5.5v11.4"></path></svg>
+</button>
+<button type="button" class="bsp" aria-label="Etapas da missão: 2 de 9">2/9</button>
+</header>
+
+<div class="obj">
+<div class="obj-l"><span class="etq">Objetivo</span><span>Reparta as 5 broas entre as 4 mesas, sem sobrar nada.</span></div>
+<div class="gesto">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px" aria-hidden="true"><path d="M7 9.5V3.8a1.3 1.3 0 0 1 2.6 0V8"></path><path d="M9.6 7.5a1.3 1.3 0 0 1 2.6 0V9"></path><path d="M12.2 8.5a1.3 1.3 0 0 1 2.6 0v2.8c0 3-2 5-4.8 5H9.2c-1.7 0-2.6-.8-3.6-2.2L3.4 10.8a1.3 1.3 0 0 1 2-1.6L7 11"></path></svg>
+Agora: toque na broa que sobrou e escolha em quantas partes cortar.</div>
+</div>
+
+<section class="ficha maq" aria-label="Bancada de partilha">
+<svg width="358" height="460" viewBox="0 0 358 460" style="display: block" role="img" aria-label="Cada uma das 4 mesas tem uma broa inteira. Na esteira sobrou uma broa.">
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="16" y="26" width="7" height="50" rx="2" fill="var(--caneta-clara)"></rect>
+<rect x="53" y="26" width="7" height="50" rx="2" fill="var(--caneta-clara)"></rect>
+<path d="M23 30 H53 V42 L23 54 Z" fill="var(--folha)"></path>
+<rect x="12" y="18" width="52" height="10" rx="4" fill="var(--caneta)"></rect>
+<rect x="14" y="64" width="48" height="22" rx="6" fill="var(--marca)"></rect>
+<rect x="70" y="80" width="272" height="14" rx="7" fill="var(--folha)"></rect>
+<circle cx="104" cy="60" r="19" fill="var(--pao)"></circle>
+<path d="M93 56 q11 -7 22 0 M96 64 q8 -5 16 0" fill="none" stroke-width="2"></path>
+</g>
+<text x="38" y="80" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--sobre-marca)">em 2</text>
+<g fill="var(--contorno)"><circle cx="82" cy="87" r="1.6"></circle><circle cx="144" cy="87" r="1.6"></circle><circle cx="206" cy="87" r="1.6"></circle><circle cx="268" cy="87" r="1.6"></circle><circle cx="330" cy="87" r="1.6"></circle></g>
+<path d="M90 34 q14 -6 28 0" fill="none" stroke="var(--caneta)" stroke-width="2" stroke-linecap="round"></path>
+<text x="104" y="27" text-anchor="middle" font-family="'Caveat', cursive" font-size="22" font-weight="700" fill="var(--caneta)">1 broa</text>
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<rect x="20" y="124" width="318" height="8" rx="4" fill="var(--grade)"></rect>
+<rect x="52" y="144" width="8" height="7" fill="var(--caneta-clara)"></rect><rect x="48" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="134" y="144" width="8" height="7" fill="var(--caneta-clara)"></rect><rect x="130" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="216" y="144" width="8" height="7" fill="var(--caneta-clara)"></rect><rect x="212" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+<rect x="298" y="144" width="8" height="7" fill="var(--caneta-clara)"></rect><rect x="294" y="130" width="16" height="15" rx="3" fill="var(--caneta)"></rect>
+</g>
+<defs>
+<g id="mesa1-t8">
+<g stroke="var(--contorno)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+<circle cx="46" cy="236" r="25" fill="var(--pao)"></circle>
+<path d="M33 231 q13 -8 26 0 M37 241 q9 -6 18 0" fill="none" stroke-width="2"></path>
+<rect x="80" y="176" width="11" height="88" rx="5.5" fill="var(--folha)"></rect>
+<rect x="21" y="266" width="72" height="10" rx="3" fill="var(--caneta-clara)"></rect>
+<path d="M31 276 V296 M83 276 V296" fill="none"></path>
+</g>
+<rect x="82.2" y="206" width="6.6" height="56" rx="3.3" fill="var(--marca)"></rect>
+<text x="56" y="326" text-anchor="middle" font-size="21" font-weight="800" fill="var(--tinta)">1</text>
+<text x="56" y="345" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--tinta-suave)">1 inteira</text>
+</g>
+</defs>
+<use href="#mesa1-t8" x="0"></use>
+<use href="#mesa1-t8" x="82"></use>
+<use href="#mesa1-t8" x="164"></use>
+<use href="#mesa1-t8" x="246"></use>
+<text x="70" y="386" font-size="13" font-weight="600" fill="var(--tinta-suave)">sobra</text>
+<text x="116" y="388" font-size="18" font-weight="800" fill="var(--tinta)">0</text>
+<path d="M136 372 H254 L246 390 H144 Z" fill="var(--folha)" stroke="var(--grafite)" stroke-width="2.2" stroke-linejoin="round"></path>
+</svg>
+</section>
+
+<div class="recado" role="status">Sobrou uma broa. Pão a gente corta.</div>
+<button type="button" class="bolha" aria-label="Nônio: abrir a janelinha para tirar dúvidas">
+<svg width="44" height="40" viewBox="-8 -48 72 64" aria-hidden="true" stroke="var(--nonio-traco)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+<line x1="28" y1="-28" x2="16" y2="-41"></line>
+<circle cx="14" cy="-43" r="4.5" fill="var(--marca)"></circle>
+<rect x="15" y="6" width="5" height="8" rx="2.5" fill="var(--nonio-aba)"></rect>
+<rect x="36" y="6" width="5" height="8" rx="2.5" fill="var(--nonio-aba)"></rect>
+<path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--nonio-cupula)"></path>
+<path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--nonio-rosto)"></path>
+<rect x="-3" y="0" width="62" height="8" rx="4" fill="var(--nonio-aba)"></rect>
+<path d="M18.5 -9 h6" fill="none" stroke="var(--nonio-olho)" stroke-width="2.4"></path>
+<circle cx="34" cy="-8.5" r="2.4" fill="var(--nonio-olho)" stroke="none"></circle>
+</svg>
+</button>
+
+<div class="banc">
+<div class="rasc" aria-label="Rascunho da máquina">
+<div class="rasc-l">
+<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--grafite)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12l1-3.4L9.6 2a1.4 1.4 0 0 1 2 2L5 10.6Z"></path><path d="M8.4 3.2l2.4 2.4"></path></svg>
+<span>Volta 1: 1 broa em cada mesa · 4 × 1 = 4</span></div>
+<div class="rasc-l" style="padding-left: 20px"><span>Na esteira: 5 − 4 = 1 broa</span></div>
+</div>
+<div class="lin">
+<span class="rot">Lote</span>
+<button type="button" class="passo" aria-label="Lote menos um">−</button>
+<div class="val">1</div>
+<button type="button" class="passo" aria-label="Lote mais um">+</button>
+<button type="button" class="bp" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1">Repartir<span style="font-size: 12.5px; font-weight: 600">1 para cada mesa</span></button>
+</div>
+<div class="lin">
+<button type="button" class="bs" style="flex: 1">Fechar a partilha</button>
+<button type="button" class="bd">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6.5a3.5 3.5 0 0 1 0 7H6"></path><path d="M6 3 3 6l3 3"></path></svg>
+Desfazer</button>
+<button type="button" class="bd" aria-label="Recomeçar o passo">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.5-3.6"></path><path d="M12 2v3h-3"></path></svg>
+</button>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="ref escuro t9">
+<p class="legenda">9 · Aparência e tela cheia (no escuro)</p>
+<div class="tela">
+
+<header class="topo">
+<div class="logo">
+<svg width="30" height="24" viewBox="-6 -46 68 58" aria-hidden="true" stroke="var(--nonio-traco)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><line x1="28" y1="-28" x2="28" y2="-38"></line><circle cx="28" cy="-41" r="4" fill="var(--marca)"></circle><path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--nonio-cupula)"></path><path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--nonio-rosto)"></path><rect x="-3" y="0" width="62" height="8" rx="4" fill="var(--nonio-aba)"></rect></svg>
+<span>interativ<span style="background: var(--marca); color: var(--sobre-marca); padding: 0 3px; border-radius: 4px">Maths</span></span>
+</div>
+<button type="button" class="qd" aria-label="Mudar para o modo claro">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="9" r="3.4"></circle><path d="M9 1.6v1.8M9 14.6v1.8M1.6 9h1.8M14.6 9h1.8M3.8 3.8l1.3 1.3M12.9 12.9l1.3 1.3M3.8 14.2l1.3-1.3M12.9 5.1l1.3-1.3"></path></svg>
+</button>
+<button type="button" class="qd" aria-label="Entrar em tela cheia">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5v-4h4M11.5 2.5h4v4M15.5 11.5v4h-4M6.5 15.5h-4v-4"></path></svg>
+</button>
+<a href="#" class="qd" aria-label="Fechar o menu" aria-current="page" style="background: var(--marca); color: var(--sobre-marca)">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"></path></svg>
+</a>
+</header>
+
+<main class="corpo">
+<div>
+<div style="font-size: 12.5px; font-weight: 600; color: var(--tinta-suave)">Do seu jeito</div>
+<h1 style="margin: 2px 0 0; font-size: 26px; font-weight: 800; line-height: 1.1">Menu</h1>
+</div>
+
+<section class="ficha" aria-label="Aparência">
+<div class="ficha-t">Aparência</div>
+<div class="ficha-s">O mesmo caderno, com a luz acesa ou apagada.</div>
+<div class="opcoes" role="radiogroup" aria-label="Aparência">
+<button type="button" class="op" role="radio" aria-checked="false">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"></circle><path d="M10 3v14" ></path><path d="M10 3a7 7 0 0 1 0 14Z" fill="currentColor"></path></svg>
+Automático</button>
+<button type="button" class="op" role="radio" aria-checked="false">
+<svg width="20" height="20" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="9" r="3.4"></circle><path d="M9 1.6v1.8M9 14.6v1.8M1.6 9h1.8M14.6 9h1.8M3.8 3.8l1.3 1.3M12.9 12.9l1.3 1.3M3.8 14.2l1.3-1.3M12.9 5.1l1.3-1.3"></path></svg>
+Claro</button>
+<button type="button" class="op" role="radio" aria-checked="true">
+<svg width="20" height="20" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 11.2A6.2 6.2 0 0 1 6.8 3.5a6.2 6.2 0 1 0 7.7 7.7Z"></path></svg>
+Escuro</button>
+</div>
+</section>
+
+<section class="ficha" aria-label="Tela cheia">
+<div class="ficha-t">Tela cheia</div>
+<div class="ficha-s">Esconde as barras do navegador. Sai com o voltar ou com Esc.</div>
+<button type="button" class="bs">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5v-4h4M11.5 2.5h4v4M15.5 11.5v4h-4M6.5 15.5h-4v-4"></path></svg>
+Entrar em tela cheia</button>
+<div class="lapis">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><rect x="4.5" y="1.8" width="9" height="14.4" rx="2"></rect><path d="M8 13.6h2"></path></svg>
+<span><b>No iPhone,</b> o Safari não deixa um site ocupar a tela inteira. Instale o jogo: <b>Compartilhar, depois Adicionar à Tela de Início</b>. Ele abre sem as barras.</span>
+</div>
+</section>
+</main>
+
+</div>
+</section>
+</div>
+</body>
+</html>

@@ -11,7 +11,7 @@ export function TiraMensagem({ texto, tom = "normal", idTeste }: { texto: string
         {tom === "atencao" ? (
           <circle cx="6" cy="6" r="5" fill="var(--vermelho)" />
         ) : tom === "feito" ? (
-          <circle cx="6" cy="6" r="4.6" fill="var(--marca-texto)" stroke="var(--tinta)" strokeWidth="1.8" />
+          <circle cx="6" cy="6" r="4.6" fill="var(--marca-texto)" stroke="var(--contorno)" strokeWidth="1.8" />
         ) : (
           <circle cx="6" cy="6" r="4.4" fill="none" stroke="var(--tinta-suave)" strokeWidth="1.8" />
         )}

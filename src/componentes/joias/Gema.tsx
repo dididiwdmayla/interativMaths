@@ -20,8 +20,8 @@ export function Gema({
   lapis?: boolean;
 }) {
   const p = (pts: [number, number][]) => pts.map(([a, c]) => `${x + a * r},${y + c * r}`).join(" ");
-  const contorno = { stroke: "var(--tinta)", strokeWidth: Math.max(1.6, Math.min(2.4, r * 0.11)), strokeLinejoin: "round" as const };
-  const faceta = { stroke: "var(--tinta)", strokeWidth: Math.max(1.2, Math.min(1.8, r * 0.08)), strokeLinejoin: "round" as const };
+  const contorno = { stroke: "var(--contorno)", strokeWidth: Math.max(1.6, Math.min(2.4, r * 0.11)), strokeLinejoin: "round" as const };
+  const faceta = { stroke: "var(--contorno)", strokeWidth: Math.max(1.2, Math.min(1.8, r * 0.08)), strokeLinejoin: "round" as const };
   let corpo: React.ReactNode;
   if (estagio === 0) {
     corpo = (

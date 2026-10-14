@@ -40,16 +40,16 @@ export function Relicario() {
 
         <section className="ficha-quadriculada mx-auto w-full max-w-[360px] p-3">
           <svg viewBox="0 0 300 300" className="traco-fixo mx-auto block w-full max-w-[300px]" role="img" aria-label={`Relicário com quatro engastes; ${achadas === 1 ? "1 joia encontrada" : `${achadas} joias encontradas`}.`}>
-            <circle cx={150} cy={150} r={124} fill="var(--folha)" stroke="var(--tinta)" strokeWidth={2.6} />
-            <circle cx={150} cy={150} r={108} fill="none" stroke="var(--tinta)" strokeWidth={1.6} strokeDasharray="2 7" />
-            <rect x={138} y={14} width={24} height={14} rx={4} fill="var(--caneta-clara)" stroke="var(--tinta)" strokeWidth={2.4} />
+            <circle cx={150} cy={150} r={124} fill="var(--folha)" stroke="var(--contorno)" strokeWidth={2.6} />
+            <circle cx={150} cy={150} r={108} fill="none" stroke="var(--contorno)" strokeWidth={1.6} strokeDasharray="2 7" />
+            <rect x={138} y={14} width={24} height={14} rx={4} fill="var(--caneta-clara)" stroke="var(--contorno)" strokeWidth={2.4} />
             <Engrenagem x={150} y={150} r={34} dentes={12} girando />
             {JOIAS.map((j) => {
               const [x, y] = ENGASTES[j.engaste];
               const e = estado(j.id);
               return (
                 <g key={j.id} data-engaste={j.id}>
-                  <circle cx={x} cy={y} r={27} fill={e?.encontrada ? "var(--marca-texto-palido)" : "var(--folha)"} stroke={e?.encontrada ? "var(--tinta)" : "var(--grafite)"} strokeWidth={2.4} strokeDasharray={e?.encontrada ? undefined : "5 5"} />
+                  <circle cx={x} cy={y} r={27} fill={e?.encontrada ? "var(--marca-texto-palido)" : "var(--folha)"} stroke={e?.encontrada ? "var(--contorno)" : "var(--grafite)"} strokeWidth={2.4} strokeDasharray={e?.encontrada ? undefined : "5 5"} />
                   {e?.encontrada && <Gema x={x} y={y} r={18} estagio={e.estagio} base={j.cor.base} luz={j.cor.luz} />}
                 </g>
               );
@@ -101,10 +101,10 @@ export function Relicario() {
 
         <section className="ficha-lapis flex items-center gap-4 p-4" data-bancada-lapidacao="em-projeto">
           <svg viewBox="0 0 64 48" width={64} height={48} aria-hidden="true" className="a-lapis shrink-0">
-            <rect x={6} y={30} width={52} height={10} rx={3} fill="var(--folha)" stroke="var(--tinta)" />
-            <path d="M14 40 V46 M50 40 V46" fill="none" stroke="var(--tinta)" />
-            <circle cx={32} cy={20} r={12} fill="var(--folha)" stroke="var(--tinta)" />
-            <path d="M32 8 V2 M20 20 H14" fill="none" stroke="var(--tinta)" />
+            <rect x={6} y={30} width={52} height={10} rx={3} fill="var(--folha)" stroke="var(--contorno)" />
+            <path d="M14 40 V46 M50 40 V46" fill="none" stroke="var(--contorno)" />
+            <circle cx={32} cy={20} r={12} fill="var(--folha)" stroke="var(--contorno)" />
+            <path d="M32 8 V2 M20 20 H14" fill="none" stroke="var(--contorno)" />
           </svg>
           <div className="min-w-0">
             <h2 className="m-0 text-[17px] font-extrabold text-tinta-suave">Bancada de lapidação</h2>

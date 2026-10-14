@@ -55,11 +55,11 @@ export function MenuCorte({
     >
       {posicao.lado === "cima" ? (
         <svg className="menu-corte-seta" width="16" height="12" viewBox="0 0 16 12" aria-hidden="true" style={{ left: posicao.seta ?? 16 }}>
-          <path d="M1 12 L8 2 L15 12" fill="var(--folha)" stroke="var(--tinta)" strokeWidth="2" strokeLinejoin="round" />
+          <path d="M1 12 L8 2 L15 12" fill="var(--folha)" stroke="var(--contorno)" strokeWidth="2" strokeLinejoin="round" />
         </svg>
       ) : (
         <svg className="menu-corte-seta" width="12" height="16" viewBox="0 0 12 16" aria-hidden="true">
-          <path d={posicao.lado === "esquerda" ? "M12 1 L2 8 L12 15" : "M0 1 L10 8 L0 15"} fill="var(--folha)" stroke="var(--tinta)" strokeWidth="2" strokeLinejoin="round" />
+          <path d={posicao.lado === "esquerda" ? "M12 1 L2 8 L12 15" : "M0 1 L10 8 L0 15"} fill="var(--folha)" stroke="var(--contorno)" strokeWidth="2" strokeLinejoin="round" />
         </svg>
       )}
       <p className="menu-corte-rotulo m-0">Cortar em</p>

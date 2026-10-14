@@ -63,6 +63,7 @@ function normalizarPreferencias(v: unknown): Preferencias {
     cotas: umDe(o.cotas, ["visiveis", "escondidas"] as const, PREFERENCIAS_PADRAO.cotas),
     animacoes: umDe(o.animacoes, ["completas", "leves"] as const, PREFERENCIAS_PADRAO.animacoes),
     conversa: umDe(o.conversa, ["ligada", "desligada"] as const, PREFERENCIAS_PADRAO.conversa),
+    aparencia: umDe(o.aparencia, ["automatico", "claro", "escuro"] as const, PREFERENCIAS_PADRAO.aparencia),
   };
 }
 

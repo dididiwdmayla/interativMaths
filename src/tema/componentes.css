@@ -1,7 +1,7 @@
 /*
  * Receitas de componente da identidade Quadriculado. A força dela é a repetição exata:
  * toda tela usa estas mesmas peças, com os mesmos raios, bordas e sombras.
- * A única sombra do jogo é a sombra dura de tinta das fichas e dos botões.
+ * A única sombra do jogo é a sombra dura (--sombra) das fichas e dos botões; bordas em --contorno.
  * Sem cor literal: tudo vem de tokens.css.
  */
 
@@ -42,15 +42,15 @@
 
 .ficha {
   background: var(--folha);
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 16px;
-  box-shadow: 0 4px 0 var(--tinta);
+  box-shadow: 0 4px 0 var(--sombra);
 }
 
 .ficha-quadriculada {
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 16px;
-  box-shadow: 0 4px 0 var(--tinta);
+  box-shadow: 0 4px 0 var(--sombra);
   background-color: var(--folha);
   background-image:
     linear-gradient(var(--grade-suave) 1px, transparent 1px),
@@ -68,7 +68,7 @@
 /* Uma caixa dentro da ficha, só quando o de dentro é um objeto de verdade. */
 .caixa {
   background: var(--folha);
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
 }
 
@@ -94,11 +94,11 @@
 .botao-principal {
   min-height: 50px;
   padding: 6px 18px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 14px;
   background: var(--caneta);
-  box-shadow: 0 4px 0 var(--tinta);
-  color: var(--folha);
+  box-shadow: 0 4px 0 var(--sombra);
+  color: var(--sobre-caneta);
   font-size: 18px;
   font-weight: 700;
 }
@@ -111,7 +111,7 @@
 .botao-secundario {
   min-height: 46px;
   padding: 6px 14px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
   color: var(--tinta);
@@ -162,7 +162,7 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
   color: var(--tinta);
@@ -179,6 +179,7 @@
 
 .botao-icone[aria-current="page"] {
   background: var(--marca-texto);
+  color: var(--sobre-marca);
 }
 
 /* Botão pequeno de dentro do balão e do cabeçalho (Me ajuda, Perguntar, etapas). O desenho tem
@@ -191,7 +192,7 @@
   gap: 6px;
   height: 38px;
   padding: 0 11px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -232,7 +233,7 @@
   gap: 6px;
   min-height: 44px;
   padding: 4px 10px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -245,8 +246,8 @@
 .opcao[aria-checked="true"],
 .opcao[aria-pressed="true"] {
   background: var(--caneta);
-  box-shadow: 0 3px 0 var(--tinta);
-  color: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--sobre-caneta);
 }
 
 .opcao:active:not(:disabled) {
@@ -258,7 +259,7 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -303,7 +304,7 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
   color: var(--tinta);
@@ -322,7 +323,7 @@
   min-width: 48px;
   height: 46px;
   padding: 0 8px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--marca-texto-palido);
   color: var(--tinta);
@@ -353,10 +354,10 @@
   align-items: center;
   gap: 6px;
   padding: 3px 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
-  box-shadow: 0 3px 0 var(--tinta);
+  box-shadow: 0 3px 0 var(--sombra);
   color: var(--tinta);
   font-size: 14px;
   font-weight: 600;
@@ -378,7 +379,7 @@
   align-items: center;
   height: 34px;
   padding: 0 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -395,6 +396,7 @@
 
 .etiqueta-nav[aria-current="page"] {
   background: var(--marca-texto);
+  color: var(--sobre-marca);
 }
 
 .etiqueta-nav[data-material="lapis"] {
@@ -409,7 +411,7 @@
   isolation: isolate;
   display: inline-block;
   padding: 1px 8px;
-  color: var(--tinta);
+  color: var(--sobre-marca);
   transform: rotate(-1.5deg);
 }
 
@@ -432,6 +434,7 @@
   padding: 1px 5px;
   border-radius: 4px;
   background: var(--marca-texto);
+  color: var(--sobre-marca);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
@@ -455,7 +458,7 @@
   align-items: center;
   gap: 5px;
   padding: 2px 9px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 8px;
   background: var(--folha);
   color: var(--tinta);
@@ -493,10 +496,10 @@
   align-items: center;
   justify-content: center;
   padding: 5px 6px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
-  box-shadow: 0 3px 0 var(--tinta);
+  box-shadow: 0 3px 0 var(--sombra);
   color: var(--tinta);
   font-size: 13px;
   font-weight: 700;
@@ -534,7 +537,7 @@
   align-items: center;
   gap: 5px;
   padding: 2px 9px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
@@ -612,7 +615,7 @@
 /* A faixa do Nônio colada no topo da folha que sobe. */
 .faixa-na-folha {
   padding: 10px 14px 10px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-bottom: 1.5px solid var(--pauta);
   border-radius: 18px 18px 0 0;
   background: var(--folha);
@@ -652,16 +655,18 @@
 
 .objetivo-etiqueta[data-etiqueta="Feito"] {
   background: var(--verde-escuro);
+  color: var(--sobre-verde);
 }
 
 .objetivo-etiqueta[data-etiqueta="Aposta do Nônio"] {
   background: var(--marca-texto);
-  box-shadow: inset 0 0 0 2px var(--tinta);
-  color: var(--tinta);
+  box-shadow: inset 0 0 0 2px var(--contorno);
+  color: var(--sobre-marca);
 }
 
 .objetivo-etiqueta[data-etiqueta="Desafio"] {
   background: var(--caneta);
+  color: var(--sobre-caneta);
 }
 
 .objetivo-gesto {
@@ -691,10 +696,10 @@
   flex-direction: column;
   gap: 5px;
   padding: 7px 9px 9px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
-  box-shadow: 0 3px 0 var(--tinta);
+  box-shadow: 0 3px 0 var(--sombra);
 }
 
 .menu-corte-seta {
@@ -723,7 +728,7 @@
 .menu-corte-botao,
 .menu-corte-quantas {
   position: relative;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 9px;
   background: var(--folha);
   color: var(--tinta);
@@ -754,7 +759,7 @@
 
 .menu-corte-quantas[aria-checked="true"] {
   background: var(--caneta);
-  color: var(--folha);
+  color: var(--sobre-caneta);
 }
 
 .menu-corte-botao:active,
@@ -771,15 +776,15 @@
 
 .bilhete {
   padding: 10px 14px 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 4px;
   background: var(--bilhete);
-  box-shadow: 0 3px 0 var(--tinta);
+  box-shadow: 0 3px 0 var(--sombra);
   transform: rotate(-2deg);
 }
 
 .bilhete-texto {
-  color: var(--caneta-escura);
+  color: var(--bilhete-tinta);
   font-family: var(--fonte-mao), cursive;
   font-size: 25px;
   font-weight: 700;
@@ -788,7 +793,7 @@
 
 .bilhete-assinatura {
   margin-top: 4px;
-  color: var(--caneta-escura);
+  color: var(--bilhete-tinta);
   font-family: var(--fonte-mao), cursive;
   font-size: 21px;
   font-weight: 700;
@@ -822,16 +827,16 @@
   justify-content: center;
   width: 26px;
   height: 26px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
 }
 
 .etapa[data-estado="feito"] .etapa-marca {
-  border-color: var(--tinta);
+  border-color: var(--contorno);
   background: var(--verde);
-  color: var(--folha);
+  color: var(--sobre-verde);
 }
 
 .etapa[data-estado="atual"] {
@@ -841,7 +846,7 @@
 
 .etapa[data-estado="atual"] .etapa-marca {
   background: var(--caneta);
-  color: var(--folha);
+  color: var(--sobre-caneta);
 }
 
 .etapa[data-estado="depois"] {
@@ -866,7 +871,7 @@
 
 .balao-nonio {
   padding: 10px 14px 11px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 14px 14px 14px 4px;
   background: var(--folha);
 }
@@ -883,7 +888,7 @@
   align-items: center;
   gap: 10px;
   min-height: 60px;
-  border-bottom: 2px solid var(--tinta);
+  border-bottom: 2px solid var(--contorno);
   background: var(--folha);
 }
 
@@ -896,7 +901,7 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  border-bottom: 2px solid var(--tinta);
+  border-bottom: 2px solid var(--contorno);
   background: var(--folha);
 }
 
@@ -905,7 +910,7 @@
 }
 
 .bancada-controles {
-  border-top: 2px solid var(--tinta);
+  border-top: 2px solid var(--contorno);
   border-radius: 18px 18px 0 0;
   background: var(--folha);
 }
@@ -917,7 +922,7 @@
   gap: 10px;
   min-height: 40px;
   padding: 6px 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -934,7 +939,7 @@
 
 .opcao.ficha-cota[aria-pressed="true"] {
   background: var(--caneta);
-  color: var(--folha);
+  color: var(--sobre-caneta);
 }
 
 /* Lacuna da frase: caixa tracejada (a lápis) até receber o número do jogador, a caneta. */
@@ -962,7 +967,7 @@
 /* Recorte colado na folha (a exposição do museu), com fita adesiva nos cantos. */
 .recorte {
   position: relative;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 6px;
   background: var(--folha);
   transform: rotate(-0.6deg);
@@ -1038,7 +1043,7 @@
   flex-direction: column;
   gap: 6px;
   padding: 8px 16px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--marca-texto-palido);
 }
@@ -1115,7 +1120,7 @@ html[data-animacoes="leves"] .folha-sobe {
   gap: 10px;
   min-height: 48px;
   padding: 6px max(14px, env(safe-area-inset-right)) 6px max(14px, env(safe-area-inset-left));
-  border-bottom: 2px solid var(--tinta);
+  border-bottom: 2px solid var(--contorno);
   background: var(--folha);
 }
 
@@ -1186,9 +1191,9 @@ html[data-animacoes="leves"] .folha-sobe {
   .palco-pedido {
     margin-bottom: 14px;
     padding: 10px 14px;
-    border: 2px solid var(--tinta);
+    border: 2px solid var(--contorno);
     border-radius: 16px;
-    box-shadow: 0 4px 0 var(--tinta);
+    box-shadow: 0 4px 0 var(--sombra);
   }
   .palco-maquina {
     margin: 0;
@@ -1205,9 +1210,9 @@ html[data-animacoes="leves"] .folha-sobe {
     max-height: 100%;
     margin: 0;
     padding: 16px;
-    border: 2px solid var(--tinta);
+    border: 2px solid var(--contorno);
     border-radius: 18px;
-    box-shadow: 0 4px 0 var(--tinta);
+    box-shadow: 0 4px 0 var(--sombra);
   }
   .palco-folha {
     align-self: start;
@@ -1230,7 +1235,7 @@ html[data-animacoes="leves"] .folha-sobe {
     padding: 10px 14px;
   }
   .palco-pedido {
-    border: 2px solid var(--tinta);
+    border: 2px solid var(--contorno);
     border-radius: 12px;
     margin-bottom: 8px;
   }
@@ -1242,7 +1247,7 @@ html[data-animacoes="leves"] .folha-sobe {
   .palco-folha {
     max-height: 100%;
     margin: 0;
-    border: 2px solid var(--tinta);
+    border: 2px solid var(--contorno);
     border-radius: 16px;
   }
 }
@@ -1262,7 +1267,7 @@ html[data-animacoes="leves"] .folha-sobe {
 
 /* Painel que sobe por cima da tela (Nônio, detalhe da Planta). */
 .painel-sobe {
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-bottom: 0;
   border-radius: 18px 18px 0 0;
   background: var(--folha);
@@ -1270,9 +1275,9 @@ html[data-animacoes="leves"] .folha-sobe {
 
 @media (min-width: 1024px) {
   .painel-sobe {
-    border-bottom: 2px solid var(--tinta);
+    border-bottom: 2px solid var(--contorno);
     border-radius: 18px;
-    box-shadow: 0 4px 0 var(--tinta);
+    box-shadow: 0 4px 0 var(--sombra);
   }
 }
 }
@@ -1298,7 +1303,7 @@ html[data-animacoes="leves"] .folha-sobe {
 .conversa-ele {
   box-sizing: border-box;
   padding: 9px 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   font-size: 15px;
   font-weight: 500;
   line-height: 1.35;
@@ -1368,7 +1373,7 @@ html[data-animacoes="leves"] .folha-sobe {
   align-items: center;
   min-height: 44px;
   padding: 0 11px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -1387,7 +1392,7 @@ html[data-animacoes="leves"] .folha-sobe {
   height: 48px;
   box-sizing: border-box;
   padding: 0 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
   color: var(--tinta);
@@ -1408,11 +1413,11 @@ html[data-animacoes="leves"] .folha-sobe {
   width: 48px;
   height: 48px;
   padding: 0;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--caneta);
-  box-shadow: 0 3px 0 var(--tinta);
-  color: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--sobre-caneta);
   transition: transform 90ms var(--curva-firme);
 }
 
@@ -1459,10 +1464,10 @@ html[data-animacoes="leves"] .folha-sobe {
   max-width: 520px;
   margin: 0 auto;
   padding: 12px 14px 14px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 16px;
   background: var(--folha);
-  box-shadow: 0 4px 0 var(--tinta);
+  box-shadow: 0 4px 0 var(--sombra);
 }
 
 .apresentacao-cartao[data-lado="baixo"] {

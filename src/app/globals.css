@@ -11,6 +11,11 @@
   --color-margem: var(--margem);
   --color-tinta: var(--tinta);
   --color-tinta-suave: var(--tinta-suave);
+  --color-contorno: var(--contorno);
+  --color-sombra: var(--sombra);
+  --color-sobre-caneta: var(--sobre-caneta);
+  --color-sobre-marca: var(--sobre-marca);
+  --color-sobre-verde: var(--sobre-verde);
   --color-grafite: var(--grafite);
   --color-grafite-claro: var(--grafite-claro);
   --color-caneta: var(--caneta);

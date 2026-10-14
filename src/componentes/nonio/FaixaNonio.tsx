@@ -69,7 +69,7 @@ export function FaixaNonio({
               <button type="button" className="botao-pequeno relative" onClick={ajuda.onPedir} data-acao="nonio">
                 <IconeAjuda />
                 {ajuda.rotulo}
-                {ajuda.oferta && <span className="anima-oferta absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-tinta bg-marca-texto" aria-hidden="true" />}
+                {ajuda.oferta && <span className="anima-oferta absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-contorno bg-marca-texto" aria-hidden="true" />}
               </button>
             )}
             {onPerguntar && (

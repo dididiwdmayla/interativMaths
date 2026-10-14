@@ -17,7 +17,7 @@ export function FolhaPautada({
   className?: string;
 }) {
   return (
-    <section className={`folha-pautada relative border-2 border-tinta ${className}`}>
+    <section className={`folha-pautada relative border-2 border-contorno ${className}`}>
       <div className="pb-5 pl-[50px] pr-4 pt-[14px]">
         {titulo && <h2 className="letra-mao m-0 text-[30px] leading-[28px] text-tinta">{titulo}</h2>}
         {children}

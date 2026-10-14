@@ -47,7 +47,7 @@ export function Caderno() {
         </header>
 
         {paginas.length === 0 && (
-          <FolhaPautada titulo="Em branco" className="rounded-[16px] shadow-[0_4px_0_var(--tinta)]">
+          <FolhaPautada titulo="Em branco" className="rounded-[16px] shadow-[0_4px_0_var(--sombra)]">
             <p className="m-0 mt-[14px] text-[16px] font-medium leading-[28px]">As páginas aparecem aqui quando você passa a limpo o que a máquina fez, no fim de cada missão.</p>
             <div className="mt-[14px]">
               <NotaDalia>Comecei este caderno trinta anos atrás e ele continua em branco. Fica com você.</NotaDalia>
@@ -77,7 +77,7 @@ function Pagina({ p, onRever }: { p: PaginaCaderno; onRever: () => void }) {
   const maquina = ehEstadoBancada(p.maquina) ? p.maquina : null;
   return (
     <article data-pagina={p.id} className="anima-subir">
-      <FolhaPautada titulo={p.titulo} className="rounded-[16px] shadow-[0_4px_0_var(--tinta)]">
+      <FolhaPautada titulo={p.titulo} className="rounded-[16px] shadow-[0_4px_0_var(--sombra)]">
         <div className="flex flex-col gap-[14px] pt-[14px] md:flex-row md:items-start md:gap-6">
           <div className="flex min-w-0 flex-1 flex-col gap-[14px]">
             {p.frase && <p className="m-0 text-[16px] font-medium leading-[28px]">{p.frase}</p>}

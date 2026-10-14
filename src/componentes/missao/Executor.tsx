@@ -307,7 +307,7 @@ export function ExecutorAtividade({
   const faixa = (compacta: boolean) => (
     <>
       {!compacta && origemDesvio && (
-        <Link href={rotaDe(origemDesvio)} className="block rotate-[-0.6deg] rounded-md border-2 border-tinta bg-marca-texto px-3 py-2 text-[14px] font-semibold" data-desvio="">
+        <Link href={rotaDe(origemDesvio)} className="block rotate-[-0.6deg] rounded-md border-2 border-contorno bg-marca-texto text-sobre-marca px-3 py-2 text-[14px] font-semibold" data-desvio="">
           Desvio. Quando quiser, volte para {origemDesvio.titulo}: a máquina está como você deixou.
         </Link>
       )}
