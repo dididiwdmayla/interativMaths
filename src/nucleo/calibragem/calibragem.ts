@@ -89,6 +89,8 @@ interface ItemBase {
   readonly conceito: IdConceito;
   /** O pedido, numa linha. */
   readonly pedido: string;
+  /** O que fazer agora, com verbo no imperativo primeiro, até 80 caracteres, terminando em ponto. */
+  readonly instrucao: string;
   /** O que o Nônio diz ao apresentar o degrau. */
   readonly fala: string;
 }

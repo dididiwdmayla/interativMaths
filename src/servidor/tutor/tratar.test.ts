@@ -137,11 +137,13 @@ describe("rota do tutor", () => {
     }
   });
 
-  it("resposta longa demais, sem formato ou com alvo inexistente: descartada, vem o degrau seguinte", async () => {
+  it("resposta longa demais, sem formato, fora da voz ou com alvo inexistente: descartada, vem o degrau seguinte", async () => {
     for (const json of [
       { ...RESPOSTA_BOA, texto: "a".repeat(301) },
       { texto: "Olhe a esteira." },
       { ...RESPOSTA_BOA, alvo: "bica:9" },
+      { ...RESPOSTA_BOA, texto: "Muito bem! Olhe a esteira." },
+      { ...RESPOSTA_BOA, texto: "Esse lote está errado. Olhe a esteira." },
       null,
     ]) {
       const { deps, logs } = montar([boa(json)]);

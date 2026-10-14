@@ -52,7 +52,7 @@ describe("próximo gesto", () => {
 
   it("sobrou peça que não dá volta inteira, e há fatiador: escolher em quantas partes (sem dizer quantas)", () => {
     const g = gesto(MISSAO_4, ate(MISSAO_4, "cinco-broas", [maq({ tipo: "repartir" })]));
-    expect(g.texto).toBe("Agora: escolha em quantas partes cortar a broa.");
+    expect(g.texto).toBe("Agora: toque na peça que sobrou e escolha em quantas partes cortar.");
     expect(g.alvo).toBe("fatiador");
   });
 
@@ -86,9 +86,9 @@ describe("próximo gesto", () => {
     expect(gesto(MISSAO_4, prova).texto).toBe("Agora: escolha a resposta e toque em Mostrar ao Nônio.");
   });
 
-  it("ainda cabe volta: repartir de novo", () => {
+  it("ainda cabe volta: repartir, ou pôr mais uma em cada", () => {
     const e = ate(MISSAO_1, "repartir", [maq({ tipo: "repartir" })]);
-    expect(gesto(MISSAO_1, e).texto).toBe("Agora: reparta de novo, ou ponha mais uma em cada carroça.");
+    expect(gesto(MISSAO_1, e).texto).toBe("Agora: toque em Repartir, ou ponha mais uma em cada carroça.");
   });
 
   it("engasgo: diminuir o lote, com a medida", () => {

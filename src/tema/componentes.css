@@ -1436,3 +1436,39 @@ html[data-animacoes="leves"] .folha-sobe {
     margin: 16px;
   }
 }
+
+/* ---------- Apresentações ---------- */
+
+/* A ferramenta apresentada sobe acima do véu (z 40), com um contorno de caneta. */
+[data-apresentando] {
+  position: relative;
+  z-index: 45;
+  outline: 3px solid var(--caneta);
+  outline-offset: 4px;
+  border-radius: 14px;
+}
+
+.apresentacao-cartao {
+  position: absolute;
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 46;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 12px 14px 14px;
+  border: 2px solid var(--tinta);
+  border-radius: 16px;
+  background: var(--folha);
+  box-shadow: 0 4px 0 var(--tinta);
+}
+
+.apresentacao-cartao[data-lado="baixo"] {
+  bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.apresentacao-cartao[data-lado="cima"] {
+  top: max(12px, env(safe-area-inset-top));
+}

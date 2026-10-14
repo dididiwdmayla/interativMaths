@@ -32,6 +32,7 @@ import { FaixaNonio } from "@/componentes/nonio/FaixaNonio";
 import { mensagemDoEvento } from "@/componentes/maquinas/mensagens";
 import { EntradaResposta } from "@/componentes/missao/Respostas";
 import { Nonio } from "@/componentes/nonio/Nonio";
+import { Objetivo } from "@/componentes/missao/Objetivo";
 import { Carregando } from "@/componentes/ui/Carregando";
 
 type Fase = "convite" | "medindo" | "resultado";
@@ -123,11 +124,8 @@ export function Calibragem() {
       </button>
     </header>
   );
-  const pedido = (
-    <p className="m-0 min-w-0 flex-1 text-[15px] font-semibold leading-snug" data-pedido="">
-      {item.pedido}
-    </p>
-  );
+  // Instrução com verbo, sem gesto nem escada: a calibragem mede, não ensina.
+  const pedido = <Objetivo etiqueta="Medida" instrucao={item.instrucao} gesto={null} />;
 
   const controlesAnotado = anotado !== null && (
     <div className="flex flex-col gap-3" role="status" data-anotado={anotado}>

@@ -15,8 +15,11 @@ uma solução. A sensação procurada é a de montar um mecanismo, não a de res
 Jovens e adultos recuperando base, gente que acredita "não ter base".
 
 - Sem nota, sem a palavra "errado", sem série escolar, sem cronômetro, sem estrelas, sem ranking.
-- Erro é um evento da máquina (ela engasga, a bandeja apara) e tudo pode ser desfeito. O vermelho
-  só chama o olhar, nunca corrige.
+- Erro é um evento da máquina (ela engasga, a bandeja apara) e tudo pode ser desfeito.
+- Acertar fica verde e diz o que ficou certo. Não acertar ainda fica vermelho por um instante, com
+  o porquê e o próximo passo, e some no primeiro gesto. Nunca "errado", nunca X, nunca risco.
+- Toda tela diz, com verbo, o que fazer agora; o Nônio está sempre na missão, sem precisar abrir
+  nada.
 - "Não sei ainda" é resposta legítima em qualquer pergunta.
 - Texto adulto, seco e caloroso, em frases curtas. Nada infantilizado, nada de exclamação.
 
@@ -80,8 +83,15 @@ Relógios usam rubis como mancais. As joias do jogo são habilidades reais do jo
 atrito do raciocínio (Ábaco, Cálculo Mental, Multiplicação, Estimativa), com quatro estágios de
 lapidação. Não dão poder fictício. O treino é assunto de outra versão.
 
-## O tutor sem IA
+## O Nônio
 
-Nesta versão o Nônio é determinístico: escada de dicas por passo (olhar, medir, caso parecido com
-outros números, resolver junto) e resposta por equívoco nomeado. A rota `POST /api/tutor` existe e
-responde que a conversa não está disponível; a correção matemática será sempre do motor.
+O Nônio é o guia da missão: lê a máquina, diz o retorno de cada conferência e dá a escada de
+ajuda a pedido (olhar, medir, caso parecido com outros números, resolver junto), com resposta
+própria para cada equívoco nomeado. **A correção é determinística, do motor**: quem diz se está
+certo é a máquina.
+
+A IA entra só na conversa ("Pergunte ao Nônio", rota `POST /api/tutor`, Claude Haiku 5.5 da
+Anthropic): perguntas livres sobre a missão aberta, na voz do Nônio. O contexto sai do servidor,
+pelos ids; duas guardas determinísticas barram a resposta que entrega o resultado do passo e a que
+traz conta falsa (no lugar, o degrau seguinte da escada). Sem a chave no servidor, o botão
+"Perguntar" não aparece e o jogo é o mesmo. O histórico não é guardado.

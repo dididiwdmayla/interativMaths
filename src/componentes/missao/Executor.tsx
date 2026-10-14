@@ -50,6 +50,8 @@ import { FaixaNonio, type AcaoAjuda } from "@/componentes/nonio/FaixaNonio";
 import { BarraJunto, FolhaCasoParecido } from "@/componentes/nonio/AjudaNonio";
 import { useFalaQuandoCalmo, useFilaNonio } from "@/componentes/nonio/useFila";
 import { ConversaNonio } from "@/componentes/nonio/ConversaNonio";
+import { Apresentacao } from "@/componentes/nonio/Apresentacao";
+import { proximaApresentacao } from "@/nucleo/tutor/apresentacoes";
 import { historicoParaEnviar, perguntar, useConversaDisponivel, type MensagemTela } from "@/componentes/nonio/useConversa";
 import { LinhaNotacao } from "@/componentes/notacao/Notacao";
 import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, SONDAGEM_ATIVA, TEXTOS_REACAO } from "@/componentes/estado/catalogo";
@@ -111,6 +113,8 @@ export function ExecutorAtividade({
   // Pergunte ao Nônio: o histórico vive só aqui, na memória da execução aberta.
   const [conversa, setConversa] = useState<{ mensagens: MensagemTela[]; perguntas: number; esperando: boolean }>({ mensagens: [], perguntas: 0, esperando: false });
   const [conversaAberta, setConversaAberta] = useState(false);
+  /** O passo em que uma apresentação já apareceu nesta visita (no máximo uma por passo). */
+  const [apresentadaEm, setApresentadaEm] = useState<string | null>(null);
   const conversaAbertaRef = useRef(false);
   const conversaPermitida = a.tipo !== "sondagem" && atividadePorId(a.id) !== null && progresso.preferencias.conversa === "ligada";
   const conversaNoAr = useConversaDisponivel(pronto && conversaPermitida);
@@ -119,13 +123,13 @@ export function ExecutorAtividade({
   const exec: Execucao = salva && salva.modo === modo ? salva : iniciarExecucao(a, modo);
   const passo = passoAtual(a, exec);
   const pele = exec.bancada ? PELES[exec.bancada.atual.config.pele] : null;
-  const oferta = pronto && !fim && passo ? falaDeOferta(passo, exec, postura, TEXTOS_REACAO) : null;
+  const oferta = pronto && !fim && passo && a.tipo !== "sondagem" ? falaDeOferta(passo, exec, postura, TEXTOS_REACAO) : null;
   useFalaQuandoCalmo(oferta, fila, oferecerFala, PERMANENCIA_MINIMA_MS + 3500);
   const gesto = passo ? proximoGesto(passo, exec, { textos: GESTOS, reacoes: TEXTOS_REACAO, pele }) : null;
   const lembrete = useLembrete(
     pronto && !fim && passo !== null && passoDeMaquina(passo) && exec.passo.situacao !== "vencido" ? `${passo.id}:${exec.bancada?.atual.seq ?? 0}:${exec.passo.situacao}` : null,
     (n) => {
-      if (!passo || !gesto || postura === "quieto" || passo.fase === "aplicacao") return;
+      if (!passo || !gesto || postura === "quieto" || passo.fase === "aplicacao" || a.tipo === "sondagem") return;
       oferecerFala(falaDeLembrete(passo, gesto.texto, TEXTOS_REACAO, n));
     },
   );
@@ -186,11 +190,13 @@ export function ExecutorAtividade({
   const palpite = palpiteDoPasso(a, exec);
   const falaAtual: FalaFaixa = falaDoPasso(fila, passo.id) ?? falaDoEstado(a, passo, exec, TEXTOS_REACAO, pele, palpite);
   const chaveRascunho = `${passo.id}:${exec.passo.respostas}:${exec.passo.tentativas}`;
-  const selo = rascunho === chaveRascunho && exec.passo.retorno === "ainda-nao" ? null : seloVisivel(falaAtual, exec);
+  // A sondagem é quieta: sem retorno colorido, sem escada; o Nônio só lê a máquina.
+  const quieta = a.tipo === "sondagem";
+  const selo = quieta || (rascunho === chaveRascunho && exec.passo.retorno === "ainda-nao") ? null : seloVisivel(falaAtual, exec);
   const retorno = selo ?? "neutro";
   const sit = exec.passo.situacao;
   const nivel = exec.passo.ajuda;
-  const temEscada = passo.dicas !== undefined && TIPOS_COM_ESCADA.includes(passo.tipo) && (sit === "ativo" || sit === "convite");
+  const temEscada = !quieta && passo.dicas !== undefined && TIPOS_COM_ESCADA.includes(passo.tipo) && (sit === "ativo" || sit === "convite");
   const podeJunto = passo.tipo === "operar" || passo.tipo === "frase" || passo.tipo === "aposta";
   const pedirAjuda = () => {
     if (nivel < 3) enviar({ tipo: "dica" });
@@ -201,7 +207,7 @@ export function ExecutorAtividade({
   const ajudaNaResposta = passo.tipo === "prever" && selo === "ainda-nao";
   const acaoAjuda: AcaoAjuda | null =
     temEscada && nivel < 4 && !ajudaNaResposta ? { rotulo: rotuloAjuda, onPedir: pedirAjuda, oferta: falaAtual.categoria === "oferta" } : null;
-  const expressao = falaAtual.categoria === "passo" && postura === "quieto" ? "quieto" : falaAtual.expressao;
+  const expressao = quieta || (falaAtual.categoria === "passo" && postura === "quieto") ? "quieto" : falaAtual.expressao;
 
   /* ---------- Pergunte ao Nônio ---------- */
 
@@ -276,6 +282,23 @@ export function ExecutorAtividade({
       onEntendi={() => atualizar((p, t) => marcarApresentacao(p, "conversa", t))}
       onEnviar={(t) => void enviarPergunta(t)}
       onFechar={fecharConversa}
+    />
+  ) : null;
+
+  /* ---------- Apresentações ---------- */
+
+  const apresentar =
+    casoAberto || conversaAberta
+      ? null
+      : proximaApresentacao(a, passo, exec, progresso.apresentacoes, { jaNestePasso: apresentadaEm === passo.id, retornoVisivel: selo !== null });
+  const apresentacao = apresentar ? (
+    <Apresentacao
+      key={apresentar}
+      id={apresentar}
+      onEntendi={() => {
+        setApresentadaEm(passo.id);
+        atualizar((p, t) => marcarApresentacao(p, apresentar, t));
+      }}
     />
   ) : null;
 
@@ -396,6 +419,7 @@ export function ExecutorAtividade({
         </TelaNarrativa>
         {folhaCaso}
         {folhaConversa}
+        {apresentacao}
       </>
     );
   }
@@ -597,6 +621,7 @@ export function ExecutorAtividade({
       />
       {folhaCaso}
       {folhaConversa}
+      {apresentacao}
     </>
   );
 }

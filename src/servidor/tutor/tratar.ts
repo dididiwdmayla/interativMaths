@@ -116,7 +116,8 @@ export async function tratarPedidoTutor(pedido: Request, deps: DependenciasTutor
     return json(recurso(lido, ctx));
   };
   const saida = lerSaidaModelo(resultado.json, ctx.alvos);
-  if (!saida || saida.texto.length > LIMITES_TUTOR.resposta) return barrar("formato");
+  // A voz do Nônio também é regra: sem exclamação e sem julgar ("errado").
+  if (!saida || saida.texto.length > LIMITES_TUTOR.resposta || /!|\berrad/i.test(saida.texto)) return barrar("formato");
   if (lido.situacao !== "vencido" && segredoEntregue(saida.texto, ctx.segredos)) return barrar("entrega");
   if (contaFalsa(saida.texto)) return barrar("conta");
 

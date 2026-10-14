@@ -13,6 +13,7 @@ export const VERBOS_DA_INSTRUCAO: readonly string[] = [
   "Corte",
   "Diga",
   "Distribua",
+  "Entregue",
   "Escolha",
   "Faça",
   "Feche",

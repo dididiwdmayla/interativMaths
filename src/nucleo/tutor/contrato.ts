@@ -1,7 +1,7 @@
 /**
  * Contrato da conversa com o Nônio (Pergunte ao Nônio). O cliente manda só ids e o estado visível;
  * o contexto (enunciado, escada, segredos) o servidor monta pelos ids. Validado à risca: campo a
- * mais, tipo errado ou texto longo demais, e o pedido é recusado.
+ * mais, tipo trocado ou texto longo demais, e o pedido é recusado.
  * A correção matemática continua sendo do motor: a conversa nunca diz se o jogador acertou.
  */
 import type { AlvoMaquina, ModoExecucao } from "../missoes/tipos";

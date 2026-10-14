@@ -8,7 +8,7 @@ import type { Gesto } from "@/nucleo/missoes/gesto";
 import { IconeMao } from "@/componentes/icones/IconeMao";
 import { IconeVisto } from "@/componentes/icones/IconeVisto";
 
-export type Etiqueta = "Objetivo" | "Pergunta" | "Palpite" | "Aposta do Nônio" | "Desafio" | "Registro" | "Feito";
+export type Etiqueta = "Objetivo" | "Pergunta" | "Palpite" | "Aposta do Nônio" | "Desafio" | "Registro" | "Medida" | "Feito";
 
 export function Objetivo({ etiqueta, instrucao, gesto, lembrete = 0 }: { etiqueta: Etiqueta; instrucao: string; gesto: Gesto | null; lembrete?: number }) {
   const feito = etiqueta === "Feito";

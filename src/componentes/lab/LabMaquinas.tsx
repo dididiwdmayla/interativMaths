@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * /lab/maquinas: a bancada solta, com qualquer configuração e pele.
+ * /lab/maquinas: a bancada solta, com qualquer configuração e pele, com ou sem mão livre.
  */
 import { useState } from "react";
-import { criarBancada, operar } from "@/nucleo/maquinas/bancada/bancada";
+import { criarBancada, maoLivreLigada, operar } from "@/nucleo/maquinas/bancada/bancada";
 import type { Bancada as BancadaEstado, ConfigBancada, IdPele } from "@/nucleo/maquinas/bancada/tipos";
 import { validarBancada, VALIDADORES_BANCADA, type NomeValidadorBancada, type ResultadoValidacao } from "@/nucleo/maquinas/bancada/validadores";
 import { PELES } from "@/conteudo/peles";
@@ -104,6 +104,15 @@ export function LabMaquinas() {
         controles={
           <div className="flex flex-col gap-3">
             <PainelBancada estado={bancada.atual} pele={pele} onAcao={(a) => setBancada((b) => operar(b, a))} onFechar={fechar} />
+            <button
+              type="button"
+              className="opcao opcao-texto"
+              aria-pressed={maoLivreLigada(config)}
+              onClick={() => usar({ ...config, maoLivre: maoLivreLigada(config) ? false : undefined })}
+              data-acao="mao-livre"
+            >
+              Mão livre: {maoLivreLigada(config) ? "ligada (toque, arraste, corte)" : config.voltasMax !== undefined ? "desligada (máquina com voltas contadas)" : "desligada (só a alavanca)"}
+            </button>
             <details className="text-[14px] text-tinta-suave">
               <summary className="min-h-[44px] cursor-pointer py-2.5 font-semibold">Configuração e validador</summary>
               <div className="flex flex-col gap-2 pt-2">
