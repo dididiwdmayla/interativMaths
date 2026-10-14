@@ -73,7 +73,7 @@ function unidadesDaPilha(p: Pilha): number {
  * cresce o bastante para a bolinha não cobrir os números das bicas.
  */
 const FAIXA_BANDEJA = 58;
-const FAIXA_BANDEJA_COM_NONIO = 84;
+const FAIXA_BANDEJA_COM_NONIO = 76;
 
 /**
  * @param proporcao altura/largura desejada (a área da tela). Entre 0,5 e 1,7.

@@ -71,6 +71,9 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   }
   await expect(v(page, "[data-tela=missao][data-situacao=vencido]")).toBeVisible();
   await expect(v(page, "[data-tela=missao]")).toHaveAttribute("data-retorno", "acertou");
+  // O rascunho a lápis: a rodada feita à mão vira uma linha só. O passo da mão não tem conta.
+  await expect(v(page, "[data-rascunho]")).toContainText("À mão: 1 saca em cada carroça · 4 × 1 = 4");
+  await expect(page.locator("[data-conta]")).toHaveCount(0);
   await tocar(page, "[data-acao=seguir]");
 
   await passo(page, "repartir");
@@ -95,10 +98,12 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
 
   await mais(page, "lote", 7);
   await tocar(page, "[data-acao=repartir]");
-  await expect(v(page, "[data-visor]")).toContainText("Uma volta de 8 em 4 bicas pede 32");
+  await expect(v(page, "[data-visor]")).toContainText("uma volta de 8 em 4 bicas pede 32");
   for (let i = 0; i < 3; i++) await tocar(page, '[data-seletor=lote] button[aria-label$="menos um"]');
   await tocar(page, "[data-acao=repartir]");
   await expect(v(page, "[data-bica='0']")).toHaveAttribute("data-quantidade", "6");
+  // Depois de Repartir, a linha da volta no rascunho (a última linha é a leitura da máquina).
+  await expect(v(page, "[data-visor]")).toContainText("Volta 1: 5 em cada · 4 × 5 = 20");
 
   // Fechar e reabrir no meio da missão: mesmo passo, máquina no mesmo estado.
   await page.reload();
@@ -108,6 +113,9 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await tocar(page, "[data-acao=fechar]");
   await expect(v(page, "[data-tela=missao][data-situacao=vencido]")).toBeVisible();
   await expect(v(page, "[data-tela=missao]")).toHaveAttribute("data-retorno", "acertou");
+  // No acerto, a conta passada a caneta, com o nome dos termos.
+  await expect(v(page, "[data-conta]")).toHaveAttribute("data-conta", "24 ÷ 4 = 6");
+  await expect(v(page, "[data-conta]")).toContainText("dividendo");
   await tocar(page, "[data-acao=seguir]");
 
   await passo(page, "trinta");

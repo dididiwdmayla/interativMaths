@@ -54,6 +54,10 @@ import { RecadoNonio } from "@/componentes/nonio/RecadoNonio";
 import { JanelaNonio, type AjudaJanela } from "@/componentes/nonio/JanelaNonio";
 import { useNonio } from "@/componentes/nonio/useNonio";
 import { recadoDaFala } from "@/nucleo/tutor/recado";
+import { rascunhoDaBancada } from "@/nucleo/maquinas/bancada/rascunho";
+import { contaDoAcerto } from "@/nucleo/missoes/conta";
+import { MODELOS_RASCUNHO } from "@/conteudo/rascunho";
+import { MODELOS_CONTA } from "@/conteudo/conta";
 import { marcadoresDaPele } from "@/nucleo/tutor/reacoes";
 import { Apresentacao } from "@/componentes/nonio/Apresentacao";
 import { proximaApresentacao } from "@/nucleo/tutor/apresentacoes";
@@ -65,6 +69,8 @@ import { useProgresso } from "@/componentes/estado/useProgresso";
 import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
 import { Bilhete, PainelAposta } from "./Aposta";
+import { ContaPassada } from "./ContaPassada";
+import { Rascunho } from "./Rascunho";
 import { BotaoEtapas } from "./Etapas";
 import { FalaDalia, Falas } from "./Falas";
 import { Objetivo, type Etiqueta } from "./Objetivo";
@@ -340,7 +346,7 @@ export function ExecutorAtividade({
 
   /** A fala atual, sempre numa região viva para o leitor de tela, mesmo sem recado. */
   const voz = (
-    <p className="so-leitor" role="status" aria-live="polite" data-visor="" data-fala-nonio={falaAtual.id} data-selo={selo ?? undefined}>
+    <p className="so-leitor" role="status" aria-live="polite" data-fala-nonio={falaAtual.id} data-selo={selo ?? undefined}>
       {selo === "acertou" ? "Acertou. " : selo === "ainda-nao" ? "Ainda não. " : ""}
       {falaAtual.texto}
     </p>
@@ -506,6 +512,11 @@ export function ExecutorAtividade({
   const chegada = chegadaDoPasso(a, exec);
   const intacto = bancada.atual.seq === exec.passo.inicio?.atual.seq && exec.passo.respostas === 0 && sit === "ativo";
 
+  // O rascunho a lápis (o que cada gesto significou em conta) e, no acerto, a conta a caneta.
+  const rascunhoDaMaquina = <Rascunho linhas={rascunhoDaBancada(bancada, peleMaquina, MODELOS_RASCUNHO)} />;
+  const contaDoPasso = contaDoAcerto(passo, exec, { pele: peleMaquina, modelos: MODELOS_CONTA, rascunho: MODELOS_RASCUNHO });
+  const conta = contaDoPasso ? <ContaPassada conta={contaDoPasso} /> : null;
+
   const maquina = (
     <MaquinaDoPasso
       key={passo.id}
@@ -524,8 +535,14 @@ export function ExecutorAtividade({
 
   // Acima da máquina: o bilhete da aposta; a Dália, quando a máquina muda ou quando abre a conversa.
   const falasDaDalia = passo.falas?.filter((f) => f.quem === "dalia").map((f) => f.texto) ?? [];
+  // Depois do acerto, a Dália diz o que achou acima da máquina; embaixo fica a conta.
+  const daliaNoAcerto = vencido && passo.tipo === "operar" ? (passo.aoConcluir?.filter((f) => f.quem === "dalia").map((f) => f.texto) ?? []) : [];
   const notaDoPasso =
-    passo.tipo === "aposta" ? (
+    daliaNoAcerto.length > 0 ? (
+      <div className="ficha px-4 pb-3 pt-2" data-dalia-acerto="">
+        <FalaDalia texto={daliaNoAcerto} compacta />
+      </div>
+    ) : passo.tipo === "aposta" ? (
       <Bilhete texto={passo.aposta} />
     ) : passo.chegada && intacto ? (
       <div className="ficha px-4 pb-3 pt-2" data-chegada={passo.id}>
@@ -536,15 +553,17 @@ export function ExecutorAtividade({
         <FalaDalia texto={falasDaDalia} compacta />
       </div>
     ) : null;
+  // A fala da Dália sobre o acerto fica só nas duas colunas: no celular em pé, a máquina e a conta vêm primeiro.
+  const soEmColunas = !avisos && daliaNoAcerto.length > 0;
   const nota =
     avisos || notaDoPasso ? (
-      <div className="flex flex-col gap-2.5">
+      <div className={`flex flex-col gap-2.5 ${soEmColunas ? "so-em-colunas" : ""}`}>
         {avisos}
         {notaDoPasso}
       </div>
     ) : null;
 
-  const conta =
+  const contaAMostrar =
     passo.tipo === "operar" && passo.conta ? (
       <div className="absolute left-3 top-3 z-10 quadro-notacao px-3 py-1" aria-label={`Conta a mostrar: ${passo.conta}`}>
         <LinhaNotacao texto={passo.conta} tamanho="pequena" rotulos={false} />
@@ -572,7 +591,15 @@ export function ExecutorAtividade({
     controles = <PainelPalpite passo={passo} onResponder={(v) => enviar({ tipo: "responder", valor: v })} />;
   } else if (passo.tipo === "prever") {
     controles = (
-      <PainelPreverComDemo exec={exec} passo={passo} marca={marcaResposta} onResponder={(v) => enviar({ tipo: "responder", valor: v })} onSeguir={() => enviar({ tipo: "seguir" })} />
+      <PainelPreverComDemo
+        exec={exec}
+        passo={passo}
+        marca={marcaResposta}
+        rascunho={rascunhoDaMaquina}
+        conta={conta}
+        onResponder={(v) => enviar({ tipo: "responder", valor: v })}
+        onSeguir={() => enviar({ tipo: "seguir" })}
+      />
     );
   } else if (passo.tipo === "aposta") {
     controles = (
@@ -585,6 +612,8 @@ export function ExecutorAtividade({
           ) : null
         }
         junto={junto(passo)}
+        rascunho={rascunhoDaMaquina}
+        conta={conta}
         marca={marcaResposta.valor}
         onRascunho={marcaResposta.onRascunho}
         onResponder={(v) => enviar({ tipo: "responder", valor: v })}
@@ -596,7 +625,8 @@ export function ExecutorAtividade({
     if (vencido) {
       controles = (
         <PainelVencido
-          falas={passo.aoConcluir}
+          rascunho={rascunhoDaMaquina}
+          conta={conta}
           palpite={palpite}
           convite={passo.convite && exec.passo.convite === null ? passo.convite.texto : null}
           onConvite={(aceitar) => enviar({ tipo: "convite", aceitar })}
@@ -606,6 +636,7 @@ export function ExecutorAtividade({
     } else {
       controles = (
         <div className="flex flex-col gap-3">
+          {rascunhoDaMaquina}
           {sit === "convite" && passo.convite && <p className="m-0 font-bold"><span className="grifo">{passo.convite.texto}</span></p>}
           {exec.passo.solucoes.length > 0 && passo.objetivo.validador === "partilha.solucoes-distintas" && (
             <p className="m-0 font-semibold" data-solucoes={exec.passo.solucoes.length}>
@@ -675,7 +706,7 @@ export function ExecutorAtividade({
         nota={nota}
         maquina={
           <>
-            {conta}
+            {contaAMostrar}
             {maquina}
           </>
         }
@@ -866,12 +897,16 @@ function PainelPreverComDemo({
   onResponder,
   onSeguir,
   marca,
+  rascunho,
+  conta,
 }: {
   exec: Execucao;
   passo: Extract<Passo, { tipo: "prever" }>;
   onResponder: (v: string | null) => void;
   onSeguir: () => void;
   marca: MarcaResposta;
+  rascunho: React.ReactNode;
+  conta: React.ReactNode;
 }) {
   const [pronto, setPronto] = useState(exec.passo.situacao !== "conferindo");
   const conferindo = exec.passo.situacao === "conferindo";
@@ -880,7 +915,7 @@ function PainelPreverComDemo({
     const t = setTimeout(() => setPronto(true), 700 * (passo.demonstracao.length + 1));
     return () => clearTimeout(t);
   }, [conferindo, passo.demonstracao.length]);
-  return <PainelPrever passo={passo} exec={exec} demonstrando={conferindo && !pronto} onResponder={onResponder} onSeguir={onSeguir} marca={marca} />;
+  return <PainelPrever passo={passo} exec={exec} demonstrando={conferindo && !pronto} onResponder={onResponder} onSeguir={onSeguir} marca={marca} rascunho={rascunho} conta={conta} />;
 }
 
 function TelaNarrativa({

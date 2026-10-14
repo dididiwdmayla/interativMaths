@@ -13,6 +13,10 @@ import { MISSOES_ARCO_1 } from "@/conteudo/missoes";
 import { PELES } from "@/conteudo/peles";
 import { Bancada } from "@/componentes/maquinas/Bancada";
 import { BlocoNotacao, LinhaNotacao } from "@/componentes/notacao/Notacao";
+import { contaArmadaDaNotacao } from "@/nucleo/missoes/conta";
+import { lerEmVoz } from "@/nucleo/racional/notacao";
+import { MODELOS_CONTA } from "@/conteudo/conta";
+import { ContaArmada } from "@/componentes/missao/ContaArmada";
 import { FolhaPautada, NotaDalia } from "@/componentes/missao/Papel";
 import { rotaDe } from "@/componentes/estado/catalogo";
 import { useProgresso } from "@/componentes/estado/useProgresso";
@@ -75,6 +79,9 @@ export function Caderno() {
 
 function Pagina({ p, onRever }: { p: PaginaCaderno; onRever: () => void }) {
   const maquina = ehEstadoBancada(p.maquina) ? p.maquina : null;
+  // A página do resto ganha a conta armada embaixo da notação.
+  const receptor = maquina ? PELES[maquina.config.pele].receptor.singular : PELES["sacas-carrocas"].receptor.singular;
+  const chave = p.notacao[0] ? contaArmadaDaNotacao(p.notacao[0], MODELOS_CONTA, receptor) : null;
   return (
     <article data-pagina={p.id} className="anima-subir">
       <FolhaPautada titulo={p.titulo} className="rounded-[16px] shadow-[0_4px_0_var(--sombra)]">
@@ -82,6 +89,11 @@ function Pagina({ p, onRever }: { p: PaginaCaderno; onRever: () => void }) {
           <div className="flex min-w-0 flex-1 flex-col gap-[14px]">
             {p.frase && <p className="m-0 text-[16px] font-medium leading-[28px]">{p.frase}</p>}
             <BlocoNotacao linhas={p.notacao} />
+            {chave && (
+              <div className="max-w-[420px]">
+                <ContaArmada conta={{ expressao: p.notacao[0], extenso: lerEmVoz(p.notacao[0]), tipo: "resto" }} chave={chave} semForma />
+              </div>
+            )}
             {p.volta && (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="letra-mao text-[22px]">caminho de volta</span>

@@ -1105,7 +1105,7 @@ html[data-animacoes="leves"] .folha-sobe {
   margin-top: 12px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 16px max(14px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  padding: 12px max(14px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
 }
 
 .palco-folha {
@@ -1494,6 +1494,266 @@ html[data-animacoes="leves"] .nonio-antena-viva,
   .janela-nonio .alca-folha {
     display: none;
   }
+}
+
+/* ---------- O rascunho a lápis e a conta passada a caneta (v04.html, referências 1, 3 e 4) ---------- */
+
+.rascunho {
+  position: relative;
+  padding-left: 20px;
+}
+
+.rascunho-lapis {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  display: flex;
+  color: var(--grafite);
+}
+
+.rascunho-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rascunho-linha {
+  color: var(--tinta-suave);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.38;
+  font-variant-numeric: tabular-nums;
+}
+
+.rascunho-linha > span {
+  padding-bottom: 1px;
+  border-bottom: 1.5px dashed var(--grafite);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Só nas duas colunas (computador, celular deitado): no celular em pé, a máquina vem primeiro. */
+.so-em-colunas,
+.palco-nota:has(> .so-em-colunas) {
+  display: none;
+}
+
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 640px) {
+  .so-em-colunas,
+  .palco-nota:has(> .so-em-colunas) {
+    display: block;
+  }
+}
+
+/* No celular, as duas últimas linhas; nas duas colunas, todas. */
+.rascunho-linha:not(:nth-last-child(-n + 2)) {
+  display: none;
+}
+
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 640px) {
+  .rascunho-linha:not(:nth-last-child(-n + 2)) {
+    display: block;
+  }
+}
+
+.conta-caneta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 14px 10px;
+  border: 2px solid var(--contorno);
+  border-radius: 14px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--tinta);
+}
+
+.conta-rotulo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--caneta);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.conta-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 10px;
+  row-gap: 4px;
+}
+
+.conta-coluna {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.conta-num,
+.conta-op,
+.conta-palavra,
+.conta-ou {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  line-height: 1;
+}
+
+.conta-num {
+  font-size: 30px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.conta-num .fracao {
+  font-size: 0.6em;
+}
+
+.conta-misto {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.conta-misto .fracao {
+  font-size: 0.5em;
+}
+
+.conta-resultado {
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+}
+
+.conta-op {
+  color: var(--caneta);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.conta-palavra {
+  color: var(--tinta-suave);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.conta-virgula {
+  display: inline-flex;
+  align-items: flex-end;
+  min-height: 32px;
+  margin-left: -8px;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.conta-ou {
+  color: var(--tinta-suave);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.conta-nome {
+  min-height: 15px;
+  padding-top: 3px;
+  color: var(--tinta-suave);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.conta-nota {
+  color: var(--tinta-suave);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.conta-nota strong,
+.conta-nomes strong {
+  color: var(--tinta);
+  font-weight: 800;
+}
+
+.conta-forma {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.conta-nomes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--tinta-suave);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+/* A chave: menos, números da esquerda, a barra e os quocientes parciais. */
+.chave {
+  display: grid;
+  flex: none;
+  grid-template-columns: 20px 54px 2px 74px;
+  grid-auto-rows: 25px;
+  align-items: center;
+  font-size: 21px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.chave-r {
+  padding-right: 8px;
+  text-align: right;
+}
+
+.chave-q {
+  padding-left: 10px;
+}
+
+.chave-menos {
+  color: var(--caneta);
+  font-weight: 700;
+  text-align: right;
+}
+
+.chave-traco {
+  border-bottom: 2px solid var(--contorno);
+}
+
+.chave-barra {
+  align-self: stretch;
+  border-left: 2px solid var(--contorno);
+}
+
+.chave-soma {
+  margin-right: 30px;
+}
+
+.chave-mais {
+  color: var(--caneta);
+}
+
+.marca-chave {
+  padding: 0 5px;
+  border-radius: 5px;
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+}
+
+.chave-lado {
+  padding-top: 26px;
+  color: var(--tinta-suave);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 /* ---------- Pergunte ao Nônio (referência 4) ---------- */
