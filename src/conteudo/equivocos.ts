@@ -23,6 +23,8 @@ export interface Equivoco extends TextoRetorno {
   readonly conceito: string;
   /** Quando a resposta veio antes de a máquina girar. */
   readonly previsao?: TextoRetorno;
+  /** A explicação geral, sem números, para o "Cuidado com" do Manual. */
+  readonly manual: string;
 }
 
 export const EQUIVOCOS: readonly Equivoco[] = [
@@ -32,6 +34,7 @@ export const EQUIVOCOS: readonly Equivoco[] = [
     conceito: "div.partilha",
     consequencia: "Uma volta de {lote} em {abertas} bicas pede {pedido}. Havia {ha}: faltaram {falta}.",
     pergunta: "Que lote cabe na pilha?",
+    manual: "Uma volta leva o lote para cada um. Se a pilha não tem tudo isso, a volta não acontece.",
   },
   {
     id: "parou-cedo",
@@ -39,6 +42,7 @@ export const EQUIVOCOS: readonly Equivoco[] = [
     conceito: "div.partilha",
     consequencia: "Ainda há {sobraNome} na esteira para {bicasNome} {receptores}.",
     pergunta: "Cabe mais uma volta?",
+    manual: "Se ainda dá uma volta inteira, não é resto: a conta não acabou.",
   },
   {
     id: "corte-que-nao-fecha",
@@ -47,6 +51,7 @@ export const EQUIVOCOS: readonly Equivoco[] = [
     consequencia: "Em {partes}, saíram {pedacos} pedaços para {bicas} {receptores}, e eles não se repartem por igual nesta máquina.",
     recado: "Em {partes}, os pedaços não se repartem por igual.",
     pergunta: "Desfaça o corte e tente outro número de partes.",
+    manual: "Os pedaços precisam se repartir por igual entre quem recebe; senão, sobra pedaço.",
   },
   {
     id: "conta-pedacos",
@@ -58,6 +63,7 @@ export const EQUIVOCOS: readonly Equivoco[] = [
       consequencia: "Contar pedaços não diz quanto de {peca} é.",
       pergunta: "De que tamanho é cada pedaço?",
     },
+    manual: "Mais pedaços não quer dizer mais quantidade: o tamanho de cada um decide.",
   },
   {
     id: "resto-jogado-fora",
@@ -69,6 +75,7 @@ export const EQUIVOCOS: readonly Equivoco[] = [
       consequencia: "Assim alguma {peca} ficaria de fora.",
       pergunta: "O que as voltas inteiras não levam, para onde vai?",
     },
+    manual: "O resto ainda é carga. Conforme a situação, ele se corta, espera ou pede mais uma viagem.",
   },
   {
     id: "arredondou-para-baixo",
@@ -76,6 +83,7 @@ export const EQUIVOCOS: readonly Equivoco[] = [
     conceito: "div.resto",
     consequencia: "{sobraNome} ficaram no pátio, e hoje tudo precisa sair.",
     pergunta: "Onde cabe o que ficou?",
+    manual: "Quando tudo precisa sair, o resto pede mais uma viagem: a conta vai para cima.",
   },
   {
     id: "fracao-invertida",
@@ -84,5 +92,6 @@ export const EQUIVOCOS: readonly Equivoco[] = [
     consequencia: "Assim cada {receptor} ganharia mais de {umaPeca}, e só há {totalNome} para {abertasNome}.",
     recado: "Assim cada {receptor} ganharia mais de {umaPeca}.",
     pergunta: "Quem vai em cima: {osPecas} ou {osReceptores}?",
+    manual: "Em cima vai o que se reparte; embaixo, entre quantos. 3 broas para 4 mesas é 3/4, menos de uma broa para cada.",
   },
 ];

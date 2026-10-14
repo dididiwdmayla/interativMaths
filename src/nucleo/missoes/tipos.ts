@@ -301,6 +301,11 @@ export interface Atividade {
   readonly titulo: string;
   /** Rótulo curto do que ensina ("dividir repartindo"). */
   readonly ideia: string;
+  /**
+   * O conteúdo formal, quando o dos conceitos não basta ("Frações: aplicação"). Sem ele, o nome
+   * vem dos conceitos.
+   */
+  readonly conteudoFormal?: string;
   readonly conceitos: readonly IdConceito[];
   readonly passos: readonly Passo[];
   /** Desafio de aplicação para quem a calibragem liberou. */

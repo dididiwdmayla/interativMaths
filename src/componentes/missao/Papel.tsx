@@ -7,18 +7,26 @@ import type { ReactNode } from "react";
 export function FolhaPautada({
   children,
   titulo,
+  sobretitulo,
   margem,
   className = "",
 }: {
   children: ReactNode;
   titulo?: string;
+  /** Uma linha impressa em cima do título (o nome formal), na meia pauta de cima. */
+  sobretitulo?: string;
   /** As notas da Dália. */
   margem?: ReactNode;
   className?: string;
 }) {
   return (
     <section className={`folha-pautada relative border-2 border-contorno ${className}`}>
-      <div className="pb-5 pl-[50px] pr-4 pt-[14px]">
+      <div className={`pb-5 pl-[50px] pr-4 ${sobretitulo ? "pt-0" : "pt-[14px]"}`}>
+        {sobretitulo && (
+          <p className="m-0 truncate text-[12px] font-semibold leading-[14px] text-tinta-suave" data-nome-formal="">
+            {sobretitulo}
+          </p>
+        )}
         {titulo && <h2 className="letra-mao m-0 text-[30px] leading-[28px] text-tinta">{titulo}</h2>}
         {children}
         {margem && <div className="mt-[14px]">{margem}</div>}

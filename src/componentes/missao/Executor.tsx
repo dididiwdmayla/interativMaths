@@ -67,22 +67,28 @@ import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, SONDAGEM_ATI
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
+import { IconePagina } from "@/componentes/icones/IconePagina";
+import { TEXTOS_MANUAL, linhaDoCabecalho, paginaDoConceito, restauradasDe, tituloDaPagina } from "@/componentes/manual/dados";
+import type { IdConceito } from "@/nucleo/curriculo/curriculo";
 import { Carregando } from "@/componentes/ui/Carregando";
 import { Bilhete, PainelAposta } from "./Aposta";
 import { ContaPassada } from "./ContaPassada";
 import { Rascunho } from "./Rascunho";
 import { BotaoEtapas } from "./Etapas";
+import { BotaoReferencia } from "./ReferenciaMissao";
 import { FalaDalia, Falas } from "./Falas";
 import { Objetivo, type Etiqueta } from "./Objetivo";
 import { ManualRasgado } from "./Manual";
 import type { MarcaResposta } from "./Respostas";
-import { descreverAcao, NOME_DA_FASE } from "./textos";
+import { descreverAcao } from "./textos";
 import { FolhaFrase, FolhaNotacao, FolhaRegistro, PainelPalpite, PainelPrever, PainelVencido, Seguir } from "./Vistas";
 
 interface Fim {
   via: "guiada" | "prova" | "registro";
   pagina: boolean;
   joia: string | null;
+  /** Páginas do Manual que esta conclusão restaurou. */
+  restauradas: readonly IdConceito[];
 }
 
 function lerModo(v: string | null): ModoExecucao {
@@ -208,10 +214,13 @@ export function ExecutorAtividade({
     }
     const concluida = r.efeitos.find((e): e is Extract<Efeito, { tipo: "concluida" }> => e.tipo === "concluida");
     if (concluida) {
+      const antes = restauradasDe(progresso);
+      const depois = restauradasDe(aplicarEfeitos(iniciarAtividade(progresso, a.id, agora), a, r.exec, r.efeitos, agora));
       setFim({
         via: concluida.via,
         pagina: r.efeitos.some((e) => e.tipo === "pagina"),
         joia: r.efeitos.find((e): e is Extract<Efeito, { tipo: "joia" }> => e.tipo === "joia")?.id ?? null,
+        restauradas: [...depois].filter((c) => !antes.has(c) && paginaDoConceito(c)),
       });
     }
   };
@@ -422,9 +431,14 @@ export function ExecutorAtividade({
   const cabecalho = (
     <CabecalhoLugar
       voltar={voltar}
-      lugar={`${lugarDe(a, modo)} · ${NOME_DA_FASE[passo.fase]}`}
+      lugar={linhaDoCabecalho(a, modo)}
       titulo={a.titulo}
-      direita={total > 1 ? <BotaoEtapas passos={passosDoModo(a, modo)} atual={exec.indice} /> : undefined}
+      direita={
+        <>
+          {a.tipo !== "sondagem" && <BotaoReferencia a={a} />}
+          {total > 1 && <BotaoEtapas passos={passosDoModo(a, modo)} atual={exec.indice} />}
+        </>
+      }
     />
   );
 
@@ -790,29 +804,6 @@ function useLembrete(chave: string | null, aoLembrar: (vez: number) => void): nu
 
 /* ---------- Peças da tela ---------- */
 
-/** Onde a atividade acontece, para a linha de cima do cabeçalho. */
-function lugarDe(a: Atividade, modo: ModoExecucao): string {
-  const distrito = a.tipo === "exposicao" ? "Museu" : a.tipo === "cena" ? "A Rua" : "A Partilha";
-  if (a.tipo === "degustacao") return `${distrito} · Degustação`;
-  const tipo =
-    modo === "prova"
-      ? "Prova direta"
-      : modo === "registro"
-        ? "Registro"
-        : a.tipo === "missao"
-          ? `Missão ${a.numero}`
-          : a.tipo === "exposicao"
-            ? "Exposição"
-            : a.tipo === "cena"
-              ? "Cena"
-              : a.tipo === "eco"
-                ? "Eco"
-                : a.tipo === "revisita"
-                  ? "Revisita"
-                  : "Sondagem";
-  return `${distrito} · ${tipo}`;
-}
-
 /** A folha pautada sobe da borda de baixo, por cima da folha quadriculada. */
 function FolhaSobe({ children }: { children: React.ReactNode }) {
   const [aberta, setAberta] = useState(false);
@@ -984,12 +975,30 @@ function TelaFim({ a, fim, voltar, desvio }: { a: Atividade; fim: Fim; voltar: {
         <p className="letra-mao absolute right-6 top-5 m-0 rotate-[-6deg] text-[30px] text-verde-escuro" aria-hidden="true">
           feita!
         </p>
+        <p className="m-0 -mb-2 text-[12.5px] font-semibold text-tinta-suave" data-nome-formal="">
+          {linhaDoCabecalho(a, "guiada").cheia}
+        </p>
         <h1 className="m-0 text-[24px] font-extrabold leading-tight">
           <span className="marca-texto" data-cresce="">
             {titulo}
           </span>
         </h1>
         <p className="m-0 max-w-sm text-[16px] font-medium text-tinta-suave">{texto}</p>
+        {fim.restauradas.length > 0 && (
+          <div className="flex w-full flex-col gap-1.5 text-left" data-manual-voltou={fim.restauradas.join(" ")}>
+            <p className="m-0 text-center text-[15px] font-semibold">{fim.restauradas.length === 1 ? TEXTOS_MANUAL.voltou.uma : TEXTOS_MANUAL.voltou.varias}</p>
+            {fim.restauradas.map((c) => {
+              const p = paginaDoConceito(c);
+              return p ? (
+                <Link key={c} href={`/manual/${p.slug}`} className="manual-pag" data-pagina-manual={c} data-restaurada="sim">
+                  <IconePagina tamanho={22} />
+                  <span className="manual-pag-t min-w-0 flex-1">{tituloDaPagina(p)}</span>
+                  <span className="manual-selo">{TEXTOS_MANUAL.restaurada}</span>
+                </Link>
+              ) : null;
+            })}
+          </div>
+        )}
         {fim.joia && (
           <p className="m-0 max-w-sm text-[15px] font-semibold" data-joia-encontrada={fim.joia}>
             A Joia do Ábaco foi para o primeiro engaste do Relicário. Ainda bruta.

@@ -20,6 +20,8 @@ import { IconeChave } from "@/componentes/icones/IconeChave";
 import { IconeVisto } from "@/componentes/icones/IconeVisto";
 import { CabecalhoJogo } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
+import { AREAS } from "@/conteudo/areas";
+import { areaDoDistrito } from "@/nucleo/curriculo/formal";
 
 const W = 400;
 const X = (x: number) => 52 + x * 59;
@@ -149,9 +151,13 @@ function Componente({ c, s, estado, selecionado, onAbrir }: { c: Conceito; s: Si
         )}
         <span className={estado === "consolidado" ? "grifo" : undefined}>{c.nome}</span>
       </button>
-      {estado === "em_projeto" && (
+      {estado === "em_projeto" ? (
         <span className="pointer-events-none mt-1 whitespace-nowrap rounded bg-papel px-1 font-mao text-[19px] font-bold leading-none text-tinta-suave" aria-hidden="true">
           ainda a lápis
+        </span>
+      ) : (
+        <span className="pointer-events-none mt-1 whitespace-nowrap rounded bg-papel px-1 text-[10.5px] font-semibold leading-none text-tinta-suave" aria-hidden="true" data-conteudo-formal="">
+          {c.formalCurto}
         </span>
       )}
     </div>
@@ -224,6 +230,9 @@ function Detalhe({ c, s, estado, progresso, onFechar }: { c: Conceito; s: Situac
       <section className="painel-sobe relative max-h-[80dvh] w-full overflow-y-auto px-5 pb-6 pt-5 area-segura-base anima-subir lg:max-w-[520px]" data-detalhe={c.id}>
         <EtiquetaEstado estado={estado} />
         <h2 className="m-0 mt-2.5 text-[22px] font-extrabold leading-tight">{c.nome}</h2>
+        <p className="m-0 mt-0.5 text-[13px] font-semibold text-tinta-suave" data-nome-formal="">
+          {areaDoDistrito(AREAS, c.distrito)?.area} · {c.formal}
+        </p>
         <p className="m-0 mt-1 text-[16px] font-medium">{c.linha}</p>
         {c.situacao !== "em_projeto" && (
           <>

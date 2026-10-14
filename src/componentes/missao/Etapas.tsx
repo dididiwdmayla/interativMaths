@@ -6,7 +6,6 @@
  */
 import { useState } from "react";
 import type { Passo } from "@/nucleo/missoes/tipos";
-import { IconeEtapas } from "@/componentes/icones/IconeEtapas";
 import { IconeFechar } from "@/componentes/icones/IconeFechar";
 import { IconeVisto } from "@/componentes/icones/IconeVisto";
 
@@ -16,13 +15,12 @@ export function BotaoEtapas({ passos, atual }: { passos: readonly Passo[]; atual
     <>
       <button
         type="button"
-        className="botao-pequeno"
+        className="botao-pequeno botao-etapas"
         aria-label={`Etapas da missão: ${atual + 1} de ${passos.length}`}
         aria-haspopup="dialog"
         onClick={() => setAberta(true)}
         data-etapas="botao"
       >
-        <IconeEtapas />
         <span className="algarismos">
           {atual + 1}/{passos.length}
         </span>

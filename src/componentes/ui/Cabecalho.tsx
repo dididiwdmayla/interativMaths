@@ -6,7 +6,7 @@
  * mesma linha. Lugar ainda fechado fica a lápis e, tocado, diz quando abre.
  */
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { concluida } from "@/nucleo/campanha/campanha";
 import { existeAtividade } from "@/componentes/estado/catalogo";
 import { useProgresso } from "@/componentes/estado/useProgresso";
@@ -16,7 +16,7 @@ import { IconeVoltar } from "@/componentes/icones/IconeVoltar";
 import { Nonio } from "@/componentes/nonio/Nonio";
 import { Marca } from "./Marca";
 
-export type Lugar = "mapa" | "caderno" | "planta" | "relicario" | "museu" | "rua" | "menu";
+export type Lugar = "mapa" | "caderno" | "manual" | "planta" | "relicario" | "museu" | "rua" | "menu";
 
 const M4 = "partilha.arco1.pao-nao-e-saca";
 
@@ -34,6 +34,7 @@ function useFila(): ItemFila[] {
   return [
     { id: "mapa", rotulo: "Mapa", href: "/mapa", fechado: null },
     { id: "caderno", rotulo: "Caderno", href: "/caderno", fechado: null },
+    { id: "manual", rotulo: "Manual", href: "/manual", fechado: null },
     { id: "planta", rotulo: "Planta", href: "/planta", fechado: null },
     { id: "relicario", rotulo: "Joias", href: "/relicario", fechado: null },
     { id: "museu", rotulo: "Museu", href: "/museu/paes-de-ahmes", fechado: transferencia && existeAtividade("museu.paes-de-ahmes") ? null : "O Museu abre depois da missão 4." },
@@ -106,7 +107,34 @@ export function CabecalhoJogo({ atual }: { atual?: Lugar }) {
   );
 }
 
-/** Dentro de missão, exposição e cena: voltar, o lugar em cima do título e um botão à direita. */
+/**
+ * A linha de cima do cabeçalho. Quando a versão cheia ("Missão 4 · Aritmética · Frações") não
+ * cabe numa linha, entra a curta ("Missão 3 · Divisão com resto"): a área sai primeiro.
+ */
+function LinhaLugar({ cheia, curta }: { cheia: string; curta: string }) {
+  const caixa = useRef<HTMLParagraphElement>(null);
+  const medida = useRef<HTMLSpanElement>(null);
+  const [cabe, setCabe] = useState(true);
+  useEffect(() => {
+    const p = caixa.current;
+    const m = medida.current;
+    if (!p || !m || cheia === curta) return;
+    // O observador avisa já na primeira medida, e de novo a cada mudança de largura.
+    const ro = new ResizeObserver(() => setCabe(m.offsetWidth <= p.clientWidth));
+    ro.observe(p);
+    return () => ro.disconnect();
+  }, [cheia, curta]);
+  return (
+    <p ref={caixa} className="relative m-0 truncate text-[12px] font-semibold text-tinta-suave" data-lugar={cabe ? "cheio" : "curto"}>
+      <span ref={medida} className="invisible absolute left-0 top-0 whitespace-nowrap" aria-hidden="true">
+        {cheia}
+      </span>
+      {cabe ? cheia : curta}
+    </p>
+  );
+}
+
+/** Dentro de missão, exposição e cena: voltar, o lugar em cima do título e botões à direita. */
 export function CabecalhoLugar({
   voltar,
   lugar,
@@ -115,10 +143,12 @@ export function CabecalhoLugar({
 }: {
   /** Sem voltar (null): a tela não tem para onde voltar (a degustação embutida). */
   voltar: { href: string; rotulo: string } | null;
-  lugar: string;
+  /** Texto, ou a versão cheia e a curta (a curta entra quando a cheia não cabe). */
+  lugar: string | { readonly cheia: string; readonly curta: string };
   titulo: string;
   direita?: ReactNode;
 }) {
+  const linha = typeof lugar === "string" ? { cheia: lugar, curta: lugar } : lugar;
   return (
     <header className="cabecalho area-segura relative z-20">
       {voltar && (
@@ -127,7 +157,7 @@ export function CabecalhoLugar({
         </Link>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-px">
-        <p className="m-0 truncate text-[12px] font-semibold text-tinta-suave">{lugar}</p>
+        <LinhaLugar cheia={linha.cheia} curta={linha.curta} />
         <h1 className="m-0 truncate text-[17px] font-extrabold leading-[1.15]">{titulo}</h1>
       </div>
       {direita}

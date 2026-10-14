@@ -18,7 +18,8 @@ import { lerEmVoz } from "@/nucleo/racional/notacao";
 import { MODELOS_CONTA } from "@/conteudo/conta";
 import { ContaArmada } from "@/componentes/missao/ContaArmada";
 import { FolhaPautada, NotaDalia } from "@/componentes/missao/Papel";
-import { rotaDe } from "@/componentes/estado/catalogo";
+import { atividadePorId, rotaDe } from "@/componentes/estado/catalogo";
+import { linhaDoCabecalho } from "@/componentes/manual/dados";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { IconeFechar } from "@/componentes/icones/IconeFechar";
 import { CabecalhoJogo } from "@/componentes/ui/Cabecalho";
@@ -77,6 +78,12 @@ export function Caderno() {
   );
 }
 
+/** "Missão 3 · Aritmética · Divisão com resto". */
+function formalDaPagina(p: PaginaCaderno): string | undefined {
+  const a = atividadePorId(p.atividade);
+  return a ? linhaDoCabecalho(a, "guiada").cheia : undefined;
+}
+
 function Pagina({ p, onRever }: { p: PaginaCaderno; onRever: () => void }) {
   const maquina = ehEstadoBancada(p.maquina) ? p.maquina : null;
   // A página do resto ganha a conta armada embaixo da notação.
@@ -84,7 +91,7 @@ function Pagina({ p, onRever }: { p: PaginaCaderno; onRever: () => void }) {
   const chave = p.notacao[0] ? contaArmadaDaNotacao(p.notacao[0], MODELOS_CONTA, receptor) : null;
   return (
     <article data-pagina={p.id} className="anima-subir">
-      <FolhaPautada titulo={p.titulo} className="rounded-[16px] shadow-[0_4px_0_var(--sombra)]">
+      <FolhaPautada titulo={p.titulo} sobretitulo={formalDaPagina(p)} className="rounded-[16px] shadow-[0_4px_0_var(--sombra)]">
         <div className="flex flex-col gap-[14px] pt-[14px] md:flex-row md:items-start md:gap-6">
           <div className="flex min-w-0 flex-1 flex-col gap-[14px]">
             {p.frase && <p className="m-0 text-[16px] font-medium leading-[28px]">{p.frase}</p>}

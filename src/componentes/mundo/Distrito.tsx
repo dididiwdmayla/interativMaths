@@ -15,6 +15,8 @@ import { ATIVIDADES } from "@/conteudo/atividades";
 import { rotaDe, SONDAGEM_ATIVA } from "@/componentes/estado/catalogo";
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
+import { AREAS, nomeFormalDe } from "@/componentes/manual/dados";
+import { areaDoDistrito } from "@/nucleo/curriculo/formal";
 import { IconeVoltar } from "@/componentes/icones/IconeVoltar";
 import { CabecalhoJogo } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
@@ -68,7 +70,12 @@ export function Distrito() {
           </Link>
           <div className="min-w-0">
             <p className="m-0 truncate text-[13px] font-semibold text-tinta-suave">Arco 1 · O resto que ninguém repartia</p>
-            <h1 className="m-0 font-mao text-[38px] font-bold leading-none">A Partilha</h1>
+            <h1 className="m-0 flex flex-wrap items-baseline gap-x-2 font-mao text-[38px] font-bold leading-none">
+              A Partilha
+              <span className="font-sans text-[16px] font-bold text-tinta-suave" data-area="">
+                · {areaDoDistrito(AREAS, "partilha")?.area}
+              </span>
+            </h1>
           </div>
         </header>
 
@@ -176,6 +183,9 @@ function Parada({ s, lado, atual }: { s: SituacaoMissao; lado: "esquerda" | "dir
           Missão {m.numero} · {m.ideia}
         </p>
         <h2 className={`m-0 text-[17px] font-extrabold leading-tight ${porVir ? "text-tinta-suave" : ""}`}>{m.titulo}</h2>
+        <p className="m-0 text-[12px] font-semibold text-tinta-suave" data-conteudo-formal="">
+          {nomeFormalDe(m).conteudo}
+        </p>
         <p className="m-0 mt-0.5 text-[14px] font-medium text-tinta-suave">{estado}</p>
         {feita && (
           <span className="absolute bottom-3 right-4 rotate-[-6deg] font-mao text-[26px] font-bold leading-none text-verde-escuro" aria-hidden="true">

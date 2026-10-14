@@ -57,6 +57,13 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   // Missão 1. A bolinha do Nônio se apresenta na primeira vez.
   await passo(page, "pedido");
   await entender(page, "bolha");
+  // O nome formal no cabeçalho, e o livro abre a referência da missão.
+  await expect(v(page, "[data-lugar]")).toContainText("Missão 1");
+  await expect(v(page, "[data-lugar]")).toContainText("Divisão exata");
+  await tocar(page, "[data-referencia-missao=botao]");
+  await expect(v(page, "[data-referencia-missao=folha]")).toContainText("Dividendo");
+  await expect(v(page, "[data-referencia-missao=folha] [data-pagina-manual='div.partilha']")).toHaveAttribute("data-restaurada", "nao");
+  await tocar(page, "[data-referencia-missao=folha] button[aria-label='Fechar a referência']");
   await tocar(page, "[data-acao=seguir]");
   await passo(page, "palpite");
   await mais(page, "resposta", 4);
@@ -153,6 +160,12 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await passo(page, "registro");
   await tocar(page, "[data-acao=guardar-pagina]");
   await expect(v(page, "[data-tela=fim]")).toBeVisible();
+
+  // Uma página do Manual voltou: a da divisão exata. No Manual, ela está restaurada.
+  await expect(v(page, "[data-manual-voltou]")).toHaveAttribute("data-manual-voltou", "div.partilha");
+  await page.goto("/manual");
+  await expect(v(page, "[data-manual] [data-pagina-manual='div.partilha']")).toHaveAttribute("data-restaurada", "sim");
+  await expect(v(page, "[data-manual] [data-pagina-manual='div.resto']")).toHaveAttribute("data-restaurada", "nao");
 
   // O Caderno guarda a página, e ela volta depois de recarregar.
   await page.goto("/caderno");
