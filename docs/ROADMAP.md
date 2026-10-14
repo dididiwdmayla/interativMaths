@@ -40,6 +40,22 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   - Verificação: `npm run verificar`, `npm run e2e`, comparação lado a lado com a referência,
     capturas em `docs/capturas/v0.2/`.
 
+- Ilhota de degustação (`/degustacao`): a Missão 4 encurtada para o primeiro contato, sem
+  pré-requisito (5 broas para aquecer, palpite, 3 broas para 4 mesas, previsão de 2 para 3, frase,
+  notação e 5 ÷ 8 sem a máquina); no fim, a padaria passa a caneta, um trailer do resto do Engenho
+  (o que existe a caneta, o que falta a lápis) e "Quero continuar". Roda numa loja de progresso à
+  parte (`interativmaths:degustacao`): não lê nem muda o progresso do jogo.
+- Modo embutido: dentro de um iframe ou com `?embed=1`, sem o voltar; `frame-ancestors` só em
+  `/degustacao` ('self', interativai.com, www.interativai.com, *.vercel.app para as prévias de
+  deploy); mensagens `{ fonte: "interativmaths", tipo }` (pronto, concluiu, quero-continuar,
+  fechar) só para a origem da página-mãe permitida; armazenamento bloqueado não quebra nada.
+  Sozinha, "Quero continuar" leva a `https://interativai.com/acesso?produto=matematica`.
+- Endereço oficial `https://matematica.interativai.com`: `metadataBase`, URL canônica de `/` e de
+  `/degustacao`, Open Graph e imagem de compartilhamento gerada dos tokens. O
+  `interativmaths.vercel.app` continua respondendo.
+- Verificação: `npm run verificar`, `npm run e2e` (a degustação nos três layouts até "Quero
+  continuar"; embutida numa página de teste, com as mensagens certas, e uma origem não permitida
+  que nem embute nem recebe nada), capturas em `docs/capturas/degustacao/`.
 - v0.3 — **O Nônio guia e a missão viva** (referência nova em `docs/referencia-visual/guia.html`):
   - Base: tokens de acertou e ainda não (`--verde`, `--verde-tinta`, `--vermelho-nevoa`), bilhete e
     véu; mão livre no núcleo (colocar, devolver, cortar, com eventos e testes de propriedade);
@@ -59,6 +75,15 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   - Fecho: apresentações (uma ferramenta por passo), calibragem com instrução e sondagem quieta,
     laboratório (faixa em todos os estados, mão livre, zerar apresentações), documentos, percurso
     de navegador ampliado e capturas em `docs/capturas/v0.3/`.
+  - Junção com a degustação (PR #3): instrução com verbo nos oito passos, faixa do Nônio, mão livre
+    e retorno verde e ainda não, como na Missão 4; a conversa fica fora (a degustação não está no
+    catálogo e é pública, sem limite de uso no servidor). O palpite de opções mostra o texto da
+    opção e tem gesto próprio. Percurso da degustação refeito para a mão livre, nos três layouts e
+    embutida; capturas de `docs/capturas/degustacao/` refeitas.
+  - Apresentações no computador e em paisagem: o cartão saiu de dentro do véu (lá ficava abaixo da
+    ferramenta em destaque e a máquina cobria o "Entendi") e vai para o lado da ferramenta quando há
+    espaço. Gesto antes de qualquer volta, quando as inteiras não dão uma para cada: "toque numa
+    peça e escolha em quantas partes cortar" (não fala em sobra).
 
 ## Parcialmente implementado
 - Pergunte ao Nônio: verificado com simulação e testes da rota; **não exercitado contra a API real
@@ -85,6 +110,24 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
 - O Contrapeso (incógnitas e equações) e os outros distritos.
 - Segunda exposição do museu e novas cenas da Rua (as três categorias já existem nos dados).
 - Revisitas espaçadas além da primeira (hoje: uma revisita até consolidar).
+
+## Decisões
+- O interativMaths faz parte do hub interativAI como produto próprio, no subdomínio
+  `matematica.interativai.com`. Os dois apps seguem separados: sem código compartilhado e sem fusão;
+  a recepção (interativai.com) só abre a degustação num iframe e conversa por `postMessage`.
+- A degustação não grava no progresso do jogo: quem joga a ilhota e depois entra no Engenho começa
+  pela abertura e pela calibragem, como qualquer pessoa.
+
+## Precisa de decisão do Will
+- O resto do Engenho fica aberto a todos ou trancado como acesso antecipado, igual à programação?
+  Hoje está aberto: "Quero continuar" leva ao acesso no interativai.com, mas `/` deste app continua
+  livre.
+
+## Pendências
+- Previsão: o resultado ("Você disse... A máquina deu") aparece antes de a demonstração terminar,
+  porque o painel começa pronto (já era assim na Missão 4). Na degustação, esperar a máquina
+  deixaria a descoberta mais forte; é mudança de comportamento das missões, então ficou anotada.
+- Sem som no jogo (fora do escopo): a regra "sons só depois do primeiro toque" não tem o que aplicar.
 
 ## Fora do escopo atual
 - Conta, login, banco, sincronização; multiplayer, ranking, loja, economia; aplicativo nativo;

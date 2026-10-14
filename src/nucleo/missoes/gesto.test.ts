@@ -2,12 +2,13 @@ import { describe, expect, it } from "vitest";
 import { MISSAO_1 } from "@/conteudo/missoes/m1-carga-igual";
 import { MISSAO_3 } from "@/conteudo/missoes/m3-sobrou";
 import { MISSAO_4 } from "@/conteudo/missoes/m4-pao-nao-e-saca";
+import { DEGUSTACAO } from "@/conteudo/degustacao";
 import { GESTOS } from "@/conteudo/gestos";
 import { PELES } from "@/conteudo/peles";
 import { TEXTOS_REACAO } from "@/conteudo/reacoes";
 import { proximoGesto } from "./gesto";
 import { segredos } from "./segredos";
-import { aplicarEntrada, iniciarExecucao, passoAtual, type Execucao } from "./motor";
+import { aplicarEntrada, iniciarExecucao, palpiteDoPasso, passoAtual, type Execucao } from "./motor";
 import type { Atividade, Entrada } from "./tipos";
 
 const ctxMotor = { agora: 1, conceitoDoEquivoco: () => null };
@@ -54,6 +55,10 @@ describe("próximo gesto", () => {
     const g = gesto(MISSAO_4, ate(MISSAO_4, "cinco-broas", [maq({ tipo: "repartir" })]));
     expect(g.texto).toBe("Agora: toque na peça que sobrou e escolha em quantas partes cortar.");
     expect(g.alvo).toBe("fatiador");
+  });
+
+  it("nada repartido e as inteiras não dão uma para cada: cortar, sem falar em sobra", () => {
+    expect(gesto(MISSAO_4, ate(MISSAO_4, "tres-broas")).texto).toBe("Agora: toque numa peça e escolha em quantas partes cortar.");
   });
 
   it("pedaços na esteira: pôr nas mesas ou repartir", () => {
@@ -129,6 +134,11 @@ describe("próximo gesto", () => {
   it("caminho de volta: a carga primeiro", () => {
     expect(gesto(MISSAO_1, ate(MISSAO_1, "volta")).texto).toBe("Agora: ponha na esteira o primeiro número da conta.");
   });
+
+  it("palpite: de número, ligar a máquina; de opções (a degustação), tocar numa opção", () => {
+    expect(gesto(MISSAO_1, ate(MISSAO_1, "palpite")).texto).toBe("Agora: escolha um número e toque em Ligar a máquina.");
+    expect(gesto(DEGUSTACAO, ate(DEGUSTACAO, "palpite")).texto).toBe("Agora: toque numa das opções. É só um palpite.");
+  });
 });
 
 describe("segredos do passo", () => {
@@ -149,5 +159,18 @@ describe("segredos do passo", () => {
   it("frase esconde as lacunas vazias", () => {
     const e = ate(MISSAO_1, "frase");
     expect(segredos(passoAtual(MISSAO_1, e)!, e).map((x) => x.valor.n)).toEqual([24, 4, 6]);
+  });
+});
+
+describe("palpite revelado", () => {
+  it("num palpite de opções, mostra o texto da opção, não o id", () => {
+    const e = ate(DEGUSTACAO, "tres-broas");
+    const comPalpite = { ...e, palpites: { ...e.palpites, palpite: "uma" } };
+    expect(palpiteDoPasso(DEGUSTACAO, comPalpite)).toEqual({ valor: "uma broa", certo: "menos de uma broa" });
+  });
+
+  it("num palpite de número, o valor fica como está", () => {
+    const e = ate(MISSAO_1, "repartir");
+    expect(palpiteDoPasso(MISSAO_1, { ...e, palpites: { ...e.palpites, palpite: "5" } })).toEqual({ valor: "5", certo: "6" });
   });
 });

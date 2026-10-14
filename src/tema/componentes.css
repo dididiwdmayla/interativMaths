@@ -1449,7 +1449,7 @@ html[data-animacoes="leves"] .folha-sobe {
 }
 
 .apresentacao-cartao {
-  position: absolute;
+  position: fixed;
   left: max(12px, env(safe-area-inset-left));
   right: max(12px, env(safe-area-inset-right));
   z-index: 46;
@@ -1471,4 +1471,12 @@ html[data-animacoes="leves"] .folha-sobe {
 
 .apresentacao-cartao[data-lado="cima"] {
   top: max(12px, env(safe-area-inset-top));
+}
+
+/* Ao lado da ferramenta (computador, paisagem): posição e largura vêm da medida da ferramenta. */
+.apresentacao-cartao[data-lado="direita"],
+.apresentacao-cartao[data-lado="esquerda"] {
+  right: auto;
+  max-width: none;
+  margin: 0;
 }

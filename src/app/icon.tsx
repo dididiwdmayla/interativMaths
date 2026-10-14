@@ -3,19 +3,11 @@
  * As cores vêm de tokens.css (lidas no build), para que tokens.css continue sendo o único arquivo
  * com cor literal.
  */
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import { lerToken as token } from "@/tema/lerToken";
 
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
-
-function token(nome: string): string {
-  const css = readFileSync(join(process.cwd(), "src", "tema", "tokens.css"), "utf8");
-  const m = new RegExp(`--${nome}:\\s*([^;]+);`).exec(css);
-  if (!m) throw new Error(`token --${nome} não está em tokens.css`);
-  return m[1].trim();
-}
 
 export default function Icone() {
   const papel = token("papel");

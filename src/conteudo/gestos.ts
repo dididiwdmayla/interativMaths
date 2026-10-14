@@ -8,6 +8,7 @@ import type { TextosGesto } from "@/nucleo/missoes/gesto";
 export const GESTOS: TextosGesto = {
   narrativa: "Agora: toque em {botao} quando quiser.",
   palpite: "Agora: escolha um número e toque em Ligar a máquina.",
+  palpiteOpcoes: "Agora: toque numa das opções. É só um palpite.",
   operar: {
     inicioComMao: "Agora: ponha {umaPeca} em cada {receptor}, ou use {repartir}.",
     inicioAlavanca: "Agora: escolha o lote e toque em {repartir}.",
@@ -16,6 +17,7 @@ export const GESTOS: TextosGesto = {
     maisVoltas: "Agora: toque em {repartir}, ou ponha mais uma em cada {receptor}.",
     maisVoltasAlavanca: "Agora: toque em {repartir} de novo.",
     cortar: "Agora: toque na peça que sobrou e escolha em quantas partes cortar.",
+    cortarAntes: "Agora: toque numa peça e escolha em quantas partes cortar.",
     cortarPedaco: "Agora: toque no pedaço e escolha em quantas partes cortar.",
     repartirPedacos: "Agora: ponha os pedaços nas {receptores}, ou use {repartir}.",
     fechar: "Agora: feche a partilha.",

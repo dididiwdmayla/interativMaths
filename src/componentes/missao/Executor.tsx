@@ -96,7 +96,8 @@ export function ExecutorAtividade({
 }: {
   a: Atividade;
   modo?: ModoExecucao;
-  voltar: { href: string; rotulo: string };
+  /** Sem voltar (null): a degustação embutida, que não tem para onde voltar. */
+  voltar: { href: string; rotulo: string } | null;
   /** Tela própria de fim (a sondagem usa para oferecer o desvio). */
   aoTerminar?: () => React.ReactNode;
 }) {
@@ -135,7 +136,7 @@ export function ExecutorAtividade({
   );
 
   if (!pronto) return <Carregando />;
-  if (fim) return aoTerminar ? <>{aoTerminar()}</> : <TelaFim a={a} fim={fim} voltar={voltar} desvio={progresso.campanha.desvio} />;
+  if (fim) return aoTerminar ? <>{aoTerminar()}</> : <TelaFim a={a} fim={fim} voltar={voltar ?? { href: "/mapa", rotulo: "Mapa" }} desvio={progresso.campanha.desvio} />;
   if (!passo) return <Carregando />;
   const total = passosDoModo(a, modo).length;
 
@@ -673,6 +674,7 @@ function useLembrete(chave: string | null, aoLembrar: (vez: number) => void): nu
 /** Onde a atividade acontece, para a linha de cima do cabeçalho. */
 function lugarDe(a: Atividade, modo: ModoExecucao): string {
   const distrito = a.tipo === "exposicao" ? "Museu" : a.tipo === "cena" ? "A Rua" : "A Partilha";
+  if (a.tipo === "degustacao") return `${distrito} · Degustação`;
   const tipo =
     modo === "prova"
       ? "Prova direta"

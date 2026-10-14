@@ -51,6 +51,10 @@ desligar as perguntas no menu ("Perguntas por escrito ao Nônio (usa IA)").
 fazer só o registro), `/partilha/revisita`, `/museu/paes-de-ahmes`, `/rua/tres-pizzas`,
 `/caderno`, `/planta`, `/relicario`, `/menu`.
 
+`/degustacao` é a ilhota de cinco a dez minutos para quem nunca viu o jogo; funciona sozinha e
+embutida (dentro de um iframe ou com `?embed=1`) na recepção do interativAI. Endereço oficial:
+https://matematica.interativai.com.
+
 ## Laboratório (fora da navegação e dos buscadores)
 
 - `/lab/maquinas`: a bancada solta, com qualquer configuração e pele, qualquer validador, com ou

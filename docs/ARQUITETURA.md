@@ -152,7 +152,16 @@ hidratação o estado é "carregando", então a primeira pintura nunca diverge.
 `/` (porta), `/abertura`, `/calibragem`, `/mapa`, `/partilha`, `/partilha/[atividade]`
 (`?modo=prova|registro`), `/partilha/revisita`, `/partilha/sondagem`, `/museu/[exposicao]`,
 `/rua/[cena]`, `/caderno`, `/planta`, `/relicario`, `/menu`, `/lab`, `/lab/maquinas`,
-`/lab/progresso`, `/lab/vitrine`, `POST /api/tutor`.
+`/lab/progresso`, `/lab/vitrine`, `POST /api/tutor`, `/degustacao` (`?embed=1`).
+
+## A degustação (`/degustacao`)
+
+A atividade `conteudo/degustacao.ts` (tipo `degustacao`, fora do catálogo, mas nas checagens de
+conteúdo) roda no mesmo `ExecutorAtividade`, dentro de um `ContextoProgresso` com uma loja à parte
+(`componentes/estado/lojaIsolada.ts`): o progresso do jogo não é lido nem gravado. `useProgresso`
+lê o contexto; o padrão é a loja do jogo. Embutida, a conversa com a recepção está em
+`componentes/degustacao/recepcao.ts`; o cabeçalho `frame-ancestors` está em `next.config.ts`, e um
+teste confere que os dois têm a mesma lista de origens.
 
 Com Cache Components, `params` só é lido dentro de `<Suspense>` (`params.then(...)`), e
 `useSearchParams` também fica sob `<Suspense>`. Telas visitadas ficam escondidas no DOM (Activity):

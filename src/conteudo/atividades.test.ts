@@ -14,8 +14,10 @@ import { CONCEITOS, CONCEITOS_DO_ARCO_1 } from "./conceitos";
 import { EQUIVOCOS } from "./equivocos";
 import { MOTIVOS } from "./reacoes";
 import { ATIVIDADES } from "./atividades";
+import { DEGUSTACAO } from "./degustacao";
 
-export const TODAS: readonly Atividade[] = ATIVIDADES;
+/** O catálogo do jogo e a degustação (que fica fora do catálogo, mas passa pelas mesmas checagens). */
+export const TODAS: readonly Atividade[] = [...ATIVIDADES, DEGUSTACAO];
 
 const ctx = (agora: number) => ({
   agora,

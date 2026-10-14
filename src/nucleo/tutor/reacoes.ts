@@ -189,6 +189,8 @@ function falaNonioDe(falas: Passo["aoConcluir"]): string | null {
 /** Palpite revelado no passo de máquina seguinte: "na mosca" ou a distância, sem julgamento. */
 export function comentarioDoPalpite(valor: string | null, certo: string, pele: NomesPele, textos: TextosReacao): string | null {
   if (valor === null) return null;
+  // Palpite de opções (texto): só "na mosca" ou nada; não há distância a medir.
+  if (valor === certo) return textos.palpite.moscaFala;
   let distancia: Racional;
   try {
     const d = subtrai(comoRacional(valor), comoRacional(certo));

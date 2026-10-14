@@ -568,7 +568,8 @@ export function resolucaoDoPasso(p: PassoOperar | PassoAposta, e: Execucao): rea
 
 /**
  * O palpite que este passo revela: o primeiro passo de máquina (não automático) depois de um
- * palpite, no mesmo modo. null se não há palpite a revelar aqui.
+ * palpite, no mesmo modo. null se não há palpite a revelar aqui. Num palpite de opções, vem o
+ * texto da opção no lugar do id ("menos de uma broa", não "menos").
  */
 export function palpiteDoPasso(a: Atividade, e: Execucao): { readonly valor: string | null; readonly certo: string } | null {
   const passos = passosDoModo(a, e.modo);
@@ -576,7 +577,13 @@ export function palpiteDoPasso(a: Atividade, e: Execucao): { readonly valor: str
   if (!atual || atual.tipo !== "operar" || atual.automatico) return null;
   for (let i = e.indice - 1; i >= 0; i--) {
     const p = passos[i];
-    if (p.tipo === "palpite") return p.id in e.palpites ? { valor: e.palpites[p.id], certo: p.certo } : null;
+    if (p.tipo === "palpite") {
+      if (!(p.id in e.palpites)) return null;
+      const opcoes = p.resposta.tipo === "opcoes" ? p.resposta.opcoes : null;
+      const texto = (v: string) => opcoes?.find((o) => o.id === v)?.texto ?? v;
+      const valor = e.palpites[p.id];
+      return { valor: valor === null ? null : texto(valor), certo: texto(p.certo) };
+    }
     if (p.tipo === "operar" && !p.automatico) return null;
   }
   return null;

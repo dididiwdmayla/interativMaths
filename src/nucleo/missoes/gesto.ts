@@ -15,6 +15,8 @@ import type { AlvoMaquina, Passo, PassoAposta, PassoOperar } from "./tipos";
 export interface TextosGesto {
   readonly narrativa: string;
   readonly palpite: string;
+  /** Palpite de opções (a degustação): tocar numa opção já responde. */
+  readonly palpiteOpcoes: string;
   readonly operar: {
     readonly inicioComMao: string;
     readonly inicioAlavanca: string;
@@ -23,6 +25,8 @@ export interface TextosGesto {
     readonly maisVoltas: string;
     readonly maisVoltasAlavanca: string;
     readonly cortar: string;
+    /** Nada repartido ainda, e as inteiras não dão uma para cada (3 broas, 4 mesas). */
+    readonly cortarAntes: string;
     readonly cortarPedaco: string;
     readonly repartirPedacos: string;
     readonly fechar: string;
@@ -95,7 +99,7 @@ export function proximoGesto(passo: Passo, e: Execucao, ctx: ContextoGesto): Ges
     case "narrativa":
       return g(preencherFala(textos.narrativa, { botao: passo.botao ?? "Continuar" }));
     case "palpite":
-      return g(textos.palpite);
+      return g(passo.resposta.tipo === "opcoes" ? textos.palpiteOpcoes : textos.palpite);
     case "notacao":
       return g(textos.notacao);
     case "registro":
@@ -221,7 +225,7 @@ function gestoOperar(passo: PassoOperar, e: Execucao, ctx: ContextoGesto, m: Rec
   // Sobrou menos que uma volta: corta (se há fatiador) ou fecha.
   if (b.config.fatiador) {
     const inteira = b.esteira.some((p) => igual(p.tamanho, comoRacional(1)));
-    return g(preencherFala(inteira ? t.cortar : t.cortarPedaco, valores), "gesto", "fatiador");
+    return g(preencherFala(inteira ? (vazias ? t.cortarAntes : t.cortar) : t.cortarPedaco, valores), "gesto", "fatiador");
   }
   return g(t.fechar);
 }
