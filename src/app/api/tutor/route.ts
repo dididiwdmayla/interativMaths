@@ -1,25 +1,15 @@
 /**
- * POST /api/tutor — tutor por conversa, preparado e desligado.
- * Sem a variável de ambiente TUTOR_CHAVE_API (lida só no servidor; nunca NEXT_PUBLIC_), responde
- * que a conversa não está disponível. Nenhum SDK de provedor é instalado nesta versão.
+ * POST /api/tutor: Pergunte ao Nônio. Só servidor: a chave (ANTHROPIC_API_KEY) nunca chega ao
+ * navegador. Sem a chave, a conversa responde que não está disponível e o jogo segue igual.
+ * O trabalho mora em src/servidor/tutor; aqui ficam só as opções da rota.
+ *
+ * Roda em Node.js, o padrão do Next 16. A opção `runtime` não é exportada: com Cache Components
+ * ligado, o Next 16.4 recusa a rota que a declara (a documentação manda removê-la).
  */
-import { ehPedidoTutor, type RespostaTutor } from "@/nucleo/tutor/contrato";
+import { dependenciasPadrao, tratarPedidoTutor } from "@/servidor/tutor/tratar";
+
+export const maxDuration = 60;
 
 export async function POST(pedido: Request): Promise<Response> {
-  let corpo: unknown;
-  try {
-    corpo = await pedido.json();
-  } catch {
-    return Response.json({ erro: "corpo inválido" }, { status: 400 });
-  }
-  if (!ehPedidoTutor(corpo)) return Response.json({ erro: "pedido fora do contrato" }, { status: 400 });
-
-  const chave = process.env.TUTOR_CHAVE_API;
-  if (!chave) {
-    const resposta: RespostaTutor = { disponivel: false, motivo: "O tutor por conversa não está disponível nesta versão. O Nônio responde pela escada de medidas." };
-    return Response.json(resposta);
-  }
-  // Com a chave configurada, a integração ainda precisa ser construída (próxima versão).
-  const resposta: RespostaTutor = { disponivel: false, motivo: "A integração do tutor por conversa ainda não foi construída." };
-  return Response.json(resposta);
+  return tratarPedidoTutor(pedido, dependenciasPadrao());
 }

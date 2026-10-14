@@ -10,7 +10,7 @@
  * de ajuda a pedido. Quem decide é o motor; a faixa só fala o que ele decidiu.
  */
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { operarVarias, quantidadeNaBica, bicasEmUso } from "@/nucleo/maquinas/bancada/bancada";
 import type { AcaoBancada, Bancada as EstadoBancada, EstadoBancada as EstadoMaquina } from "@/nucleo/maquinas/bancada/tipos";
@@ -31,22 +31,26 @@ import {
 } from "@/nucleo/missoes/motor";
 import { aplicarEfeitos, chaveExecucao, restaurarExecucao } from "@/nucleo/missoes/efeitos";
 import type { AlvoMaquina, Atividade, Entrada, FaixasExposicao, ModoExecucao, Passo } from "@/nucleo/missoes/tipos";
-import { definirDesvio, iniciarAtividade, type Desvio } from "@/nucleo/progresso";
+import { definirDesvio, iniciarAtividade, marcarApresentacao, type Desvio } from "@/nucleo/progresso";
 import { situacaoConceito } from "@/nucleo/dominio/dominio";
 import { falaDoPasso, PERMANENCIA_MINIMA_MS, type FalaFaixa } from "@/nucleo/tutor/fila";
-import { falaDeLembrete, falaDeOferta, falaDoEstado, reagir, seloVisivel } from "@/nucleo/tutor/reacoes";
+import { encurtarFala, falaDeLembrete, falaDeOferta, falaDoEstado, reagir, seloVisivel, textoDoDegrau } from "@/nucleo/tutor/reacoes";
+import { LIMITES_TUTOR, type EntradaTutor } from "@/nucleo/tutor/contrato";
 import { passoDeMaquina, proximoGesto } from "@/nucleo/missoes/gesto";
 import { CATEGORIAS_RUA } from "@/conteudo/rua";
 import { PELES, type Pele } from "@/conteudo/peles";
 import { AJUDA } from "@/conteudo/reacoes";
 import { GESTOS } from "@/conteudo/gestos";
-import { Bancada, type MarcasBancada } from "@/componentes/maquinas/Bancada";
+import { FALHAS_CONVERSA, PERGUNTAS_PADRAO, TEXTOS_CONVERSA } from "@/conteudo/tutor";
+import { Bancada, descreverBancada, type MarcasBancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
 import { Nonio } from "@/componentes/nonio/Nonio";
 import { FaixaNonio, type AcaoAjuda } from "@/componentes/nonio/FaixaNonio";
 import { BarraJunto, FolhaCasoParecido } from "@/componentes/nonio/AjudaNonio";
 import { useFalaQuandoCalmo, useFilaNonio } from "@/componentes/nonio/useFila";
+import { ConversaNonio } from "@/componentes/nonio/ConversaNonio";
+import { historicoParaEnviar, perguntar, useConversaDisponivel, type MensagemTela } from "@/componentes/nonio/useConversa";
 import { LinhaNotacao } from "@/componentes/notacao/Notacao";
 import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, SONDAGEM_ATIVA, TEXTOS_REACAO } from "@/componentes/estado/catalogo";
 import { agoraDoJogo } from "@/componentes/estado/loja";
@@ -104,6 +108,12 @@ export function ExecutorAtividade({
   const [rascunho, setRascunho] = useState<string | null>(null);
   const postura = progresso.preferencias.postura;
   const { fila, oferecerFala } = useFilaNonio(postura);
+  // Pergunte ao Nônio: o histórico vive só aqui, na memória da execução aberta.
+  const [conversa, setConversa] = useState<{ mensagens: MensagemTela[]; perguntas: number; esperando: boolean }>({ mensagens: [], perguntas: 0, esperando: false });
+  const [conversaAberta, setConversaAberta] = useState(false);
+  const conversaAbertaRef = useRef(false);
+  const conversaPermitida = a.tipo !== "sondagem" && atividadePorId(a.id) !== null && progresso.preferencias.conversa === "ligada";
+  const conversaNoAr = useConversaDisponivel(pronto && conversaPermitida);
 
   const salva = restaurarExecucao(progresso.campanha.execucoes[chaveExecucao(a, modo)], a, (m) => passosDoModo(a, m).length);
   const exec: Execucao = salva && salva.modo === modo ? salva : iniciarExecucao(a, modo);
@@ -193,6 +203,82 @@ export function ExecutorAtividade({
     temEscada && nivel < 4 && !ajudaNaResposta ? { rotulo: rotuloAjuda, onPedir: pedirAjuda, oferta: falaAtual.categoria === "oferta" } : null;
   const expressao = falaAtual.categoria === "passo" && postura === "quieto" ? "quieto" : falaAtual.expressao;
 
+  /* ---------- Pergunte ao Nônio ---------- */
+
+  const podePerguntar = conversaNoAr && !casoAberto;
+  const avisoConversa = !("conversa" in progresso.apresentacoes);
+  const conversaFechada = conversa.perguntas >= LIMITES_TUTOR.perguntasPorExecucao;
+  const sugestoes = passo.perguntas ?? PERGUNTAS_PADRAO[passo.tipo];
+  const novaMensagem = (m: Omit<MensagemTela, "id">, c: { mensagens: MensagemTela[] }): MensagemTela => ({ ...m, id: (c.mensagens.at(-1)?.id ?? 0) + 1 });
+  /** A última resposta vai para a faixa (pedida) e, com alvo, aponta na máquina. */
+  const levarParaFaixa = (m: MensagemTela | undefined) => {
+    if (!m || m.autor !== "nonio" || m.aviso) return;
+    oferecerFala({
+      id: `conversa:${m.id}`,
+      texto: encurtarFala(m.texto),
+      expressao: m.expressao ?? "neutro",
+      prioridade: "pedida",
+      categoria: "conversa",
+      passo: passo.id,
+      alvo: m.alvo ?? undefined,
+    });
+  };
+  const abrirConversa = () => {
+    conversaAbertaRef.current = true;
+    setConversaAberta(true);
+  };
+  const fecharConversa = () => {
+    conversaAbertaRef.current = false;
+    setConversaAberta(false);
+    levarParaFaixa(conversa.mensagens.at(-1));
+  };
+  const enviarPergunta = async (texto: string) => {
+    if (conversa.esperando || conversaFechada) return;
+    const entrada: EntradaTutor = {
+      atividade: a.id,
+      passo: passo.id,
+      modo,
+      situacao: exec.passo.situacao === "vencido" ? "vencido" : "ativo",
+      degrau: Math.min(4, exec.passo.ajuda),
+      maquina: exec.bancada && pele ? descreverBancada(exec.bancada.atual, pele).slice(0, LIMITES_TUTOR.maquina) : "",
+      equivocos: [...new Set(exec.equivocos)].slice(-LIMITES_TUTOR.equivocos),
+      historico: historicoParaEnviar(conversa.mensagens),
+      pergunta: texto,
+    };
+    setConversa((c) => ({ ...c, esperando: true, mensagens: [...c.mensagens, novaMensagem({ autor: "jogador", texto }, c)] }));
+    const d = await perguntar(entrada);
+    let resposta: Omit<MensagemTela, "id">;
+    if (d.tipo === "resposta") {
+      resposta = { autor: "nonio", texto: d.texto, expressao: d.expressao, alvo: d.alvo };
+    } else if (d.tipo === "recurso") {
+      // A guarda barrou a resposta: no lugar, o degrau seguinte da escada, com as medidas vivas.
+      const degrau = d.degrau ? textoDoDegrau(passo, d.degrau, exec, pele) : null;
+      resposta = { autor: "nonio", texto: degrau?.texto ?? TEXTOS_CONVERSA.semResposta, expressao: "medindo", alvo: degrau?.alvo ?? null };
+    } else {
+      resposta = { autor: "nonio", texto: FALHAS_CONVERSA[d.falha], expressao: "duvida", aviso: true };
+    }
+    setConversa((c) => {
+      const perguntas = c.perguntas + 1;
+      const r = novaMensagem(resposta, c);
+      const mensagens = [...c.mensagens, r];
+      if (perguntas >= LIMITES_TUTOR.perguntasPorExecucao) mensagens.push({ id: r.id + 1, autor: "nonio", texto: TEXTOS_CONVERSA.limite, aviso: true });
+      if (!conversaAbertaRef.current) levarParaFaixa(r);
+      return { mensagens, perguntas, esperando: false };
+    });
+  };
+  const folhaConversa = conversaAberta ? (
+    <ConversaNonio
+      mensagens={conversa.mensagens}
+      esperando={conversa.esperando}
+      sugestoes={sugestoes}
+      fechada={conversaFechada}
+      aviso={avisoConversa}
+      onEntendi={() => atualizar((p, t) => marcarApresentacao(p, "conversa", t))}
+      onEnviar={(t) => void enviarPergunta(t)}
+      onFechar={fecharConversa}
+    />
+  ) : null;
+
   const origemDesvio = progresso.campanha.desvio?.destino === a.id ? atividadePorId(progresso.campanha.desvio.origem) : null;
   const faixa = (compacta: boolean) => (
     <>
@@ -208,6 +294,7 @@ export function ExecutorAtividade({
         retorno={retorno}
         expressao={expressao}
         ajuda={acaoAjuda}
+        onPerguntar={podePerguntar ? abrirConversa : null}
         compacta={compacta}
         apontando={falaAtual.alvo !== undefined}
         extra={
@@ -308,6 +395,7 @@ export function ExecutorAtividade({
           )}
         </TelaNarrativa>
         {folhaCaso}
+        {folhaConversa}
       </>
     );
   }
@@ -508,6 +596,7 @@ export function ExecutorAtividade({
         sobreposicao={sobreposicao}
       />
       {folhaCaso}
+      {folhaConversa}
     </>
   );
 }

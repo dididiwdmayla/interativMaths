@@ -65,6 +65,9 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await tocar(page, "[data-acao=seguir]");
 
   await passo(page, "repartir");
+  // Sem chave no servidor, a conversa não aparece: a faixa tem só o Me ajuda.
+  await expect(v(page, "[data-acao=nonio]")).toBeVisible();
+  await expect(page.locator("[data-acao=perguntar]")).toHaveCount(0);
   await mais(page, "lote", 7);
   await tocar(page, "[data-acao=repartir]");
   await expect(v(page, "[data-visor]")).toContainText("Uma volta de 8 em 4 bicas pede 32");

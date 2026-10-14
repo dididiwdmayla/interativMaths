@@ -477,20 +477,40 @@ function textoProduto(ctx: ContextoReacao, valores: Record<string, string>): str
   return preencherFala(ctx.textos.respostas.produto, { ...m, ...valores, resposta: formatar(comoRacional(valores.resposta), { misto: true }), produto: formatar(produto, { misto: true }) });
 }
 
+/** Cabe na faixa (160): corta na última frase inteira; sem frase inteira, nas palavras. */
+export function encurtarFala(texto: string): string {
+  const t = texto.trim();
+  if (t.length <= LIMITE_FALA) return t;
+  const corte = t.slice(0, LIMITE_FALA);
+  const fim = Math.max(corte.lastIndexOf(". "), corte.lastIndexOf("? "));
+  if (fim > 40) return corte.slice(0, fim + 1);
+  return `${corte.slice(0, corte.lastIndexOf(" ")).replace(/[,;:]$/, "")}…`;
+}
+
+/**
+ * Um degrau da escada como texto, com as medidas vivas, sem subir a escada. O Me ajuda usa o
+ * degrau atual; a conversa usa o degrau seguinte quando a guarda barra a resposta do modelo.
+ */
+export function textoDoDegrau(passo: Passo, degrau: 1 | 2 | 3, e: Execucao, pele: NomesPele | null): { readonly texto: string; readonly alvo?: AlvoMaquina } | null {
+  const dica = passo.dicas?.[degrau - 1];
+  if (!dica) return null;
+  const vivas = { ...(pele ? medidasComNomes(e.bancada?.atual ?? null, pele) : medidasVivas(e.bancada?.atual ?? null)), feitas: String(e.passo.solucoes.length) };
+  const alvo = degrau === 1 ? dica.alvo : degrau === 2 ? (dica.cota?.alvo ?? dica.alvo) : undefined;
+  return { texto: preencherFala(dica.texto, vivas), alvo };
+}
+
 /** Me ajuda: o degrau atual da escada, com as medidas vivas; aponta e mostra a cota. */
 export function falaDeAjuda(passo: Passo, e: Execucao, textos: TextosReacao, pele: NomesPele | null): FalaFaixa | null {
   const nivel = e.passo.ajuda;
   if (nivel === 0) return null;
-  const vivas = { ...(pele ? medidasComNomes(e.bancada?.atual ?? null, pele) : medidasVivas(e.bancada?.atual ?? null)), feitas: String(e.passo.solucoes.length) };
   if (nivel >= 4) return fala(passo, `ajuda:4`, textos.ajuda.junto, { categoria: "ajuda", prioridade: "pedida", expressao: "atento" });
-  const dica = passo.dicas?.[nivel - 1];
-  if (!dica) return fala(passo, `ajuda:sem`, textos.ajuda.semDica, { categoria: "ajuda", prioridade: "pedida", expressao: "neutro" });
-  const alvo = nivel === 1 ? dica.alvo : nivel === 2 ? (dica.cota?.alvo ?? dica.alvo) : undefined;
-  return fala(passo, `ajuda:${nivel}`, preencherFala(dica.texto, vivas), {
+  const degrau = textoDoDegrau(passo, nivel as 1 | 2 | 3, e, pele);
+  if (!degrau) return fala(passo, `ajuda:sem`, textos.ajuda.semDica, { categoria: "ajuda", prioridade: "pedida", expressao: "neutro" });
+  return fala(passo, `ajuda:${nivel}`, degrau.texto, {
     categoria: "ajuda",
     prioridade: "pedida",
     expressao: nivel === 1 ? "atento" : "medindo",
-    alvo,
+    alvo: degrau.alvo,
   });
 }
 

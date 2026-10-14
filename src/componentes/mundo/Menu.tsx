@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Menu: postura do Nônio, cotas, animações, rever abertura, apagar progresso.
+ * Menu: postura do Nônio, perguntas por escrito (IA), cotas, animações, rever abertura, apagar progresso.
  * Sem controle de som: som não entra nesta versão.
  */
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { useState, type ReactNode } from "react";
 import { definirPreferencias, progressoNovo, type Preferencias } from "@/nucleo/progresso";
 import { substituirProgresso } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
+import { TEXTOS_CONVERSA } from "@/conteudo/tutor";
 import { CabecalhoJogo } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
 
@@ -97,6 +98,17 @@ export function Menu() {
               { valor: "quieto", rotulo: "Quieto", linha: "Só quando chamado." },
               { valor: "disponivel", rotulo: "Disponível", linha: "Oferece uma medida depois de duas tentativas travadas." },
               { valor: "presente", rotulo: "Presente", linha: "Comenta o que a máquina mostra, por conta própria." },
+            ]}
+          />
+          <Grupo
+            id="conversa"
+            titulo={TEXTOS_CONVERSA.preferencia}
+            ajuda="O botão Perguntar abre uma conversa sobre a missão. As perguntas vão para um serviço de IA da Anthropic; as contas e as correções continuam com a máquina."
+            valor={prefs.conversa}
+            onMudar={(conversa) => mudar({ conversa })}
+            opcoes={[
+              { valor: "ligada", rotulo: TEXTOS_CONVERSA.preferenciaLigada, linha: "O Perguntar aparece na faixa do Nônio, quando o serviço está no ar." },
+              { valor: "desligada", rotulo: TEXTOS_CONVERSA.preferenciaDesligada, linha: "Só a escada do Me ajuda, sem IA." },
             ]}
           />
           <Grupo
