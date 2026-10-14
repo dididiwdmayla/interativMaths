@@ -47,6 +47,8 @@ export interface ConfigBancada {
    * há `voltasMax` (o desafio é sobre a alavanca) ou quando o passo disser.
    */
   readonly maoLivre?: boolean;
+  /** Nomes das bicas na tela ("A", "B"), quando o passo fala delas pelo nome. Só desenho. */
+  readonly nomesBicas?: readonly string[];
 }
 
 export interface Pilha {

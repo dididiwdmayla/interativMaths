@@ -323,6 +323,22 @@ function textoComposicao(pecas: readonly { tamanho: Racional; quantidade: number
 }
 
 /**
+ * O que cada bica deve receber, escrito como fração sem simplificar ("2x1/8" vira "2/8"): a tela
+ * escreve a lápis na bica vazia, como pergunta. Só para objetivos de composição.
+ */
+export function metasDeComposicao(o: { readonly validador: string; readonly params?: Parametros } | undefined): Record<number, string> {
+  const metas: Record<number, string> = {};
+  if (!o || o.validador !== "partilha.composicao" || !o.params) return metas;
+  for (const [k, v] of Object.entries(o.params)) {
+    const m = /^bica(\d+)$/.exec(k);
+    if (!m) continue;
+    const partes = lerComposicao(String(v)).map((x) => `${x.quantidade * x.tamanho.n}/${x.tamanho.d}`);
+    metas[Number(m[1]) - 1] = `${partes.join(" + ")}?`;
+  }
+  return metas;
+}
+
+/**
  * Composição declarada por bica: params `bica1`, `bica2`... no formato "2x1/8" ou "1x1/4+1x1/8".
  * Confere só as bicas declaradas; o que ficou na esteira não importa.
  */

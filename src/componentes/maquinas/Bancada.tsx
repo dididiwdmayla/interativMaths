@@ -45,6 +45,10 @@ export interface PropsBancada {
   className?: string;
   /** Altura/largura fixa (miniatura). Sem ela, a bancada ocupa a área disponível. */
   proporcao?: number;
+  /** A chegada de um passo: as peças novas entram pela esteira e a bica nova abre. */
+  chegada?: { readonly pecasNovas: readonly { readonly tamanho: string; readonly quantidade: number }[]; readonly bicasAbriram: readonly number[] } | null;
+  /** O que cada bica precisa mostrar, a lápis, enquanto está vazia ("2/8?"). */
+  metas?: Readonly<Record<number, string>>;
 }
 
 function ativarComTeclado(e: KeyboardEvent, f: () => void) {
@@ -117,8 +121,18 @@ export function Bancada({
   rotulo,
   className,
   proporcao,
+  chegada = null,
+  metas,
 }: PropsBancada) {
   const id = useId().replace(/:/g, "");
+  // A chegada: a bica nova começa a lápis e passa a caneta; as peças novas entram pela esteira.
+  const temChegada = chegada !== null;
+  const [chegou, setChegou] = useState(!temChegada);
+  useEffect(() => {
+    if (!temChegada) return;
+    const t = setTimeout(() => setChegou(true), 650);
+    return () => clearTimeout(t);
+  }, [temChegada]);
   const forma = pele.peca.forma;
   const caixaRef = useRef<HTMLDivElement>(null);
   const [medida, setMedida] = useState({ proporcao: 0.62, largura: 360 });
@@ -194,7 +208,9 @@ export function Bancada({
     if (!onAcao || !mao) return;
     setMenu(null);
     if (pilhaArmada) {
+      // Uma peça por escolha: o gesto seguinte é de novo "toque numa peça, depois numa mesa".
       onAcao({ tipo: "colocar", tamanho: pilhaArmada.chave, bica: i });
+      setArmada(false);
       return;
     }
     const t = pecaParaDevolver(estado.bicas[i], null);
@@ -287,6 +303,7 @@ export function Bancada({
           const cx = lp.caixa.x + lp.caixa.largura / 2;
           const tremor = engasgo && sel;
           const cortou = (ev?.tipo === "cortou" || ev?.tipo === "fatia") && ev.novo === lp.chave;
+          const novas = chegada?.pecasNovas.find((x) => x.tamanho === lp.chave) ?? null;
           return (
             <g
               key={lp.chave}
@@ -310,9 +327,22 @@ export function Bancada({
             >
               <rect x={lp.caixa.x - 4} y={lp.topo - 26} width={lp.caixa.largura + 8} height={L.esteira.y - lp.topo + 44} rx={8} fill="transparent" stroke="none" />
               <rect className="anel-foco" x={lp.caixa.x - 4} y={lp.topo - 6} width={lp.caixa.largura + 8} height={L.esteira.y - lp.topo + 24} rx={8} />
-              <g key={tremor ? `tremor-${estado.seq}` : cortou ? `corte-${estado.seq}` : "parada"} className={tremor ? "anima-engasgo" : cortou ? "anima-fatia" : undefined}>
+              <g key={tremor ? `tremor-${estado.seq}` : cortou ? `corte-${estado.seq}` : "parada"} className={tremor ? "anima-engasgo" : cortou ? "anima-fatia" : novas ? "anima-chegada" : undefined}>
                 <PilhaDesenho lp={lp} forma={forma} raio={L.raioPilha} />
               </g>
+              {novas && (
+                <g className="anima-esmaecer" aria-hidden="true" data-chegaram={novas.quantidade}>
+                  {letraDeMao ? (
+                    <Anotacao x={lp.caixa.x + lp.caixa.largura + 8} y={lp.topo + 6} inclinacao={-4}>
+                      + <NumeroAnotado tamanho={16}>{novas.quantidade}</NumeroAnotado>
+                    </Anotacao>
+                  ) : (
+                    <text x={lp.caixa.x + lp.caixa.largura + 8} y={lp.topo + 8} fontSize={15} fontWeight={800} fill="var(--caneta)" stroke="none">
+                      {`+${novas.quantidade}`}
+                    </text>
+                  )}
+                </g>
+              )}
               {sel && mexivel && !mao && <line x1={lp.caixa.x - 2} x2={lp.caixa.x + lp.caixa.largura + 2} y1={L.esteira.y + 19} y2={L.esteira.y + 19} stroke="var(--caneta)" strokeWidth={3} strokeLinecap="round" />}
               {escolhida && (
                 <rect
@@ -383,13 +413,23 @@ export function Bancada({
               >
                 <rect x={lb.cx - lb.largura / 2 + 2} y={lb.bicaY - 8} width={lb.largura - 4} height={36} rx={8} fill="transparent" stroke="none" />
                 <rect className="anel-foco" x={lb.cx - 13} y={lb.bicaY - 4} width={26} height={30} rx={6} />
-                <PassarACaneta feito={b.aberta}>
+                <PassarACaneta feito={b.aberta && (chegou || !chegada?.bicasAbriram.includes(lb.indice))}>
                   <Bica cx={lb.cx} y={lb.bicaY} />
                 </PassarACaneta>
               </g>
 
               {/* Conteúdo e receptor: a lápis enquanto a bica não foi usada */}
               <Conteudo forma={forma} caixa={lb.conteudo} unidades={unidades} pecas={b.pecas} raioMax={L.raioConteudo} />
+              {metas?.[lb.indice] && b.pecas.length === 0 && (
+                <text x={xConteudo} y={lb.conteudo.y + lb.conteudo.altura / 2 + 5} textAnchor="middle" fontSize={15} fontWeight={700} fill="var(--tinta-suave)" stroke="none" className="algarismos" aria-hidden="true">
+                  {metas[lb.indice]}
+                </text>
+              )}
+              {estado.config.nomesBicas?.[lb.indice] && (
+                <text x={lb.cx - lb.largura / 2 + 8} y={lb.conteudo.y - 4} fontSize={14} fontWeight={800} fill="var(--tinta)" stroke="none" aria-hidden="true">
+                  {estado.config.nomesBicas[lb.indice]}
+                </text>
+              )}
               <PassarACaneta feito={emUso}>
                 <Receptor forma={pele.receptor.forma} cx={lb.cx} y={lb.receptorY} largura={lb.largura} />
               </PassarACaneta>
@@ -421,7 +461,7 @@ export function Bancada({
                 <g
                   role="button"
                   tabIndex={0}
-                  aria-label={rotuloMesa(pele, lb.indice, q, pilhaArmada ? nomeDaPeca(pele, pilhaArmada.pilha.tamanho).toLowerCase() : null, b)}
+                  aria-label={rotuloMesa(pele, lb.indice, q, pilhaArmada ? nomeDaPeca(pele, pilhaArmada.pilha.tamanho).toLowerCase() : null, b, estado.config.nomesBicas)}
                   data-focavel=""
                   data-receptor={lb.indice}
                   onClick={() => tocarMesa(lb.indice)}
@@ -542,8 +582,8 @@ export function Bancada({
   );
 }
 
-function rotuloMesa(pele: Pele, i: number, q: ReturnType<typeof quantidadeNaBica>, escolhida: string | null, b: EstadoBica): string {
-  const nome = `${pele.receptor.singular[0].toUpperCase()}${pele.receptor.singular.slice(1)} ${i + 1}`;
+function rotuloMesa(pele: Pele, i: number, q: ReturnType<typeof quantidadeNaBica>, escolhida: string | null, b: EstadoBica, nomes?: readonly string[]): string {
+  const nome = `${pele.receptor.singular[0].toUpperCase()}${pele.receptor.singular.slice(1)} ${nomes?.[i] ?? i + 1}`;
   const tem = q.n === 0 ? (pele.receptor.genero === "f" ? "vazia" : "vazio") : quantidadeComNomeDaPele(q, pele);
   if (escolhida) return `${nome}: ${tem}. Pôr ${escolhida} aqui.`;
   if (b.pecas.length > 0) return `${nome}: ${tem}. Devolver uma peça à esteira.`;

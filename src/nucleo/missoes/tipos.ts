@@ -56,7 +56,14 @@ export interface Objetivo {
 
 export type TipoResposta =
   | { readonly tipo: "numero"; readonly minimo: number; readonly maximo: number; readonly unidade?: string }
-  | { readonly tipo: "fracao"; readonly maximo: number }
+  | {
+      readonly tipo: "fracao";
+      readonly maximo: number;
+      /** As fichas que aparecem (sem elas, de 1 ao máximo). */
+      readonly fichas?: readonly number[];
+      /** A frase em volta da fração: "Cada mesa recebe [ ] de broa". */
+      readonly moldura?: { readonly antes: string; readonly depois: string };
+    }
   | { readonly tipo: "opcoes"; readonly opcoes: readonly { readonly id: string; readonly texto: string }[] };
 
 /** Resposta típica que denuncia um equívoco: "4/3" → fracao-invertida. */
@@ -148,8 +155,17 @@ export interface PassoOperar extends PassoBase {
    * (a mão põe uma saca em cada carroça, e o passo seguinte continua da mesma máquina).
    */
   readonly automatico?: boolean;
-  /** Convite opcional depois de vencido (ex.: "dá para fazer numa volta só?"). */
-  readonly convite?: { readonly texto: string; readonly objetivo: Objetivo; readonly evidencias?: readonly EvidenciaDeclarada[] };
+  /**
+   * O desafio, depois de vencido: um botão secundário "Desafio: {texto}"; aceito, a etiqueta passa
+   * a Desafio e a instrução vira a do desafio.
+   */
+  readonly convite?: {
+    readonly texto: string;
+    /** A instrução enquanto o desafio está aberto (verbo primeiro). */
+    readonly instrucao?: string;
+    readonly objetivo: Objetivo;
+    readonly evidencias?: readonly EvidenciaDeclarada[];
+  };
 }
 
 export interface PassoPrever extends PassoBase {
@@ -189,6 +205,8 @@ export interface PassoAposta extends PassoBase {
   readonly nonioTemRazao: boolean;
   /** O gesto que tira a prova (sem ele, um modelo genérico). Sem a resposta. */
   readonly gesto?: string;
+  /** A bancada mostra o lote e Repartir (padrão sim); false quando a prova é só com a mão. */
+  readonly alavanca?: boolean;
 }
 
 export interface LacunaFrase {

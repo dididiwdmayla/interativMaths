@@ -19,9 +19,10 @@ function ate(a: Atividade, idPasso: string, depois: Entrada[] = []): Execucao {
   for (let i = 0; i < 40 && passoAtual(a, e)?.id !== idPasso; i++) {
     const p = passoAtual(a, e);
     if (p?.tipo === "palpite") enviar({ tipo: "responder", valor: null });
-    else if (p?.tipo === "operar") {
+    else if (p?.tipo === "operar" || p?.tipo === "aposta") {
       for (const acao of p.resolucao) enviar({ tipo: "maquina", acao });
-      if (!p.automatico) enviar({ tipo: "fechar" });
+      if (p.tipo === "operar" && !p.automatico) enviar({ tipo: "fechar" });
+      if (p.tipo === "aposta") enviar({ tipo: "responder", valor: p.esperado });
       enviar({ tipo: "seguir" });
     } else if (p?.tipo === "prever") {
       enviar({ tipo: "responder", valor: null });
@@ -61,13 +62,28 @@ describe("próximo gesto", () => {
   });
 
   it("esteira vazia e partilha não fechada: fechar", () => {
-    const e = ate(MISSAO_1, "repartir", [maq({ tipo: "lote", valor: 6 }), maq({ tipo: "repartir" })]);
+    const e = ate(MISSAO_1, "repartir", [maq({ tipo: "lote", valor: 5 }), maq({ tipo: "repartir" })]);
     expect(gesto(MISSAO_1, e).texto).toBe("Agora: feche a partilha.");
   });
 
   it("sobra que não dá volta e sem fatiador: fechar", () => {
     const e = ate(MISSAO_3, "repartir", [maq({ tipo: "lote", valor: 6 }), maq({ tipo: "repartir" })]);
     expect(gesto(MISSAO_3, e).texto).toBe("Agora: feche a partilha.");
+  });
+
+  it("o passo da mão: uma de cada vez, e devolver o que passou", () => {
+    expect(gesto(MISSAO_1, ate(MISSAO_1, "a-mao")).texto).toBe("Agora: toque numa saca, depois numa carroça.");
+    const passou = ate(MISSAO_1, "a-mao", [maq({ tipo: "colocar", tamanho: "1/1", bica: 1 }), maq({ tipo: "colocar", tamanho: "1/1", bica: 1 })]);
+    expect(gesto(MISSAO_1, passou)).toMatchObject({ texto: "Agora: devolva o que passou na carroça 2: toque na peça.", alvo: "bica:1" });
+  });
+
+  it("aposta: tirar a prova com o gesto do passo; cumprida, responder", () => {
+    const e = ate(MISSAO_4, "comparar");
+    expect(gesto(MISSAO_4, e).texto).toBe("Corte uma broa em 8 e outra em 4. Arraste 2 oitavos para a mesa A e 1 quarto para a mesa B.");
+    const p = passoAtual(MISSAO_4, e);
+    if (p?.tipo !== "aposta") throw new Error("passo errado");
+    const prova = p.resolucao.reduce((x, acao) => aplicarEntrada(MISSAO_4, x, maq(acao), ctxMotor).exec, e);
+    expect(gesto(MISSAO_4, prova).texto).toBe("Agora: escolha a resposta e toque em Mostrar ao Nônio.");
   });
 
   it("ainda cabe volta: repartir de novo", () => {
@@ -77,7 +93,7 @@ describe("próximo gesto", () => {
 
   it("engasgo: diminuir o lote, com a medida", () => {
     const e = ate(MISSAO_1, "repartir", [maq({ tipo: "lote", valor: 7 }), maq({ tipo: "repartir" })]);
-    expect(gesto(MISSAO_1, e).texto).toBe("Agora: diminua o lote. A volta pede 28; há 24.");
+    expect(gesto(MISSAO_1, e).texto).toBe("Agora: diminua o lote. A volta pede 28; há 20.");
   });
 
   it("corte que não fecha mais: desfazer", () => {
@@ -86,7 +102,7 @@ describe("próximo gesto", () => {
   });
 
   it("depois do ainda não, diz o que tentar", () => {
-    const e = ate(MISSAO_1, "repartir", [maq({ tipo: "lote", valor: 5 }), maq({ tipo: "repartir" }), { tipo: "fechar" }]);
+    const e = ate(MISSAO_1, "repartir", [maq({ tipo: "lote", valor: 4 }), maq({ tipo: "repartir" }), { tipo: "fechar" }]);
     expect(gesto(MISSAO_1, e)).toMatchObject({ tom: "tentar", texto: "Agora: reparta o que ainda está na esteira." });
   });
 

@@ -12,6 +12,7 @@ import { useAmbiente } from "@/componentes/ui/useAmbiente";
 export function Palco({
   cabecalho,
   pedido,
+  nota,
   maquina,
   faixa,
   controles,
@@ -20,6 +21,8 @@ export function Palco({
 }: {
   cabecalho?: ReactNode;
   pedido?: ReactNode;
+  /** Acima da máquina: o bilhete da aposta, a fala da Dália quando a máquina muda. */
+  nota?: ReactNode;
   maquina: ReactNode;
   /** A faixa do Nônio (e o que mora com ela: desvio, categoria da Rua). */
   faixa?: ReactNode;
@@ -34,6 +37,7 @@ export function Palco({
       {cabecalho}
       <div className="palco-grade" data-folha-aberta={sobreposicao ? "sim" : "nao"}>
         {pedido && <div className="palco-pedido">{pedido}</div>}
+        {nota && !sobreposicao && <div className="palco-nota">{nota}</div>}
         <section className="palco-maquina ficha-quadriculada" aria-label="Máquina">
           {maquina}
         </section>

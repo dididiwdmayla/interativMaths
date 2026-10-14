@@ -53,12 +53,22 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await passo(page, "palpite");
   await mais(page, "resposta", 4);
   await tocar(page, "[data-acao=responder]");
+
+  // A mão: tocar numa saca e depois numa carroça, quatro vezes.
+  await passo(page, "a-mao");
+  for (const bica of ["0", "1", "2", "3"]) {
+    await tocar(page, "[data-peca='1/1']");
+    await tocar(page, `[data-receptor='${bica}']`);
+  }
+  await expect(v(page, "[data-tela=missao][data-situacao=vencido]")).toBeVisible();
+  await expect(v(page, "[data-tela=missao]")).toHaveAttribute("data-retorno", "acertou");
+  await tocar(page, "[data-acao=seguir]");
+
   await passo(page, "repartir");
   await mais(page, "lote", 7);
   await tocar(page, "[data-acao=repartir]");
   await expect(v(page, "[data-visor]")).toContainText("Uma volta de 8 em 4 bicas pede 32");
-  await tocar(page, '[data-seletor=lote] button[aria-label$="menos um"]');
-  await tocar(page, '[data-seletor=lote] button[aria-label$="menos um"]');
+  for (let i = 0; i < 3; i++) await tocar(page, '[data-seletor=lote] button[aria-label$="menos um"]');
   await tocar(page, "[data-acao=repartir]");
   await expect(v(page, "[data-bica='0']")).toHaveAttribute("data-quantidade", "6");
 

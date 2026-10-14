@@ -24,9 +24,11 @@ export interface PropsPainel {
   parada?: boolean;
   /** Mais um controle, numa linha própria (a calibragem põe "Não sei ainda"). */
   extra?: ReactNode;
+  /** Só a alavanca (carga, bicas, lote e Repartir): a aposta tem os próprios botões. */
+  soAlavanca?: boolean;
 }
 
-export function PainelBancada({ estado, pele, onAcao, onFechar, rotuloFechar = "Fechar a partilha", parada = false, extra }: PropsPainel) {
+export function PainelBancada({ estado, pele, onAcao, onFechar, rotuloFechar = "Fechar a partilha", parada = false, extra, soAlavanca = false }: PropsPainel) {
   const c = estado.config;
   const fechada = estado.fechada;
   const travado = parada || fechada;
@@ -90,6 +92,7 @@ export function PainelBancada({ estado, pele, onAcao, onFechar, rotuloFechar = "
         </button>
       </div>
 
+      {!soAlavanca && (
       <div className="flex items-center gap-2">
         {onFechar ? (
           <button type="button" className="botao-secundario min-w-0 flex-1" disabled={parada || fechada} onClick={onFechar} data-acao="fechar">
@@ -106,6 +109,7 @@ export function PainelBancada({ estado, pele, onAcao, onFechar, rotuloFechar = "
           <IconeRecomecar />
         </button>
       </div>
+      )}
       {extra}
     </div>
   );

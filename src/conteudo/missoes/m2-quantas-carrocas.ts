@@ -3,7 +3,7 @@
  */
 import type { ConfigBancada } from "@/nucleo/maquinas/bancada/tipos";
 import type { Atividade, Entrada } from "@/nucleo/missoes/tipos";
-import { CONFERIR, FECHAR, LOTE_4, LOTE_6, LOTE_8, MAQUINA_MONTAR_SACAS, REPARTIR, SEGUIR } from "./comum";
+import { CONFERIR, FECHAR, LOTE_4, LOTE_5, LOTE_6, LOTE_8, MAQUINA_MONTAR_SACAS, REPARTIR, SEGUIR } from "./comum";
 
 const MAQUINA: ConfigBancada = {
   pele: "sacas-carrocas",
@@ -29,7 +29,10 @@ const REGISTRO: Entrada[] = [
   SEGUIR,
 ];
 
-const FORMALIZACAO: Entrada[] = [{ tipo: "responder", valor: "5" }, SEGUIR, ...REGISTRO];
+/** A aposta: tira a prova na máquina e responde que o Nônio tinha razão. */
+const APOSTA: Entrada[] = [LOTE_5, REPARTIR, { tipo: "responder", valor: "sim" }, SEGUIR];
+
+const FORMALIZACAO: Entrada[] = [...APOSTA, ...REGISTRO];
 
 export const MISSAO_2: Atividade = {
   id: "partilha.arco1.quantas-carrocas",
@@ -92,25 +95,36 @@ export const MISSAO_2: Atividade = {
         },
       ],
       equivocos: ["lote-maior-que-cabe"],
+      nonio: "Agora quem muda é o número de carroças. Toque numa bica para abrir ou fechar.",
       evidencias: [{ conceito: "div.medida", tipo: "experimento" }],
       aoConcluir: [{ quem: "dalia", texto: "Cinco carroças de seis. Nenhuma saca no pátio, nenhuma carroça a mais." }],
     },
     {
       id: "familia",
-      tipo: "prever",
+      tipo: "aposta",
       fase: "descoberta",
-      pedido: "Os mesmos três números, outra pergunta.",
-      instrucao: "Responda quantas sacas vão em cada uma das 6 carroças.",
-      falas: [{ quem: "nonio", texto: "Trinta, cinco e seis. São os números do fim da missão anterior: lá, trinta entre cinco carroças deu seis em cada." }],
+      pedido: "Uma aposta do Nônio.",
+      instrucao: "Mostre na máquina se o Nônio tem razão.",
+      nonio: "Trinta, cinco e seis, de novo. Fiz uma aposta: leia o bilhete e tire a prova na máquina.",
+      aposta: "Aposto que entre 6 carroças dá 5 em cada. São os mesmos números.",
+      gesto: "Agora: reparta as 30 sacas entre as 6 carroças.",
       maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 30 }, bicas: { quantidade: 6, ajustavel: false } } },
-      pergunta: "E se as 30 sacas forem repartidas entre 6 carroças, quantas em cada?",
-      resposta: { tipo: "numero", minimo: 0, maximo: 30, unidade: "sacas" },
-      medida: "carga-por-bica",
-      demonstracao: [{ tipo: "lote", valor: 5 }, { tipo: "repartir" }],
-      explicacao: "Trinta entre cinco dá seis; trinta entre seis dá cinco. Repartir e contar grupos são a mesma família de contas.",
+      objetivo: { validador: "partilha.fechada" },
+      resolucao: [{ tipo: "lote", valor: 5 }, { tipo: "repartir" }],
+      pergunta: "Depois de repartir: o Nônio tinha razão?",
+      resposta: {
+        tipo: "opcoes",
+        opcoes: [
+          { id: "sim", texto: "Tinha razão" },
+          { id: "nao", texto: "Não tinha" },
+        ],
+      },
+      esperado: "sim",
+      nonioTemRazao: true,
+      explicacao: "Ganhei essa: trinta entre seis dá cinco. Repartir e contar grupos são a mesma família de contas.",
       dicas: [
-        { texto: "Agora são seis bicas abertas.", alvo: "bicas" },
-        { texto: "Uma volta de 1 em cada usa 6 sacas. São 30 na esteira." },
+        { texto: "Agora são seis carroças abertas. Reparta e olhe os medidores.", alvo: "bicas" },
+        { texto: "Uma volta de {lote} em cada pede {pedido}. Na esteira há {ha}.", cota: { alvo: "pilha", texto: "volta de {lote}: pede {pedido} · há {ha}" } },
         {
           texto: "Com outros números: 12 sacas em grupos de 3 dão 4 carroças; entre 4 carroças dão 3 em cada.",
           caso: {
@@ -119,6 +133,7 @@ export const MISSAO_2: Atividade = {
           },
         },
       ],
+      equivocos: ["lote-maior-que-cabe"],
       evidencias: [{ conceito: "div.medida", tipo: "descoberta" }],
     },
     {
@@ -212,6 +227,24 @@ export const MISSAO_2: Atividade = {
     },
   ],
   solucoesDeTeste: [
+    {
+      nome: "lote 5 e a última saca de cada carroça à mão",
+      modo: "guiada",
+      entradas: [
+        ...ABERTURA,
+        { tipo: "maquina", acao: { tipo: "bica", indice: 4 } },
+        LOTE_5,
+        REPARTIR,
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 0 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 1 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 2 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 3 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 4 } },
+        FECHAR,
+        SEGUIR,
+        ...FORMALIZACAO,
+      ],
+    },
     { nome: "abrindo a quinta bica", modo: "guiada", entradas: [...ABERTURA, { tipo: "maquina", acao: { tipo: "bica", indice: 4 } }, LOTE_6, REPARTIR, FECHAR, SEGUIR, ...FORMALIZACAO] },
     {
       nome: "quatro primeiro, depois a quinta sozinha",
@@ -233,5 +266,11 @@ export const MISSAO_2: Atividade = {
   ],
   sabotagens: [
     { nome: "lote 8 com 4 bicas pede 32", modo: "guiada", entradas: [...ABERTURA, LOTE_8, REPARTIR], equivoco: "lote-maior-que-cabe" },
+    {
+      nome: "na aposta, lote 6 em 6 carroças pede 36",
+      modo: "guiada",
+      entradas: [...ABERTURA, { tipo: "maquina", acao: { tipo: "bica", indice: 4 } }, LOTE_6, REPARTIR, FECHAR, SEGUIR, LOTE_6, REPARTIR],
+      equivoco: "lote-maior-que-cabe",
+    },
   ],
 };

@@ -9,6 +9,7 @@ import { useState } from "react";
 import type { TipoResposta } from "@/nucleo/missoes/tipos";
 import { Fracao } from "@/componentes/notacao/Numero";
 import { Seletor } from "@/componentes/ui/Seletor";
+import { IconeDesfazer } from "@/componentes/icones/IconeDesfazer";
 
 export interface MarcaResposta {
   /** A resposta que não bateu (passageiro: some no primeiro toque). */
@@ -34,7 +35,7 @@ export function EntradaResposta({
   marca?: MarcaResposta;
 }) {
   if (tipo.tipo === "numero") return <RespostaNumero tipo={tipo} onResponder={onResponder} rotuloConferir={rotuloConferir} rotuloNaoSei={rotuloNaoSei} desabilitado={desabilitado} marca={marca} />;
-  if (tipo.tipo === "fracao") return <RespostaFracao maximo={tipo.maximo} onResponder={onResponder} rotuloConferir={rotuloConferir} rotuloNaoSei={rotuloNaoSei} desabilitado={desabilitado} marca={marca} />;
+  if (tipo.tipo === "fracao") return <RespostaFracao tipo={tipo} onResponder={onResponder} rotuloConferir={rotuloConferir} rotuloNaoSei={rotuloNaoSei} desabilitado={desabilitado} marca={marca} />;
   return (
     <div className="flex flex-col gap-2" role="group" aria-label="Escolha uma resposta">
       {tipo.opcoes.map((o) => (
@@ -152,14 +153,14 @@ function RespostaNumero({
 }
 
 function RespostaFracao({
-  maximo,
+  tipo,
   onResponder,
   rotuloConferir,
   rotuloNaoSei,
   desabilitado,
   marca,
 }: {
-  maximo: number;
+  tipo: Extract<TipoResposta, { tipo: "fracao" }>;
   onResponder: (valor: string | null) => void;
   rotuloConferir: string;
   rotuloNaoSei: string;
@@ -169,6 +170,7 @@ function RespostaFracao({
   const [n, setN] = useState<number | null>(null);
   const [d, setD] = useState<number | null>(null);
   const [ativa, setAtiva] = useState<"n" | "d">("n");
+  const fichas = tipo.fichas ?? Array.from({ length: tipo.maximo }, (_, i) => i + 1);
   const colocar = (k: number) => {
     marca?.onRascunho();
     if (ativa === "n") {
@@ -183,7 +185,7 @@ function RespostaFracao({
   const casa = (qual: "n" | "d", v: number | null, rotulo: string) => (
     <button
       type="button"
-      className={`passo-valor-quadro h-12 w-14 ${marcada ? "caixa-ainda-nao" : ativa === qual ? "outline outline-[3px] outline-offset-2 outline-caneta" : ""}`}
+      className={`passo-valor-quadro h-11 w-[52px] ${marcada ? "caixa-ainda-nao" : ativa === qual ? "outline outline-[3px] outline-offset-2 outline-caneta" : ""}`}
       onClick={() => setAtiva(qual)}
       aria-label={`${rotulo}: ${v ?? "vazio"}`}
       aria-pressed={ativa === qual}
@@ -194,26 +196,46 @@ function RespostaFracao({
   );
   return (
     <div className="flex flex-col gap-3" data-fichas="">
-      <div className="flex items-center justify-center gap-5">
-        <div className="flex flex-col items-center gap-1.5" role="group" aria-label="Fração montada">
+      <div className="flex items-center justify-center gap-3">
+        {tipo.moldura && <span className="text-[15px] font-semibold">{tipo.moldura.antes}</span>}
+        <div className="flex flex-col items-center gap-1" role="group" aria-label="Fração montada">
           {casa("n", n, "Numerador")}
-          <span className="block h-[3px] w-16 rounded bg-tinta" aria-hidden="true" />
+          <span className="block h-[3px] w-[58px] rounded bg-tinta" aria-hidden="true" />
           {casa("d", d, "Denominador")}
         </div>
-        <div className="min-w-[96px] text-tinta">
-          {valor ? (
-            <span className="text-[30px] font-extrabold">{d && d !== 1 && n !== null ? <Fracao n={n} d={d} /> : valor}</span>
-          ) : (
-            <span className="text-[14px] font-semibold text-tinta-suave">Toque numa ficha para a casa marcada.</span>
-          )}
-        </div>
+        {tipo.moldura ? (
+          <span className="text-[15px] font-semibold">{tipo.moldura.depois}</span>
+        ) : (
+          <div className="min-w-[96px] text-tinta">
+            {valor ? (
+              <span className="text-[30px] font-extrabold">{d && d !== 1 && n !== null ? <Fracao n={n} d={d} /> : valor}</span>
+            ) : (
+              <span className="text-[14px] font-semibold text-tinta-suave">Toque numa ficha para a casa marcada.</span>
+            )}
+          </div>
+        )}
       </div>
-      <div className="opcoes" role="group" aria-label="Fichas" style={{ gridTemplateColumns: `repeat(${Math.min(maximo, 6)}, minmax(0, 1fr))` }}>
-        {Array.from({ length: maximo }, (_, i) => i + 1).map((k) => (
-          <button key={k} type="button" className="opcao" disabled={desabilitado} onClick={() => colocar(k)} data-ficha={k}>
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Fichas">
+        {fichas.map((k) => (
+          <button key={k} type="button" className="ficha-numero" disabled={desabilitado} onClick={() => colocar(k)} data-ficha={k}>
             {k}
           </button>
         ))}
+        <button
+          type="button"
+          className="botao-discreto ml-auto px-1"
+          disabled={desabilitado || (n === null && d === null)}
+          onClick={() => {
+            marca?.onRascunho();
+            setN(null);
+            setD(null);
+            setAtiva("n");
+          }}
+          data-acao="limpar"
+        >
+          <IconeDesfazer />
+          Limpar
+        </button>
       </div>
       <Botoes
         rotuloConferir={rotuloConferir}
@@ -224,19 +246,6 @@ function RespostaFracao({
         onNaoSei={() => onResponder(null)}
         marca={marca}
       />
-      <button
-        type="button"
-        className="botao-discreto self-center"
-        disabled={desabilitado || (n === null && d === null)}
-        onClick={() => {
-          marca?.onRascunho();
-          setN(null);
-          setD(null);
-          setAtiva("n");
-        }}
-      >
-        Limpar a fração
-      </button>
     </div>
   );
 }

@@ -253,6 +253,30 @@
   transform: translateY(2px);
 }
 
+/* Ficha de número, para montar uma fração (44 x 44). */
+.ficha-numero {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 19px;
+  font-weight: 800;
+  transition: transform 90ms var(--curva-firme);
+}
+
+.ficha-numero:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.ficha-numero:disabled {
+  background: var(--grafite-claro);
+  border-color: var(--grafite);
+  color: var(--tinta-suave);
+}
+
 /* Opção de texto, em linha cheia (respostas, preferências). */
 .opcao-texto {
   justify-content: flex-start;
@@ -743,6 +767,40 @@
   touch-action: none;
 }
 
+/* ---------- A aposta do Nônio: o bilhete amarelo ---------- */
+
+.bilhete {
+  padding: 10px 14px 12px;
+  border: 2px solid var(--tinta);
+  border-radius: 4px;
+  background: var(--bilhete);
+  box-shadow: 0 3px 0 var(--tinta);
+  transform: rotate(-2deg);
+}
+
+.bilhete-texto {
+  color: var(--caneta-escura);
+  font-family: var(--fonte-mao), cursive;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.bilhete-assinatura {
+  margin-top: 4px;
+  color: var(--caneta-escura);
+  font-family: var(--fonte-mao), cursive;
+  font-size: 21px;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* A nota acima da máquina (o bilhete, a chegada da Dália). */
+.palco-nota {
+  grid-area: nota;
+  margin: 14px max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left));
+}
+
 /* ---------- Etapas da missão ---------- */
 
 .etapa {
@@ -1046,8 +1104,8 @@ html[data-animacoes="leves"] .folha-sobe {
   flex: 1;
   min-height: 0;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(150px, 1fr) auto auto;
-  grid-template-areas: "pedido" "maquina" "faixa" "controles";
+  grid-template-rows: auto auto minmax(150px, 1fr) auto auto;
+  grid-template-areas: "pedido" "nota" "maquina" "faixa" "controles";
 }
 
 .palco-pedido {
@@ -1115,9 +1173,10 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (min-width: 1024px) {
   .palco-grade {
     grid-template-columns: minmax(0, 760px) 380px;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
+      "maquina nota"
       "maquina faixa"
       "maquina controles";
     justify-content: center;
@@ -1137,6 +1196,9 @@ html[data-animacoes="leves"] .folha-sobe {
   }
   .palco-faixa {
     margin: 0 0 14px;
+  }
+  .palco-nota {
+    margin: 0 4px 16px;
   }
   .palco-controles {
     align-self: start;
@@ -1158,9 +1220,10 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (orientation: landscape) and (min-width: 640px) and (max-width: 1023px) {
   .palco-grade {
     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
+      "maquina nota"
       "maquina faixa"
       "maquina controles";
     column-gap: 12px;

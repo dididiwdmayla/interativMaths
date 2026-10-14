@@ -28,7 +28,7 @@ export function FolhaPautada({
 }
 
 /** Algarismos no meio da letra de mão saem em Rubik, que se lê com precisão. */
-function comAlgarismos(texto: string): ReactNode {
+export function comAlgarismos(texto: string): ReactNode {
   return texto.split(/(\d+(?:\/\d+)?)/).map((p, i) =>
     /^\d/.test(p) ? (
       <span key={i} className="font-interface text-[0.78em] font-bold">

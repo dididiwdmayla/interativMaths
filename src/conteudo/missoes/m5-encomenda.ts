@@ -69,6 +69,7 @@ export const MISSAO_5: Atividade = {
       objetivo: { validador: "partilha.solucoes-distintas", params: { n: 2 } },
       resolucao: [{ tipo: "partes", valor: 4 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 3 }, { tipo: "repartir" }],
       alternativas: [[{ tipo: "partes", valor: 8 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 6 }, { tipo: "repartir" }]],
+      nonio: "Encomenda sem manual. Eu só falo se você chamar.",
       marcaUnitaria: "unitarias-sem-repetir",
       dicas: [
         { texto: "Dois jeitos contam como diferentes quando os pedaços de cada mesa são diferentes.", alvo: "fatiador" },
@@ -106,6 +107,7 @@ export const MISSAO_5: Atividade = {
         { texto: "Na esteira há {total}; cada mesa tem {cada}." },
         { texto: "Com outros números: 4 mesas com 1/2 cada pedem 2 broas." },
       ],
+      nonio: "O bilhete do forno está aí em cima. Eu só falo se você chamar.",
       equivocos: ["corte-que-nao-fecha"],
       evidencias: [{ conceito: "fra.quociente", tipo: "aplicacao" }],
       aoConcluir: [{ quem: "dalia", texto: "Duas broas. O forno não mentiu." }],
@@ -138,6 +140,25 @@ export const MISSAO_5: Atividade = {
     },
   ],
   solucoesDeTeste: [
+    {
+      nome: "quartos pelo menu, o último de cada mesa à mão, depois oitavos",
+      modo: "guiada",
+      entradas: [
+        SEGUIR,
+        { tipo: "maquina", acao: { tipo: "cortar", tamanho: "1/1", partes: 4, quantidade: "todas" } },
+        LOTE_2,
+        REPARTIR,
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 0 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 1 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 2 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 3 } },
+        FECHAR,
+        ...OITAVOS,
+        SEGUIR,
+        ...FORNO_OK,
+        ...FIM,
+      ],
+    },
     { nome: "quartos e oitavos", modo: "guiada", entradas: [SEGUIR, ...QUARTOS, ...OITAVOS, SEGUIR, ...FORNO_OK, ...FIM] },
     { nome: "metade e um quarto, depois quartos", modo: "guiada", entradas: [SEGUIR, ...MEIO_E_QUARTO, ...QUARTOS, SEGUIR, ...FORNO_OK, ...FIM] },
     {

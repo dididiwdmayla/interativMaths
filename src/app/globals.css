@@ -344,6 +344,22 @@ html[data-animacoes="leves"] .anima-oferta {
   animation: voo 220ms var(--curva-firme) forwards;
 }
 
+/* A chegada: as peças novas entram pela esteira. */
+@keyframes chegada {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.anima-chegada {
+  animation: chegada 640ms var(--curva-saida) both;
+}
+
 /* O corte separa a peça em fatias, com um pequeno escalonamento. */
 @keyframes fatia-sai {
   from {
@@ -378,7 +394,8 @@ html[data-animacoes="leves"] .anima-lamina {
   .anima-pousa {
     animation: voo-leve 400ms linear forwards;
   }
-  .anima-fatia {
+  .anima-fatia,
+  .anima-chegada {
     animation: esmaecer-entrar 260ms linear both;
   }
   .anima-engasgo,

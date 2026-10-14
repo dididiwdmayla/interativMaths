@@ -501,7 +501,7 @@ export function falaDeAbertura(a: Atividade, passo: Passo, e: Execucao, textos: 
     return fala(passo, `abertura:${passo.id}`, passo.nonio ? preencherFala(passo.nonio, m) : textos.aberturaAplicacao, { categoria: "passo", expressao: "quieto" });
   }
   const daCena = passo.tipo !== "narrativa" ? passo.falas?.filter((f) => f.quem === "nonio").map((f) => f.texto).join(" ") : undefined;
-  const propria = passo.nonio ?? (daCena && daCena.length <= LIMITE_FALA ? daCena : undefined);
+  const propria = passo.nonio ?? passo.chegada?.texto ?? (daCena && daCena.length <= LIMITE_FALA ? daCena : undefined);
   const texto = preencherFala(propria ?? textos.aberturas[passo.tipo] ?? "", m);
   return fala(passo, `abertura:${passo.id}`, texto, { categoria: "passo", expressao: passo.tipo === "narrativa" ? "neutro" : "atento" });
 }

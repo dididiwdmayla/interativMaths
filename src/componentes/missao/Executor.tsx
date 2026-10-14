@@ -14,9 +14,12 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { operarVarias, quantidadeNaBica, bicasEmUso } from "@/nucleo/maquinas/bancada/bancada";
 import type { AcaoBancada, Bancada as EstadoBancada, EstadoBancada as EstadoMaquina } from "@/nucleo/maquinas/bancada/tipos";
+import { metasDeComposicao } from "@/nucleo/maquinas/bancada/validadores";
+import type { DiferencaMaquinas } from "@/nucleo/maquinas/bancada/diferenca";
 import { compara } from "@/nucleo/racional/racional";
 import {
   aplicarEntrada,
+  chegadaDoPasso,
   iniciarExecucao,
   medidasVivas,
   palpiteDoPasso,
@@ -27,7 +30,7 @@ import {
   type Execucao,
 } from "@/nucleo/missoes/motor";
 import { aplicarEfeitos, chaveExecucao, restaurarExecucao } from "@/nucleo/missoes/efeitos";
-import type { AlvoMaquina, Atividade, Entrada, FaixasExposicao, ModoExecucao, Passo, PassoAposta } from "@/nucleo/missoes/tipos";
+import type { AlvoMaquina, Atividade, Entrada, FaixasExposicao, ModoExecucao, Passo } from "@/nucleo/missoes/tipos";
 import { definirDesvio, iniciarAtividade, type Desvio } from "@/nucleo/progresso";
 import { situacaoConceito } from "@/nucleo/dominio/dominio";
 import { falaDoPasso, PERMANENCIA_MINIMA_MS, type FalaFaixa } from "@/nucleo/tutor/fila";
@@ -50,11 +53,12 @@ import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
+import { Bilhete, PainelAposta } from "./Aposta";
 import { BotaoEtapas } from "./Etapas";
-import { Falas } from "./Falas";
+import { FalaDalia, Falas } from "./Falas";
 import { Objetivo, type Etiqueta } from "./Objetivo";
 import { ManualRasgado } from "./Manual";
-import { EntradaResposta, type MarcaResposta } from "./Respostas";
+import type { MarcaResposta } from "./Respostas";
 import { descreverAcao, NOME_DA_FASE } from "./textos";
 import { FaixaNaFolha, FolhaFrase, FolhaNotacao, FolhaRegistro, PainelPalpite, PainelPrever, PainelVencido, Seguir } from "./Vistas";
 
@@ -270,7 +274,9 @@ export function ExecutorAtividade({
               : passo.tipo === "frase" || passo.tipo === "notacao" || passo.tipo === "registro"
                 ? "Registro"
                 : "Objetivo";
-  const pedido = <Objetivo etiqueta={etiqueta} instrucao={desafio ? passo.convite.texto : passo.instrucao} gesto={gesto} lembrete={lembrete} />;
+  const pedido = (
+    <Objetivo etiqueta={etiqueta} instrucao={desafio ? (passo.convite.instrucao ?? passo.convite.texto) : passo.instrucao} gesto={gesto} lembrete={lembrete} />
+  );
 
   if (passo.tipo === "narrativa" || !exec.bancada) {
     const exposicao = a.tipo === "exposicao" && passo.tipo === "narrativa" && passo.faixas !== undefined;
@@ -324,9 +330,13 @@ export function ExecutorAtividade({
   const formalizacao = passo.tipo === "frase" || passo.tipo === "notacao" || passo.tipo === "registro";
   const parada = formalizacao || passo.tipo === "palpite" || passo.tipo === "prever";
   const operavel = (passo.tipo === "operar" || passo.tipo === "aposta") && !vencido;
+  // A máquina nova continua a história: a chegada anima só a diferença, enquanto o passo está intacto.
+  const chegada = chegadaDoPasso(a, exec);
+  const intacto = bancada.atual.seq === exec.passo.inicio?.atual.seq && exec.passo.respostas === 0 && sit === "ativo";
 
   const maquina = (
     <MaquinaDoPasso
+      key={passo.id}
       exec={exec}
       passo={passo}
       pele={peleMaquina}
@@ -335,8 +345,25 @@ export function ExecutorAtividade({
       realce={realce}
       cotaExtra={cotaExtra}
       marcas={marcas}
+      chegada={chegada}
+      metas={passo.tipo === "aposta" && !vencido ? metasDeComposicao(passo.objetivo) : undefined}
     />
   );
+
+  // Acima da máquina: o bilhete da aposta; a Dália, quando a máquina muda ou quando abre a conversa.
+  const falasDaDalia = passo.falas?.filter((f) => f.quem === "dalia").map((f) => f.texto) ?? [];
+  const nota =
+    passo.tipo === "aposta" ? (
+      <Bilhete texto={passo.aposta} />
+    ) : passo.chegada && intacto ? (
+      <div className="ficha px-4 pb-3 pt-2" data-chegada={passo.id}>
+        <FalaDalia texto={passo.chegada.fala} compacta />
+      </div>
+    ) : falasDaDalia.length > 0 && intacto ? (
+      <div className="ficha px-4 pb-3 pt-2">
+        <FalaDalia texto={falasDaDalia} compacta />
+      </div>
+    ) : null;
 
   const conta =
     passo.tipo === "operar" && passo.conta ? (
@@ -373,6 +400,11 @@ export function ExecutorAtividade({
       <PainelAposta
         passo={passo}
         exec={exec}
+        alavanca={
+          passo.alavanca !== false ? (
+            <PainelBancada estado={bancada.atual} pele={peleMaquina} onAcao={(acao) => enviar({ tipo: "maquina", acao })} soAlavanca />
+          ) : null
+        }
         junto={junto(passo)}
         marca={marcaResposta.valor}
         onRascunho={marcaResposta.onRascunho}
@@ -464,6 +496,7 @@ export function ExecutorAtividade({
         atributos={{ ...atributos, "data-cena": a.tipo === "cena" ? "sim" : "nao" }}
         cabecalho={cabecalho}
         pedido={pedido}
+        nota={nota}
         maquina={
           <>
             {conta}
@@ -545,45 +578,6 @@ function lugarDe(a: Atividade, modo: ModoExecucao): string {
   return `${distrito} · ${tipo}`;
 }
 
-/** A aposta: a pergunta destrava quando a máquina mostra o que o bilhete diz. */
-function PainelAposta({
-  passo,
-  exec,
-  junto,
-  marca,
-  onRascunho,
-  onResponder,
-  onDesfazer,
-  onSeguir,
-}: {
-  passo: PassoAposta;
-  exec: Execucao;
-  junto: React.ReactNode;
-  marca: string | null;
-  onRascunho: () => void;
-  onResponder: (v: string | null) => void;
-  onDesfazer: () => void;
-  onSeguir: () => void;
-}) {
-  const vencido = exec.passo.situacao === "vencido";
-  return (
-    <div className="flex flex-col gap-3" data-painel="aposta" data-cumprido={exec.passo.cumprido ? "sim" : "nao"}>
-      {junto}
-      <p className="m-0 text-[14px] font-semibold text-tinta-suave">{passo.pergunta}</p>
-      {vencido ? (
-        <Seguir rotulo="Continuar" onClick={onSeguir} />
-      ) : (
-        <>
-          <EntradaResposta tipo={passo.resposta} onResponder={onResponder} desabilitado={!exec.passo.cumprido} marca={{ valor: marca, onRascunho }} />
-          <button type="button" className="botao-discreto self-end" onClick={onDesfazer} data-acao="desfazer">
-            Desfazer
-          </button>
-        </>
-      )}
-    </div>
-  );
-}
-
 /** A folha pautada sobe da borda de baixo, por cima da folha quadriculada. */
 function FolhaSobe({ children }: { children: React.ReactNode }) {
   const [aberta, setAberta] = useState(false);
@@ -608,6 +602,8 @@ function MaquinaDoPasso({
   realce,
   cotaExtra,
   marcas,
+  chegada,
+  metas,
 }: {
   exec: Execucao;
   passo: Passo;
@@ -617,6 +613,8 @@ function MaquinaDoPasso({
   realce: AlvoMaquina | null;
   cotaExtra: { alvo: AlvoMaquina; texto: string } | null;
   marcas: MarcasBancada;
+  chegada: DiferencaMaquinas | null;
+  metas?: Readonly<Record<number, string>>;
 }) {
   const demo = useDemonstracao(passo.tipo === "prever" && exec.passo.situacao === "conferindo" ? passo : null, exec.passo.inicio);
   const estado = demo ?? exec.bancada;
@@ -630,6 +628,8 @@ function MaquinaDoPasso({
       realce={realce}
       cotaExtra={cotaExtra}
       marcas={demo ? { aceita: false } : passo.tipo === "prever" && exec.passo.situacao === "conferindo" ? { aceita: true } : marcas}
+      chegada={demo ? null : chegada}
+      metas={metas}
     />
   );
 }

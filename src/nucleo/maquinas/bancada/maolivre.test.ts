@@ -5,6 +5,7 @@ import {
   criarBancada,
   diferencaDeMaquinas,
   maoLivreLigada,
+  metasDeComposicao,
   operar,
   operarVarias,
   quantidadeNaBica,
@@ -147,6 +148,12 @@ describe("validadores novos", () => {
       motivo: "composicao-diferente",
       medidas: { bica: "1", pedido: "2 de 1/8", tem: "1 de 1/4" },
     });
+  });
+
+  it("metas a lápis: a composição sem simplificar, como pergunta", () => {
+    expect(metasDeComposicao({ validador: "partilha.composicao", params: { bica1: "2x1/8", bica2: "1x1/4" } })).toEqual({ 0: "2/8?", 1: "1/4?" });
+    expect(metasDeComposicao({ validador: "partilha.composicao", params: { bica2: "1x1/4+1x1/8" } })).toEqual({ 1: "1/4 + 1/8?" });
+    expect(metasDeComposicao({ validador: "partilha.igual" })).toEqual({});
   });
 });
 

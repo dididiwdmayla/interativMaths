@@ -38,3 +38,11 @@ export const LOTE_5: Entrada = { tipo: "maquina", acao: { tipo: "lote", valor: 5
 export const LOTE_6: Entrada = { tipo: "maquina", acao: { tipo: "lote", valor: 6 } };
 export const LOTE_7: Entrada = { tipo: "maquina", acao: { tipo: "lote", valor: 7 } };
 export const LOTE_8: Entrada = { tipo: "maquina", acao: { tipo: "lote", valor: 8 } };
+
+/** Mão livre: pôr uma peça inteira na bica (0 é a primeira). */
+export const POR_1: Entrada = { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 0 } };
+export const POR_2: Entrada = { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 1 } };
+export const POR_3: Entrada = { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 2 } };
+export const POR_4: Entrada = { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 3 } };
+/** Uma inteira em cada uma das quatro primeiras bicas. */
+export const UMA_EM_CADA_4: readonly Entrada[] = [POR_1, POR_2, POR_3, POR_4];

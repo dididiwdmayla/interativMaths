@@ -19,6 +19,7 @@ import { medir } from "../maquinas/bancada/medidas";
 import type { AcaoBancada, Bancada, EstadoBancada } from "../maquinas/bancada/tipos";
 import { assinaturaPartilha, ehPartilhaUnitaria, validarBancada, type ResultadoValidacao } from "../maquinas/bancada/validadores";
 import { aindaFecha } from "../maquinas/bancada/viabilidade";
+import { diferencaDeMaquinas, temDiferenca, type DiferencaMaquinas } from "../maquinas/bancada/diferenca";
 import { comoRacional, formatar, igual } from "../racional/racional";
 import type { PaginaCaderno } from "../progresso/tipos";
 import { conferirResposta } from "./respostas";
@@ -579,6 +580,21 @@ export function palpiteDoPasso(a: Atividade, e: Execucao): { readonly valor: str
     if (p.tipo === "operar" && !p.automatico) return null;
   }
   return null;
+}
+
+/**
+ * A chegada do passo atual: a diferença entre a máquina nova e a máquina anterior da atividade.
+ * Só enquanto o passo está intacto (nenhum gesto ainda); depois, null.
+ */
+export function chegadaDoPasso(a: Atividade, e: Execucao): DiferencaMaquinas | null {
+  const passos = passosDoModo(a, e.modo);
+  const p = passos[e.indice];
+  if (!p || !p.chegada || !p.maquina || !e.bancada || !e.passo.inicio) return null;
+  if (e.bancada.atual.seq !== e.passo.inicio.atual.seq || e.passo.respostas > 0 || e.passo.situacao !== "ativo") return null;
+  let anterior: MaquinaDoPasso | null = null;
+  for (let i = e.indice - 1; i >= 0 && !anterior; i--) anterior = passos[i].maquina ?? null;
+  const d = diferencaDeMaquinas(anterior ? anterior.config : null, p.maquina.config);
+  return temDiferenca(d) ? d : null;
 }
 
 /** O que a máquina mostra ao conferir uma previsão. */
