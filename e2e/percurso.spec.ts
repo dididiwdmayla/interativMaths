@@ -173,4 +173,12 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await page.reload();
   await expect(v(page, "[data-pagina='partilha.arco1.carga-igual']")).toBeVisible();
   await expect(v(page, "[data-pagina='partilha.arco1.carga-igual']")).toContainText("24 sacas repartidas entre 4 carroças dão 6 em cada.");
+
+  // A luz do caderno: a lua do topo apaga, e o escuro continua depois de recarregar.
+  await expect(page.locator("html")).toHaveAttribute("data-tema", "claro");
+  await tocar(page, "[data-botao-tema]");
+  await expect(page.locator("html")).toHaveAttribute("data-tema", "escuro");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-tema", "escuro");
+  await expect(v(page, "[data-botao-tema]")).toHaveAttribute("data-botao-tema", "escuro");
 });

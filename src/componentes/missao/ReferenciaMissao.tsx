@@ -8,6 +8,7 @@
  */
 import Link from "next/link";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { IdConceito } from "@/nucleo/curriculo/curriculo";
 import type { Atividade } from "@/nucleo/missoes/tipos";
 import { useProgresso } from "@/componentes/estado/useProgresso";
@@ -79,7 +80,8 @@ export function BotaoReferencia({ a }: { a: Atividade }) {
       <button type="button" className="botao-icone" aria-label={T.titulo} aria-haspopup="dialog" onClick={() => setAberta(true)} data-referencia-missao="botao">
         <IconeLivro />
       </button>
-      {aberta && <FolhaReferencia a={a} onFechar={() => setAberta(false)} />}
+      {/* No corpo do documento: dentro do cabeçalho, a folha ficaria presa à camada dele. */}
+      {aberta && createPortal(<FolhaReferencia a={a} onFechar={() => setAberta(false)} />, document.body)}
     </>
   );
 }

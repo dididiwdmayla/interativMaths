@@ -5,6 +5,7 @@
  * Feitos com visto verde, o atual a caneta, os seguintes a lápis, cada um com o rótulo curto.
  */
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { Passo } from "@/nucleo/missoes/tipos";
 import { IconeFechar } from "@/componentes/icones/IconeFechar";
 import { IconeVisto } from "@/componentes/icones/IconeVisto";
@@ -25,7 +26,8 @@ export function BotaoEtapas({ passos, atual }: { passos: readonly Passo[]; atual
           {atual + 1}/{passos.length}
         </span>
       </button>
-      {aberta && <FolhaEtapas passos={passos} atual={atual} onFechar={() => setAberta(false)} />}
+      {/* No corpo do documento: dentro do cabeçalho, a folha ficaria presa à camada dele. */}
+      {aberta && createPortal(<FolhaEtapas passos={passos} atual={atual} onFechar={() => setAberta(false)} />, document.body)}
     </>
   );
 }

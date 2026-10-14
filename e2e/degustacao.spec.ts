@@ -159,6 +159,18 @@ for (const layout of LAYOUTS) {
   });
 }
 
+test.describe("degustação num aparelho escuro", () => {
+  test.use({ colorScheme: "dark" });
+
+  test("segue o aparelho, sem botão, e aceita ?tema= da recepção", async ({ page }) => {
+    await page.goto("/degustacao");
+    await expect(page.locator("html")).toHaveAttribute("data-tema", "escuro");
+    await expect(page.locator("[data-botao-tema]")).toHaveCount(0);
+    await page.goto("/degustacao?tema=claro");
+    await expect(page.locator("html")).toHaveAttribute("data-tema", "claro");
+  });
+});
+
 /* ---------- Embutida ---------- */
 
 declare global {

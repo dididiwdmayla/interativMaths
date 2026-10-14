@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Cabeçalho das telas principais: o Nônio pequeno e a marca; à direita, o contador de joias e o
- * menu. Abaixo, a fila de lugares, a mesma em todas as telas. No computador, a fila sobe para a
+ * Cabeçalho das telas principais: o Nônio pequeno e a marca; à direita, o contador de joias (depois
+ * da primeira), a lua ou o sol, e o menu. Abaixo, a fila de lugares, a mesma em todas as telas. No computador, a fila sobe para a
  * mesma linha. Lugar ainda fechado fica a lápis e, tocado, diz quando abre.
  */
 import Link from "next/link";
@@ -15,6 +15,7 @@ import { IconeMenu } from "@/componentes/icones/IconeMenu";
 import { IconeVoltar } from "@/componentes/icones/IconeVoltar";
 import { Nonio } from "@/componentes/nonio/Nonio";
 import { Marca } from "./Marca";
+import { BotaoTema } from "./Tema";
 
 export type Lugar = "mapa" | "caderno" | "manual" | "planta" | "relicario" | "museu" | "rua" | "menu";
 
@@ -81,15 +82,19 @@ export function CabecalhoJogo({ atual }: { atual?: Lugar }) {
           <FilaLugares atual={atual} onFechado={setBilhete} />
         </nav>
         <div className="flex items-center gap-2">
-          <Link
-            href="/relicario"
-            className="flex h-9 items-center gap-1.5 rounded-[10px] border-2 border-contorno bg-folha px-[11px] text-[15px] font-bold"
-            aria-label={joias === 1 ? "1 joia encontrada" : `${joias} joias encontradas`}
-            data-contador="joias"
-          >
-            <IconeJoia />
-            <span className="algarismos">{joias}</span>
-          </Link>
+          {/* O contador só aparece depois da primeira joia: um "0" a sessão inteira diz "você não tem nada". */}
+          {joias > 0 && (
+            <Link
+              href="/relicario"
+              className="flex h-9 items-center gap-1.5 rounded-[10px] border-2 border-contorno bg-folha px-[11px] text-[15px] font-bold"
+              aria-label={joias === 1 ? "1 joia encontrada" : `${joias} joias encontradas`}
+              data-contador="joias"
+            >
+              <IconeJoia />
+              <span className="algarismos">{joias}</span>
+            </Link>
+          )}
+          <BotaoTema />
           <Link href="/menu" className="botao-icone" aria-label="Menu" aria-current={atual === "menu" ? "page" : undefined} data-nav="menu">
             <IconeMenu />
           </Link>

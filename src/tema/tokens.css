@@ -10,8 +10,15 @@
  *   vermelho = só traço, em sobra, para chamar o olhar e no "ainda não" passageiro (nunca texto);
  *   verde = acertou e dominado: a cor quer dizer "está certo".
  * Os cinzas puxam para o azul. Grafite e vermelho têm contraste baixo: só traço, nunca texto.
+ *
+ * Modo escuro (v0.4): o mesmo caderno com a luz apagada. Papel e tinta invertem; objetos não
+ * (o Nônio, o pão, a saca, a madeira, o marca-texto, o bilhete, as joias). Nada de brilho,
+ * degradê ou cor nova: só a tabela trocada, no bloco [data-tema="escuro"] do fim do arquivo.
+ * O bloco claro vem primeiro: as imagens geradas (ícone, compartilhamento) leem o claro.
  */
 :root {
+  color-scheme: light;
+
   /* Papel */
   --papel: #fbfcff;
   --grade: #dfe7f5;
@@ -103,4 +110,63 @@
   --t-folha: 480ms;
   --curva-firme: cubic-bezier(0.4, 0, 0.2, 1);
   --curva-saida: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* ---------- O escuro: a mesma tabela, com a luz apagada ---------- */
+:root[data-tema="escuro"] {
+  color-scheme: dark;
+
+  /* Papel */
+  --papel: #10162a;
+  --grade: #1c2540;
+  --grade-suave: #18203a;
+  --folha: #182039;
+  --pauta: #2a3554;
+  --margem: #7d3f4c;
+
+  /* Tinta: texto 13,7:1 sobre a folha; o contorno não berra; a sombra fica mais escura que o papel */
+  --tinta: #e9edf7;
+  --tinta-suave: #a9b2c9;
+  --contorno: #8792b3;
+  --sombra: #05080f;
+
+  --sobre-caneta: #0d1326;
+  --sobre-marca: #1b2440;
+  --sobre-verde: #0d1a14;
+
+  /* O Nônio: a cúpula acende um pouco, o traço clareia para aparecer no papel escuro */
+  --nonio-cupula: #3d6bff;
+  --nonio-rosto: #ffffff;
+  --nonio-aba: #8fb0ff;
+  --nonio-traco: #c9d3ee;
+  --nonio-olho: #1b2440;
+
+  --grafite: #5c6788;
+  --grafite-claro: #1e2742;
+
+  --caneta: #7fa3ff;
+  --caneta-escura: #a9c0ff;
+  --caneta-clara: #3f5ba8;
+  --caneta-palida: #25335e;
+
+  --marca-texto: #ffe45c;
+  --marca-texto-palido: #3a3418;
+
+  --vermelho: #ff6b70;
+  --vermelho-nevoa: #3b1c26;
+
+  --verde: #3fc791;
+  --verde-escuro: #62d6a7;
+  --verde-tinta: #93e9c4;
+  --verde-palido: #163d31;
+
+  --bilhete: #f1dc7c;
+
+  /* Materiais: objetos, só um pouco menos acesos para não ofuscar no papel escuro */
+  --pao: #e8b35e;
+  --pao-miolo: #f3d49b;
+  --saca: #cfae80;
+  --madeira: #b98457;
+
+  --veu: rgba(3, 5, 12, 0.6);
 }
