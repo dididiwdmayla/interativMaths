@@ -36,6 +36,7 @@ export const CENA_PIZZAS: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Sexta à noite, na Rua.",
+      instrucao: "Leia a cena e sirva a mesa.",
       falas: [
         { quem: "dalia", texto: "Três pizzas chegaram já cortadas em oito. Quatro amigos, todo mundo igual." },
         { quem: "nonio", texto: "Aqui a máquina não corta: as fatias já vêm prontas." },
@@ -47,6 +48,7 @@ export const CENA_PIZZAS: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "24 fatias, 4 pratos, todos iguais.",
+      instrucao: "Sirva as 24 fatias em 4 pratos, todos iguais.",
       maquina: {
         config: {
           pele: "pizzas-amigos",
@@ -70,6 +72,7 @@ export const CENA_PIZZAS: Atividade = {
       tipo: "prever",
       fase: "aplicacao",
       pedido: "Quanto de pizza cada um comeu?",
+      instrucao: "Monte com as fichas quanto de pizza cada amigo comeu.",
       pergunta: "Cada amigo comeu quanto de pizza? Monte com as fichas.",
       resposta: { tipo: "fracao", maximo: 8 },
       medida: "carga-por-bica",
@@ -89,6 +92,7 @@ export const CENA_PIZZAS: Atividade = {
       tipo: "narrativa",
       fase: "retencao",
       pedido: "A conta estava na mesa.",
+      instrucao: "Leia e volte à Rua.",
       falas: [{ quem: "nonio", texto: "Aplicação direta: a mesma conta, do mesmo jeito. Seis oitavos ou três quartos, o prato é o mesmo." }],
       botao: "Voltar à Rua",
     },

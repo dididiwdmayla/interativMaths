@@ -56,7 +56,14 @@ export interface Objetivo {
 
 export type TipoResposta =
   | { readonly tipo: "numero"; readonly minimo: number; readonly maximo: number; readonly unidade?: string }
-  | { readonly tipo: "fracao"; readonly maximo: number }
+  | {
+      readonly tipo: "fracao";
+      readonly maximo: number;
+      /** As fichas que aparecem (sem elas, de 1 ao máximo). */
+      readonly fichas?: readonly number[];
+      /** A frase em volta da fração: "Cada mesa recebe [ ] de broa". */
+      readonly moldura?: { readonly antes: string; readonly depois: string };
+    }
   | { readonly tipo: "opcoes"; readonly opcoes: readonly { readonly id: string; readonly texto: string }[] };
 
 /** Resposta típica que denuncia um equívoco: "4/3" → fracao-invertida. */
@@ -74,9 +81,25 @@ export interface MaquinaDoPasso {
 interface PassoBase {
   readonly id: string;
   readonly fase: Fase;
-  /** O pedido atual, que cabe numa linha. */
+  /** Rótulo curto do passo (a lista de etapas), que cabe numa linha. */
   readonly pedido: string;
+  /**
+   * O que fazer agora, com verbo no imperativo primeiro, até 80 caracteres, terminando em ponto:
+   * "Reparta as 5 broas entre as 4 mesas, sem sobrar nada."
+   */
+  readonly instrucao: string;
+  /** Perguntas sugeridas para a conversa com o Nônio (sem elas, um padrão por tipo de passo). */
+  readonly perguntas?: readonly string[];
+  /**
+   * A máquina nova continua a história (chegaram sacas, abriu uma bica): a tela anima a
+   * diferença em relação à máquina anterior antes de o passo começar, com a fala da Dália.
+   */
+  readonly chegada?: { readonly fala: string; readonly texto: string };
   readonly falas?: readonly Fala[];
+  /** A fala do Nônio na faixa quando o passo começa (sem ela, um modelo do tipo de passo). */
+  readonly nonio?: string;
+  /** O que o Nônio diz quando o passo é vencido: o que ficou certo, com os números. */
+  readonly acerto?: string;
   /** Nova máquina. Sem ela, o passo continua a máquina do passo anterior. */
   readonly maquina?: MaquinaDoPasso;
   readonly dicas?: EscadaDicas;
@@ -125,8 +148,24 @@ export interface PassoOperar extends PassoBase {
   readonly rotuloFechar?: string;
   /** Se a partilha aceita usar só pedaços de numerador 1 sem repetir, guarda esta marca. */
   readonly marcaUnitaria?: string;
-  /** Convite opcional depois de vencido (ex.: "dá para fazer numa volta só?"). */
-  readonly convite?: { readonly texto: string; readonly objetivo: Objetivo; readonly evidencias?: readonly EvidenciaDeclarada[] };
+  /** false: só a alavanca neste passo (sem pôr e tirar peças à mão). */
+  readonly maoLivre?: false;
+  /**
+   * O objetivo é conferido a cada gesto; cumprido, o passo vence sem fechar a máquina
+   * (a mão põe uma saca em cada carroça, e o passo seguinte continua da mesma máquina).
+   */
+  readonly automatico?: boolean;
+  /**
+   * O desafio, depois de vencido: um botão secundário "Desafio: {texto}"; aceito, a etiqueta passa
+   * a Desafio e a instrução vira a do desafio.
+   */
+  readonly convite?: {
+    readonly texto: string;
+    /** A instrução enquanto o desafio está aberto (verbo primeiro). */
+    readonly instrucao?: string;
+    readonly objetivo: Objetivo;
+    readonly evidencias?: readonly EvidenciaDeclarada[];
+  };
 }
 
 export interface PassoPrever extends PassoBase {
@@ -142,6 +181,32 @@ export interface PassoPrever extends PassoBase {
   readonly respostasEquivoco?: readonly RespostaEquivoco[];
   /** Explicação curta mostrada depois que a máquina confere. */
   readonly explicacao?: string;
+}
+
+/**
+ * A aposta do Nônio: ele escreve num bilhete uma aposta com um equívoco comum. O jogador tira a
+ * prova na máquina (o objetivo é conferido a cada gesto); cumprido, a pergunta destrava.
+ * Quem perde a aposta nunca é o jogador.
+ */
+export interface PassoAposta extends PassoBase {
+  readonly tipo: "aposta";
+  /** O texto do bilhete, na voz do Nônio. */
+  readonly aposta: string;
+  readonly objetivo: Objetivo;
+  /** Ações que tiram a prova a partir do começo do passo (resolver junto). */
+  readonly resolucao: readonly AcaoBancada[];
+  readonly pergunta: string;
+  readonly resposta: TipoResposta;
+  readonly esperado: string;
+  readonly respostasEquivoco?: readonly RespostaEquivoco[];
+  /** O Nônio admite (ou confirma) em uma frase. */
+  readonly explicacao: string;
+  /** A resposta certa confirma o bilhete: o Nônio tinha razão. */
+  readonly nonioTemRazao: boolean;
+  /** O gesto que tira a prova (sem ele, um modelo genérico). Sem a resposta. */
+  readonly gesto?: string;
+  /** A bancada mostra o lote e Repartir (padrão sim); false quando a prova é só com a mão. */
+  readonly alavanca?: boolean;
 }
 
 export interface LacunaFrase {
@@ -183,6 +248,7 @@ export type Passo =
   | PassoPalpite
   | PassoOperar
   | PassoPrever
+  | PassoAposta
   | PassoFrase
   | PassoNotacao
   | PassoRegistro;

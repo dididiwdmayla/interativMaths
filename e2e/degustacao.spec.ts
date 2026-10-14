@@ -16,42 +16,64 @@ const ORIGEM_JOGO = "https://matematica.interativai.com";
 const v = (alvo: Alvo, seletor: string) => alvo.locator(seletor).locator("visible=true").first();
 const tocar = (alvo: Alvo, seletor: string) => v(alvo, seletor).click();
 const passo = (alvo: Alvo, id: string) => expect(v(alvo, `[data-tela=missao][data-passo="${id}"]`)).toBeVisible();
-const ficha = (alvo: Alvo, n: number) => tocar(alvo, `[data-painel=prever] button:text-is("${n}")`);
-const partes = (alvo: Alvo, n: number) => tocar(alvo, `[aria-label="Cortar em quantas partes"] :text-is("${n}")`);
+const ficha = (alvo: Alvo, n: number) => tocar(alvo, `[data-ficha='${n}']`);
 
-/** A ilhota inteira, do pedido da Dália à tela final. */
+/** A primeira vez com uma ferramenta: a apresentação do Nônio, e "Entendi". */
+async function entender(alvo: Alvo, id: string) {
+  await expect(v(alvo, `[data-apresentacao="${id}"]`)).toBeVisible();
+  await tocar(alvo, "[data-acao=entendi]");
+  await expect(alvo.locator(`[data-apresentacao="${id}"]`)).toHaveCount(0);
+}
+
+/** Toca na peça da esteira e corta pelo menu que abre sobre ela. */
+async function cortar(alvo: Alvo, peca: string, partes: number, todas = false) {
+  await tocar(alvo, `[data-peca='${peca}']`);
+  await expect(v(alvo, "[data-menu-corte]")).toBeVisible();
+  if (todas) await tocar(alvo, "[data-menu-corte] [data-cortar=todas]");
+  await tocar(alvo, `[data-menu-corte] [data-cortar-em='${partes}']`);
+}
+
+/** A ilhota inteira, do pedido da Dália à tela final, com a faixa do Nônio e a mão livre (v0.3). */
 async function jogar(alvo: Alvo) {
   await passo(alvo, "chegada");
+  await entender(alvo, "faixa");
   await tocar(alvo, "[data-acao=seguir]");
 
-  // 5 broas, 4 mesas: uma para cada, a que sobra cortada em 4.
+  // 5 broas, 4 mesas: uma para cada, e a que sobra, cortada em 4 pelo menu sobre ela.
   await passo(alvo, "cinco-broas");
+  await entender(alvo, "mao-livre");
+  // A degustação fica fora do catálogo: sem conversa com IA, com ou sem chave no servidor.
+  await expect(v(alvo, "[data-acao=nonio]")).toBeVisible();
+  await expect(alvo.locator("[data-acao=perguntar]")).toHaveCount(0);
   await tocar(alvo, "[data-acao=repartir]");
   await expect(v(alvo, "[data-bica='0']")).toHaveAttribute("data-quantidade", "1");
-  await partes(alvo, 4);
-  await tocar(alvo, "[data-acao=cortar-uma]");
+  await expect(v(alvo, "[data-gesto]")).toContainText("toque na peça que sobrou");
+  await cortar(alvo, "1/1", 4);
   await tocar(alvo, "[data-acao=repartir]");
   await tocar(alvo, "[data-acao=fechar]");
-  await expect(v(alvo, "[data-tela=missao][data-situacao=vencido]")).toBeVisible();
+  await expect(v(alvo, "[data-tela=missao][data-situacao=vencido]")).toHaveAttribute("data-retorno", "acertou");
   await tocar(alvo, "[data-acao=seguir]");
 
   await passo(alvo, "palpite");
+  await expect(v(alvo, "[data-gesto]")).toContainText("toque numa das opções");
   await tocar(alvo, "[data-opcao=uma]");
 
   // 3 broas, 4 mesas: todas em 4, três pedaços para cada.
   await passo(alvo, "tres-broas");
-  await partes(alvo, 4);
-  await tocar(alvo, "[data-acao=cortar-todas]");
+  await entender(alvo, "menu-corte");
+  await cortar(alvo, "1/1", 4, true);
   await tocar(alvo, '[data-seletor=lote] button[aria-label$="mais um"]');
   await tocar(alvo, '[data-seletor=lote] button[aria-label$="mais um"]');
   await tocar(alvo, "[data-acao=repartir]");
   await tocar(alvo, "[data-acao=fechar]");
   await expect(v(alvo, "[data-bica='3']")).toHaveAttribute("data-quantidade", "3/4");
+  await expect(v(alvo, "[data-tela=missao]")).toHaveAttribute("data-retorno", "acertou");
   await expect(v(alvo, "[data-painel=vencido]")).toContainText("Seu palpite: uma broa");
   await tocar(alvo, "[data-acao=seguir]");
 
-  // Descoberta: 2 broas, 3 mesas; a máquina confere.
+  // Descoberta: 2 broas, 3 mesas; a resposta com fichas, e a máquina confere.
   await passo(alvo, "duas-tres");
+  await entender(alvo, "fichas");
   await ficha(alvo, 2);
   await ficha(alvo, 3);
   await tocar(alvo, "[data-acao=responder]");

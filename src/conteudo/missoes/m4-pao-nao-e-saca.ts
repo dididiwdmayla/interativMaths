@@ -3,7 +3,7 @@
  */
 import type { ConfigBancada } from "@/nucleo/maquinas/bancada/tipos";
 import type { Atividade, Entrada } from "@/nucleo/missoes/tipos";
-import { CONFERIR, CORTAR_TODAS, CORTAR_UMA, FATIADOR_PADARIA, FECHAR, LOTE_2, LOTE_3, LOTE_6, MAQUINA_MONTAR_BROAS, REPARTIR, SEGUIR } from "./comum";
+import { CONFERIR, CORTAR_TODAS, CORTAR_UMA, FATIADOR_PADARIA, FECHAR, LOTE_2, LOTE_3, LOTE_6, MAQUINA_MONTAR_BROAS, REPARTIR, SEGUIR, UMA_EM_CADA_4 } from "./comum";
 
 const CINCO: ConfigBancada = {
   pele: "broas-mesas",
@@ -27,7 +27,28 @@ const PILHA_MEIO: Entrada = { tipo: "maquina", acao: { tipo: "pilha", tamanho: "
 
 const CINCO_OK: Entrada[] = [SEGUIR, REPARTIR, PARTES_4, CORTAR_UMA, REPARTIR, FECHAR, SEGUIR];
 
-const COMPARAR: Entrada[] = [{ tipo: "responder", valor: "mesmo" }, SEGUIR];
+/** Cinco broas só com a mão e o menu de corte: a referência 1. */
+const CINCO_A_MAO: Entrada[] = [
+  SEGUIR,
+  ...UMA_EM_CADA_4,
+  { tipo: "maquina", acao: { tipo: "cortar", tamanho: "1/1", partes: 4 } },
+  { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 0 } },
+  { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 1 } },
+  { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 2 } },
+  { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 3 } },
+  FECHAR,
+  SEGUIR,
+];
+
+/** A aposta: corta uma broa em 8 e outra em 4, põe 2 oitavos na A e 1 quarto na B; empate. */
+const PROVA_DA_APOSTA: Entrada[] = [
+  { tipo: "maquina", acao: { tipo: "cortar", tamanho: "1/1", partes: 8 } },
+  { tipo: "maquina", acao: { tipo: "cortar", tamanho: "1/1", partes: 4 } },
+  { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/8", bica: 0 } },
+  { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/8", bica: 0 } },
+  { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/4", bica: 1 } },
+];
+const COMPARAR: Entrada[] = [...PROVA_DA_APOSTA, { tipo: "responder", valor: "empate" }, SEGUIR];
 const DESCOBERTA: Entrada[] = [...COMPARAR, { tipo: "responder", valor: "2/3" }, SEGUIR];
 
 const REGISTRO: Entrada[] = [
@@ -64,6 +85,7 @@ export const MISSAO_4: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Leia o pedido da Dália.",
+      instrucao: "Leia o pedido da Dália e aceite o serviço.",
       falas: [
         { quem: "dalia", texto: "Padaria do Engenho. Cinco broas, quatro mesas. O manual das sacas não serve aqui: pão se corta." },
         { quem: "dalia", texto: "O fatiador está ali. Ninguém mexe nele desde que o seu Odilo se aposentou." },
@@ -79,6 +101,7 @@ export const MISSAO_4: Atividade = {
       tipo: "operar",
       fase: "experimentacao",
       pedido: "5 broas, 4 mesas, partes iguais.",
+      instrucao: "Reparta as 5 broas entre as 4 mesas, sem sobrar nada.",
       maquina: { config: CINCO },
       objetivo: { validador: "partilha.fechada" },
       resolucao: [{ tipo: "repartir" }, { tipo: "partes", valor: 4 }, { tipo: "fatiar", quantidade: 1 }, { tipo: "repartir" }],
@@ -93,6 +116,8 @@ export const MISSAO_4: Atividade = {
           },
         },
       ],
+      nonio: "Pão não é saca: o que sobra dá para cortar. Comece como com as sacas.",
+      acerto: "Uma broa e mais um quarto em cada mesa. A broa que sobrou virou pedaço, e nada ficou na esteira.",
       equivocos: ["resto-jogado-fora", "corte-que-nao-fecha", "parou-cedo"],
       evidencias: [
         { conceito: "fra.parte", tipo: "experimento" },
@@ -105,6 +130,7 @@ export const MISSAO_4: Atividade = {
       tipo: "operar",
       fase: "experimentacao",
       pedido: "Agora 3 broas e 4 mesas.",
+      instrucao: "Reparta 3 broas entre as 4 mesas, sem sobrar nada.",
       maquina: { config: TRES },
       objetivo: { validador: "partilha.fechada" },
       resolucao: [{ tipo: "partes", valor: 4 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 3 }, { tipo: "repartir" }],
@@ -119,55 +145,62 @@ export const MISSAO_4: Atividade = {
           },
         },
       ],
+      nonio: "Três broas, quatro mesas: nenhuma volta de inteiras cabe. Olhe a altura dos medidores.",
       equivocos: ["corte-que-nao-fecha", "resto-jogado-fora", "parou-cedo"],
       evidencias: [{ conceito: "fra.quociente", tipo: "experimento" }],
       aoConcluir: [{ quem: "nonio", texto: "Os medidores pararam na mesma altura. Seja qual for o corte, três quartos de broa em cada mesa." }],
     },
     {
       id: "comparar",
-      tipo: "prever",
+      tipo: "aposta",
       fase: "descoberta",
-      pedido: "Uma mesa reclama da outra.",
-      falas: [{ quem: "dalia", texto: "Uma mesa ganhou dois pedaços pequenos; a outra, um pedaço só. A dos dois diz que comeu mais." }],
+      pedido: "Uma aposta sobre dois pedaços.",
+      instrucao: "Mostre na máquina se ele tem razão.",
+      aposta: "Aposto que 2/8 é mais que 1/4. Afinal, dois é mais que um.",
+      gesto: "Corte uma broa em 8 e outra em 4. Arraste 2 oitavos para a mesa A e 1 quarto para a mesa B.",
       maquina: {
-        config: { pele: "broas-mesas", pecas: { quantidade: 1 }, bicas: { quantidade: 2, ajustavel: true }, fatiador: FATIADOR_PADARIA },
-        acoes: [
-          { tipo: "partes", valor: 2 },
-          { tipo: "fatiar", quantidade: 1 },
-          { tipo: "partes", valor: 2 },
-          { tipo: "fatiar", quantidade: 1 },
-          { tipo: "pilha", tamanho: "1/4" },
-          { tipo: "bica", indice: 1 },
-          { tipo: "repartir" },
-        ],
+        config: { pele: "broas-mesas", pecas: { quantidade: 2 }, bicas: { quantidade: 2, ajustavel: false }, fatiador: FATIADOR_PADARIA, nomesBicas: ["A", "B"] },
       },
-      pergunta: "2 pedaços de 1/8 ou 1 pedaço de 1/4: qual é mais pão?",
+      objetivo: { validador: "partilha.composicao", params: { bica1: "2x1/8", bica2: "1x1/4" } },
+      resolucao: [
+        { tipo: "cortar", tamanho: "1/1", partes: 8 },
+        { tipo: "cortar", tamanho: "1/1", partes: 4 },
+        { tipo: "colocar", tamanho: "1/8", bica: 0 },
+        { tipo: "colocar", tamanho: "1/8", bica: 0 },
+        { tipo: "colocar", tamanho: "1/4", bica: 1 },
+      ],
+      alavanca: false,
+      pergunta: "Depois de repartir: quem ficou com mais pão?",
       resposta: {
         tipo: "opcoes",
         opcoes: [
-          { id: "dois-oitavos", texto: "2 pedaços de 1/8" },
-          { id: "um-quarto", texto: "1 pedaço de 1/4" },
-          { id: "mesmo", texto: "É o mesmo" },
+          { id: "mesa-a", texto: "Mesa A" },
+          { id: "empate", texto: "Empate" },
+          { id: "mesa-b", texto: "Mesa B" },
         ],
       },
-      esperado: "mesmo",
-      respostasEquivoco: [{ resposta: "dois-oitavos", equivoco: "conta-pedacos" }],
-      demonstracao: [
-        { tipo: "bica", indice: 1 },
-        { tipo: "bica", indice: 0 },
-        { tipo: "pilha", tamanho: "1/4" },
-        { tipo: "partes", valor: 2 },
-        { tipo: "fatiar", quantidade: 1 },
-        { tipo: "pilha", tamanho: "1/8" },
-        { tipo: "lote", valor: 2 },
-        { tipo: "repartir" },
-      ],
-      explicacao: "Os dois medidores param na mesma altura: dois oitavos e um quarto são a mesma quantidade de pão.",
+      esperado: "empate",
+      respostasEquivoco: [{ resposta: "mesa-a", equivoco: "conta-pedacos" }],
+      nonioTemRazao: false,
+      explicacao: "Perdi a aposta. Dois oitavos e um quarto enchem a mesa até a mesma altura.",
       dicas: [
-        { texto: "Olhe os medidores, não os pedaços.", alvo: "bicas" },
-        { texto: "Um quarto cortado em 2 dá dois oitavos." },
-        { texto: "Com outros números: 2 pedaços de 1/4 e 1 pedaço de 1/2 enchem o medidor até a mesma altura." },
+        { texto: "Olhe os medidores das mesas, não o número de pedaços.", alvo: "bicas" },
+        { texto: "Um quarto cortado em 2 dá dois pedaços. De que tamanho é cada um?", cota: { alvo: "fatiador", texto: "1/4 em 2 partes" } },
+        {
+          texto: "Com outros números: 2 pedaços de 1/4 e 1 pedaço de 1/2 enchem o medidor até a mesma altura.",
+          caso: {
+            maquina: { pele: "broas-mesas", pecas: { quantidade: 2 }, bicas: { quantidade: 2, ajustavel: false }, fatiador: FATIADOR_PADARIA },
+            acoes: [
+              { tipo: "cortar", tamanho: "1/1", partes: 4 },
+              { tipo: "cortar", tamanho: "1/1", partes: 2 },
+              { tipo: "colocar", tamanho: "1/4", bica: 0 },
+              { tipo: "colocar", tamanho: "1/4", bica: 0 },
+              { tipo: "colocar", tamanho: "1/2", bica: 1 },
+            ],
+          },
+        },
       ],
+      equivocos: ["conta-pedacos"],
       evidencias: [{ conceito: "fra.parte", tipo: "descoberta" }],
     },
     {
@@ -175,9 +208,11 @@ export const MISSAO_4: Atividade = {
       tipo: "prever",
       fase: "descoberta",
       pedido: "Monte a resposta com fichas.",
+      instrucao: "Monte com as fichas o pedaço que cada mesa recebe: 2 broas, 3 mesas.",
       maquina: { config: { pele: "broas-mesas", pecas: { quantidade: 2 }, bicas: { quantidade: 3, ajustavel: false }, fatiador: FATIADOR_PADARIA } },
       pergunta: "2 broas, 3 mesas. Que pedaço cada mesa recebe?",
-      resposta: { tipo: "fracao", maximo: 12 },
+      nonio: "Duas broas, três mesas. A resposta vem antes; a máquina confere depois.",
+      resposta: { tipo: "fracao", maximo: 12, fichas: [1, 2, 3, 4, 6], moldura: { antes: "Cada mesa recebe", depois: "de broa" } },
       medida: "carga-por-bica",
       aceitaEquivalente: true,
       demonstracao: [{ tipo: "partes", valor: 3 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 2 }, { tipo: "repartir" }],
@@ -201,6 +236,7 @@ export const MISSAO_4: Atividade = {
       tipo: "frase",
       fase: "formalizacao",
       pedido: "Toque numa cota, depois na lacuna.",
+      instrucao: "Complete a frase com os números da máquina parada.",
       falas: [{ quem: "nonio", texto: "Para o registro, a máquina mostra a partilha em quartos." }],
       maquina: { config: TRES, acoes: [{ tipo: "partes", valor: 4 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 3 }, { tipo: "repartir" }] },
       frase: "Cada broa foi cortada em {a} partes iguais, e cada pedaço é {b} de broa. Cada mesa recebeu {c} pedaços: {d} de broa.",
@@ -222,6 +258,7 @@ export const MISSAO_4: Atividade = {
       tipo: "notacao",
       fase: "formalizacao",
       pedido: "Comprima a frase em notação.",
+      instrucao: "Comprima a frase em notação.",
       linhas: ["3 ÷ 4 = 3/4", "5 ÷ 4 = 1 1/4 = 5/4"],
       falas: [
         { quem: "nonio", texto: "O denominador diz em quantas partes iguais o inteiro foi cortado. O numerador, quantos pedaços." },
@@ -233,6 +270,7 @@ export const MISSAO_4: Atividade = {
       tipo: "operar",
       fase: "formalizacao",
       pedido: "Caminho de volta: monte 2 ÷ 5.",
+      instrucao: "Monte a conta 2 ÷ 5 na máquina.",
       conta: "2 ÷ 5",
       maquina: { config: MAQUINA_MONTAR_BROAS },
       objetivo: { validador: "maquina.mostra-divisao", params: { dividendo: 2, divisor: 5 } },
@@ -256,6 +294,7 @@ export const MISSAO_4: Atividade = {
       tipo: "registro",
       fase: "formalizacao",
       pedido: "Guarde a página no Caderno.",
+      instrucao: "Guarde a página no Caderno.",
       pagina: {
         id: "partilha.arco1.pao-nao-e-saca",
         titulo: "O traço é uma divisão",
@@ -271,6 +310,7 @@ export const MISSAO_4: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Prova direta: resposta antes da máquina.",
+      instrucao: "Leia a encomenda e aceite.",
       falas: [{ quem: "dalia", texto: "Cinco broas, oito mesas. Me diga quanto vai em cada mesa antes de ligar. Depois a máquina confere." }],
       botao: "Aceitar",
     },
@@ -279,6 +319,7 @@ export const MISSAO_4: Atividade = {
       tipo: "prever",
       fase: "aplicacao",
       pedido: "Responda em notação.",
+      instrucao: "Responda quanto de broa cada mesa recebe: 5 broas, 8 mesas.",
       maquina: { config: { pele: "broas-mesas", pecas: { quantidade: 5 }, bicas: { quantidade: 8, ajustavel: false }, fatiador: FATIADOR_PADARIA } },
       pergunta: "5 broas, 8 mesas. Quanto de broa cada mesa recebe?",
       resposta: { tipo: "fracao", maximo: 12 },
@@ -295,6 +336,11 @@ export const MISSAO_4: Atividade = {
     },
   ],
   solucoesDeTeste: [
+    {
+      nome: "à mão, com o menu de corte",
+      modo: "guiada",
+      entradas: [...CINCO_A_MAO, PARTES_4, CORTAR_TODAS, LOTE_3, REPARTIR, FECHAR, SEGUIR, ...DESCOBERTA, ...REGISTRO],
+    },
     {
       nome: "tudo em quartos",
       modo: "guiada",
@@ -337,7 +383,12 @@ export const MISSAO_4: Atividade = {
   sabotagens: [
     { nome: "fecha com uma broa inteira na esteira", modo: "guiada", entradas: [SEGUIR, REPARTIR, FECHAR], equivoco: "resto-jogado-fora" },
     { nome: "corta a broa que sobrou em 3 para 4 mesas", modo: "guiada", entradas: [SEGUIR, REPARTIR, PARTES_3, CORTAR_UMA], equivoco: "corte-que-nao-fecha" },
-    { nome: "dois pedaços pequenos parecem mais", modo: "guiada", entradas: [...CINCO_OK, PARTES_4, CORTAR_TODAS, LOTE_3, REPARTIR, FECHAR, SEGUIR, { tipo: "responder", valor: "dois-oitavos" }], equivoco: "conta-pedacos" },
+    {
+      nome: "na aposta, responde como o bilhete: dois pedaços parecem mais",
+      modo: "guiada",
+      entradas: [...CINCO_OK, PARTES_4, CORTAR_TODAS, LOTE_3, REPARTIR, FECHAR, SEGUIR, ...PROVA_DA_APOSTA, { tipo: "responder", valor: "mesa-a" }],
+      equivoco: "conta-pedacos",
+    },
     {
       nome: "2 broas para 3 mesas escrito 3/2",
       modo: "guiada",

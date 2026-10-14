@@ -4,11 +4,15 @@
  */
 import { describe, expect, it } from "vitest";
 import { aplicarEntrada, iniciarExecucao, passosDoModo, type Efeito, type Execucao } from "@/nucleo/missoes/motor";
-import type { Atividade, Entrada, ModoExecucao } from "@/nucleo/missoes/tipos";
+import type { Atividade, Entrada, ModoExecucao, Passo } from "@/nucleo/missoes/tipos";
+import { diferencaDeMaquinas, maoLivreLigada, temDiferenca } from "@/nucleo/maquinas/bancada";
+import { maoLivreNoPasso } from "@/nucleo/missoes/motor";
 import { situacaoConceito, type Evidencia } from "@/nucleo/dominio";
 import { VALIDADORES_BANCADA } from "@/nucleo/maquinas/bancada/validadores";
+import { problemasDaInstrucao } from "@/nucleo/missoes/instrucao";
 import { CONCEITOS, CONCEITOS_DO_ARCO_1 } from "./conceitos";
-import { EQUIVOCOS, MOTIVOS } from "./equivocos";
+import { EQUIVOCOS } from "./equivocos";
+import { MOTIVOS } from "./reacoes";
 import { ATIVIDADES } from "./atividades";
 import { DEGUSTACAO } from "./degustacao";
 
@@ -63,6 +67,10 @@ describe.each(TODAS.map((a) => [a.id, a] as const))("atividade %s", (_, a) => {
     }
   });
 
+  it("todo passo diz, com verbo, o que fazer agora", () => {
+    for (const p of [...a.passos, ...(a.prova ?? [])]) expect(problemasDaInstrucao(p.instrucao), `${a.id}#${p.id}: "${p.instrucao}"`).toEqual([]);
+  });
+
   it("o pedido de cada passo cabe numa linha do celular", () => {
     for (const p of [...a.passos, ...(a.prova ?? [])]) expect(p.pedido.length, `${p.id}: ${p.pedido}`).toBeLessThanOrEqual(44);
   });
@@ -97,10 +105,52 @@ describe.each(TODAS.map((a) => [a.id, a] as const))("atividade %s", (_, a) => {
   });
 });
 
+describe("passos novos da v0.3", () => {
+  const missoes = TODAS.filter((a) => a.tipo === "missao");
+  const apostas = missoes.flatMap((a) => a.passos.filter((p): p is Extract<Passo, { tipo: "aposta" }> => p.tipo === "aposta").map((p) => ({ a, p })));
+
+  it("há apostas, e numa delas o Nônio tem razão (a resposta nunca é automática)", () => {
+    expect(apostas.length).toBeGreaterThanOrEqual(3);
+    expect(apostas.some(({ p }) => p.nonioTemRazao)).toBe(true);
+    expect(apostas.some(({ p }) => !p.nonioTemRazao)).toBe(true);
+  });
+
+  it("toda aposta que o Nônio perde tem uma sabotagem que responde do jeito do bilhete", () => {
+    for (const { a, p } of apostas.filter(({ p }) => !p.nonioTemRazao)) {
+      const doBilhete = (p.respostasEquivoco ?? []).map((r) => r.resposta);
+      expect(doBilhete.length, `${a.id}#${p.id}: a resposta do bilhete precisa de equívoco`).toBeGreaterThan(0);
+      const sabotou = a.sabotagens.some((s) => s.entradas.some((e) => e.tipo === "responder" && e.valor !== null && doBilhete.includes(e.valor)));
+      expect(sabotou, `${a.id}#${p.id}`).toBe(true);
+    }
+  });
+
+  it("toda missão com mão livre tem uma solução que põe peças com a mão", () => {
+    for (const a of missoes) {
+      const comMao = a.passos.some((p) => (p.tipo === "operar" || p.tipo === "aposta") && p.maquina && maoLivreLigada(p.maquina.config) && maoLivreNoPasso(p));
+      if (!comMao) continue;
+      const usa = a.solucoesDeTeste.some((s) => s.entradas.some((e) => e.tipo === "maquina" && e.acao.tipo === "colocar"));
+      expect(usa, a.id).toBe(true);
+    }
+  });
+
+  it("a chegada só aparece onde a máquina nova continua a anterior", () => {
+    for (const a of TODAS) {
+      const passos = passosDoModo(a, "guiada");
+      passos.forEach((p, i) => {
+        if (!p.chegada) return;
+        const anterior = [...passos.slice(0, i)].reverse().find((x) => x.maquina)?.maquina?.config ?? null;
+        expect(anterior, `${a.id}#${p.id}`).not.toBeNull();
+        expect(p.maquina, `${a.id}#${p.id}`).toBeDefined();
+        if (anterior && p.maquina) expect(temDiferenca(diferencaDeMaquinas(anterior, p.maquina.config)), `${a.id}#${p.id}`).toBe(true);
+      });
+    }
+  });
+});
+
 describe("conteúdo das respostas", () => {
   it("todo equívoco tem resposta e conceito existente", () => {
     for (const e of EQUIVOCOS) {
-      expect(e.resposta.length).toBeGreaterThan(10);
+      expect(e.consequencia.length).toBeGreaterThan(10);
       expect(conceitosIds.has(e.conceito), e.id).toBe(true);
     }
     expect(Object.keys(MOTIVOS).length).toBeGreaterThan(10);

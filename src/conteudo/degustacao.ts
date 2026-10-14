@@ -57,6 +57,7 @@ export const DEGUSTACAO: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Um pedido da Dália, na padaria.",
+      instrucao: "Leia o pedido da Dália e aceite o serviço.",
       falas: [
         { quem: "dalia", texto: "Padaria do Engenho. Broas para repartir entre as mesas, e toda mesa quer a mesma quantidade de pão." },
         { quem: "dalia", texto: "A máquina reparte sozinha. O manual diz como ligar; a página do porquê rasgou." },
@@ -73,6 +74,7 @@ export const DEGUSTACAO: Atividade = {
       tipo: "operar",
       fase: "experimentacao",
       pedido: "5 broas, 4 mesas, todas iguais.",
+      instrucao: "Reparta as 5 broas entre as 4 mesas, sem sobrar nada.",
       maquina: { config: CINCO },
       objetivo: { validador: "partilha.fechada" },
       resolucao: [{ tipo: "repartir" }, { tipo: "partes", valor: 4 }, { tipo: "fatiar", quantidade: 1 }, { tipo: "repartir" }],
@@ -95,6 +97,7 @@ export const DEGUSTACAO: Atividade = {
       tipo: "palpite",
       fase: "palpite",
       pedido: "Agora 3 broas. Antes, um palpite.",
+      instrucao: "Diga quanto de broa você acha que vai em cada mesa.",
       maquina: { config: TRES },
       pergunta: "Três broas para quatro mesas. Quanto vai em cada mesa?",
       resposta: {
@@ -112,6 +115,7 @@ export const DEGUSTACAO: Atividade = {
       tipo: "operar",
       fase: "experimentacao",
       pedido: "3 broas, 4 mesas, todas iguais.",
+      instrucao: "Reparta 3 broas entre as 4 mesas, sem sobrar nada.",
       objetivo: { validador: "partilha.fechada" },
       resolucao: [{ tipo: "partes", valor: 4 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 3 }, { tipo: "repartir" }],
       dicas: [
@@ -133,6 +137,7 @@ export const DEGUSTACAO: Atividade = {
       tipo: "prever",
       fase: "descoberta",
       pedido: "Preveja antes da máquina.",
+      instrucao: "Monte com as fichas o pedaço que cada mesa recebe: 2 broas, 3 mesas.",
       maquina: { config: { pele: "broas-mesas", pecas: { quantidade: 2 }, bicas: { quantidade: 3, ajustavel: false }, fatiador: FATIADOR_PADARIA } },
       pergunta: "2 broas, 3 mesas. Que pedaço vai em cada mesa? Monte com as fichas.",
       resposta: { tipo: "fracao", maximo: 12 },
@@ -158,6 +163,7 @@ export const DEGUSTACAO: Atividade = {
       tipo: "frase",
       fase: "formalizacao",
       pedido: "Toque numa cota, depois na lacuna.",
+      instrucao: "Complete a frase com os números da máquina parada.",
       falas: [{ quem: "nonio", texto: "Hora de passar a limpo. A máquina mostra de novo as três broas em quartos." }],
       maquina: { config: TRES, acoes: [{ tipo: "partes", valor: 4 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 3 }, { tipo: "repartir" }] },
       frase: "Cada broa foi cortada em {a} partes iguais, e cada pedaço é {b} de broa. Cada mesa recebeu {c} pedaços: {d} de broa.",
@@ -179,6 +185,7 @@ export const DEGUSTACAO: Atividade = {
       tipo: "notacao",
       fase: "formalizacao",
       pedido: "Comprima a frase em notação.",
+      instrucao: "Comprima a frase em notação.",
       linhas: ["3 ÷ 4 = 3/4", "2 ÷ 3 = 2/3"],
       falas: [
         { quem: "nonio", texto: "O número de baixo diz em quantas partes iguais a broa foi cortada. O de cima, quantos pedaços." },
@@ -190,6 +197,7 @@ export const DEGUSTACAO: Atividade = {
       tipo: "prever",
       fase: "aplicacao",
       pedido: "Agora sem ligar a máquina.",
+      instrucao: "Responda quanto de broa cada mesa recebe: 5 broas, 8 mesas.",
       maquina: { config: { pele: "broas-mesas", pecas: { quantidade: 5 }, bicas: { quantidade: 8, ajustavel: false }, fatiador: FATIADOR_PADARIA } },
       pergunta: "5 broas, 8 mesas. Quanto de broa vai em cada mesa?",
       resposta: { tipo: "fracao", maximo: 12 },

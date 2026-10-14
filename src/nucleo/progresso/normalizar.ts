@@ -62,6 +62,7 @@ function normalizarPreferencias(v: unknown): Preferencias {
     postura: umDe(o.postura, ["quieto", "disponivel", "presente"] as const, PREFERENCIAS_PADRAO.postura),
     cotas: umDe(o.cotas, ["visiveis", "escondidas"] as const, PREFERENCIAS_PADRAO.cotas),
     animacoes: umDe(o.animacoes, ["completas", "leves"] as const, PREFERENCIAS_PADRAO.animacoes),
+    conversa: umDe(o.conversa, ["ligada", "desligada"] as const, PREFERENCIAS_PADRAO.conversa),
   };
 }
 
@@ -217,5 +218,6 @@ export function normalizar(v: unknown, agora: number): Progresso {
         : null,
     },
     relogio: { deslocamentoMs: Math.max(0, num(relogio.deslocamentoMs, 0)) },
+    apresentacoes: registro(v.apresentacoes, (x) => numOuNull(x)),
   };
 }

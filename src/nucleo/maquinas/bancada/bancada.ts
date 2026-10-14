@@ -10,6 +10,7 @@ import {
   divide,
   igual,
   inteiro,
+  maiorQue,
   soma,
   somaTodos,
   vezes,
@@ -89,6 +90,18 @@ export function cargaInicial(config: ConfigBancada): Racional {
 
 export function podeCortar(e: EstadoBancada): boolean {
   return e.config.fatiador !== undefined;
+}
+
+/** Mão livre ligada: padrão sim; não com `voltasMax` (o desafio é sobre a alavanca). */
+export function maoLivreLigada(config: ConfigBancada): boolean {
+  return config.maoLivre !== false && config.voltasMax === undefined;
+}
+
+/** A pilha escolhida continua valendo? Se sumiu, escolhe a primeira que sobrou. */
+function pilhaQueFica(esteira: readonly Pilha[], atual: string | null, preferida?: string): string | null {
+  if (pilhaDe(esteira, atual)) return atual;
+  if (preferida && pilhaDe(esteira, preferida)) return preferida;
+  return esteira[0] ? chave(esteira[0].tamanho) : null;
 }
 
 /* ---------- Criação ---------- */
@@ -229,6 +242,55 @@ export function aplicar(e: EstadoBancada, acao: AcaoBancada): EstadoBancada {
         e,
         { tipo: "fatia", tamanho: chave(p.tamanho), partes: e.partes, quantidade: q, novo: chave(novo) },
         { esteira, pilha: continua ? e.pilha : chave(novo), cargaTravada: true },
+      );
+    }
+    case "colocar": {
+      if (!maoLivreLigada(e.config)) return recusa(e, "sem-mao-livre");
+      const b = e.bicas[acao.bica];
+      if (!b) return recusa(e, "fora-do-limite");
+      if (!b.aberta) return recusa(e, "bica-fechada");
+      const p = pilhaDe(e.esteira, acao.tamanho);
+      if (!p) return recusa(e, "sem-pilha");
+      if (e.config.teto !== undefined && maiorQue(soma(quantidadeNaBica(b), p.tamanho), inteiro(e.config.teto))) {
+        return recusa(e, "passou-do-teto");
+      }
+      const esteira = removerPecas(e.esteira, p.tamanho, 1);
+      const bicas = e.bicas.map((x, i) => (i === acao.bica ? { ...x, pecas: adicionarPecas(x.pecas, p.tamanho, 1) } : x));
+      return comEvento(
+        e,
+        { tipo: "colocou", tamanho: chave(p.tamanho), bica: acao.bica },
+        { esteira, bicas, cargaTravada: true, pilha: pilhaQueFica(esteira, e.pilha) },
+      );
+    }
+    case "devolver": {
+      if (!maoLivreLigada(e.config)) return recusa(e, "sem-mao-livre");
+      const b = e.bicas[acao.bica];
+      if (!b) return recusa(e, "fora-do-limite");
+      const p = pilhaDe(b.pecas, acao.tamanho);
+      if (!p) return recusa(e, "sem-peca");
+      const bicas = e.bicas.map((x, i) => (i === acao.bica ? { ...x, pecas: removerPecas(x.pecas, p.tamanho, 1) } : x));
+      const esteira = adicionarPecas(e.esteira, p.tamanho, 1);
+      return comEvento(
+        e,
+        { tipo: "devolveu", tamanho: chave(p.tamanho), bica: acao.bica },
+        { esteira, bicas, pilha: pilhaQueFica(esteira, e.pilha) },
+      );
+    }
+    case "cortar": {
+      const f = e.config.fatiador;
+      if (!f) return recusa(e, "sem-fatiador");
+      if (!f.partes.includes(acao.partes)) return recusa(e, "partes-invalidas");
+      const p = pilhaDe(e.esteira, acao.tamanho);
+      if (!p) return recusa(e, "sem-pilha");
+      const novo = divide(p.tamanho, inteiro(acao.partes));
+      if (novo.d > f.denominadorMaximo) return recusa(e, "pedaco-pequeno-demais");
+      const pedida = acao.quantidade ?? 1;
+      const q = pedida === "todas" ? p.quantidade : Math.min(Math.max(1, Math.round(pedida)), p.quantidade);
+      const esteira = adicionarPecas(removerPecas(e.esteira, p.tamanho, q), novo, q * acao.partes);
+      return comEvento(
+        e,
+        { tipo: "cortou", tamanho: chave(p.tamanho), partes: acao.partes, quantidade: q, novo: chave(novo) },
+        { esteira, partes: acao.partes, cargaTravada: true, pilha: pilhaQueFica(esteira, e.pilha, chave(novo)) },
       );
     }
     case "fechar": {

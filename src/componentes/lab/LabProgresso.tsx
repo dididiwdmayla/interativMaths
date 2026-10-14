@@ -5,7 +5,7 @@
  * de evidências e os estados calculados.
  */
 import { situacaoConceito } from "@/nucleo/dominio";
-import { adiantarRelogio, progressoNovo, UM_DIA_MS, type Progresso } from "@/nucleo/progresso";
+import { adiantarRelogio, progressoNovo, UM_DIA_MS, zerarApresentacoes, type Progresso } from "@/nucleo/progresso";
 import { proximaRevisita, revisitasDevidas } from "@/nucleo/dominio/dominio";
 import { CONCEITOS, CONCEITOS_DO_ARCO_1 } from "@/conteudo/conceitos";
 import { agoraDoJogo, substituirProgresso } from "@/componentes/estado/loja";
@@ -51,6 +51,16 @@ export function LabProgresso() {
         </p>
         <button type="button" className="botao-principal self-start" onClick={() => atualizar((p, t) => adiantarRelogio(p, UM_DIA_MS, t))} data-acao="adiantar-dia">
           Adiantar um dia
+        </button>
+      </section>
+
+      <section className="ficha flex flex-col gap-2 p-4">
+        <h2 className="m-0 text-[17px] font-extrabold">Apresentações</h2>
+        <p className="m-0 text-tinta-suave" data-apresentacoes-vistas={Object.keys(progresso.apresentacoes).length}>
+          {Object.keys(progresso.apresentacoes).length > 0 ? `Vistas: ${Object.keys(progresso.apresentacoes).join(", ")}.` : "Nenhuma vista ainda."}
+        </p>
+        <button type="button" className="botao-secundario self-start" onClick={() => atualizar((p, t) => zerarApresentacoes(p, t))} data-acao="zerar-apresentacoes">
+          Zerar apresentações
         </button>
       </section>
 

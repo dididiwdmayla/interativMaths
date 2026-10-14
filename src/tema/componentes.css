@@ -181,6 +181,42 @@
   background: var(--marca-texto);
 }
 
+/* Botão pequeno de dentro do balão e do cabeçalho (Me ajuda, Perguntar, etapas). O desenho tem
+   38 px; o alvo de toque passa de 44 px. */
+.botao-pequeno {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 11px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 90ms var(--curva-firme);
+}
+
+.botao-pequeno::after {
+  content: "";
+  position: absolute;
+  inset: -5px -3px;
+}
+
+.botao-pequeno:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.botao-pequeno:disabled {
+  border-color: var(--grafite);
+  color: var(--tinta-suave);
+}
+
 /* ---------- Opções (uma entre várias) ---------- */
 
 .opcoes {
@@ -215,6 +251,30 @@
 
 .opcao:active:not(:disabled) {
   transform: translateY(2px);
+}
+
+/* Ficha de número, para montar uma fração (44 x 44). */
+.ficha-numero {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 19px;
+  font-weight: 800;
+  transition: transform 90ms var(--curva-firme);
+}
+
+.ficha-numero:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.ficha-numero:disabled {
+  background: var(--grafite-claro);
+  border-color: var(--grafite);
+  color: var(--tinta-suave);
 }
 
 /* Opção de texto, em linha cheia (respostas, preferências). */
@@ -466,7 +526,343 @@
   background: var(--marca-texto-palido);
 }
 
+/* ---------- Retorno: acertou e ainda não ---------- */
+
+/* O selo no começo do balão: a palavra e uma forma, nunca só a cor. */
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border: 2px solid var(--tinta);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.selo[data-selo="acertou"] {
+  background: var(--verde-palido);
+  color: var(--verde-tinta);
+}
+
+.selo[data-selo="ainda-nao"] {
+  gap: 6px;
+  border-color: var(--vermelho);
+  background: var(--folha);
+  color: var(--tinta);
+}
+
+/* A caixa da resposta que não bateu: borda vermelha e névoa. O texto continua em tinta. */
+.caixa-ainda-nao {
+  border: 2.5px solid var(--vermelho) !important;
+  background: var(--vermelho-nevoa) !important;
+  color: var(--tinta) !important;
+}
+
 /* ---------- Nônio, cabeçalho, bancada ---------- */
+
+/* A faixa do Nônio: rosto à esquerda, balão com nome, selo, fala e ações. */
+.faixa-nonio {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.faixa-balao {
+  padding: 9px 13px 11px;
+}
+
+.faixa-fala {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.faixa-balao > .selo + .faixa-fala {
+  margin-top: 6px;
+}
+
+.faixa-ponto {
+  display: inline-flex;
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+
+.faixa-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.faixa-nonio[data-compacta="sim"] .faixa-balao {
+  padding: 7px 11px 8px;
+}
+
+.faixa-nonio[data-compacta="sim"] .faixa-fala {
+  font-size: 14px;
+}
+
+.faixa-nonio[data-compacta="sim"] .faixa-acoes {
+  margin-top: 6px;
+}
+
+/* A faixa do Nônio colada no topo da folha que sobe. */
+.faixa-na-folha {
+  padding: 10px 14px 10px;
+  border: 2px solid var(--tinta);
+  border-bottom: 1.5px solid var(--pauta);
+  border-radius: 18px 18px 0 0;
+  background: var(--folha);
+}
+
+/* ---------- A faixa do objetivo ---------- */
+
+.objetivo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.objetivo-linha {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.objetivo-etiqueta {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+  padding: 2px 8px;
+  border-radius: 7px;
+  background: var(--tinta);
+  color: var(--folha);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.objetivo-etiqueta[data-etiqueta="Feito"] {
+  background: var(--verde-escuro);
+}
+
+.objetivo-etiqueta[data-etiqueta="Aposta do Nônio"] {
+  background: var(--marca-texto);
+  box-shadow: inset 0 0 0 2px var(--tinta);
+  color: var(--tinta);
+}
+
+.objetivo-etiqueta[data-etiqueta="Desafio"] {
+  background: var(--caneta);
+}
+
+.objetivo-gesto {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  color: var(--caneta);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.objetivo-gesto > svg {
+  margin-top: 0;
+}
+
+.objetivo-gesto[data-tom="resumo"] {
+  color: var(--verde-escuro);
+}
+
+/* ---------- Mão livre: menu de corte, peça escolhida, mesa que recebe ---------- */
+
+.menu-corte {
+  position: absolute;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px 9px 9px;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--tinta);
+}
+
+.menu-corte-seta {
+  position: absolute;
+  top: 18px;
+}
+
+.menu-corte[data-lado="esquerda"] .menu-corte-seta {
+  left: -11px;
+}
+
+.menu-corte[data-lado="direita"] .menu-corte-seta {
+  right: -11px;
+}
+
+.menu-corte[data-lado="cima"] .menu-corte-seta {
+  top: -11px;
+}
+
+.menu-corte-rotulo {
+  color: var(--tinta-suave);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.menu-corte-botao,
+.menu-corte-quantas {
+  position: relative;
+  border: 2px solid var(--tinta);
+  border-radius: 9px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-weight: 700;
+  transition: transform 90ms var(--curva-firme);
+}
+
+.menu-corte-botao {
+  width: 40px;
+  height: 38px;
+  font-size: 16px;
+}
+
+.menu-corte-quantas {
+  height: 34px;
+  padding: 0 9px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* O alvo de toque passa de 44 px, maior que o desenho. */
+.menu-corte-botao::after,
+.menu-corte-quantas::after {
+  content: "";
+  position: absolute;
+  inset: -4px -2px;
+}
+
+.menu-corte-quantas[aria-checked="true"] {
+  background: var(--caneta);
+  color: var(--folha);
+}
+
+.menu-corte-botao:active,
+.menu-corte-quantas:active {
+  transform: translateY(2px);
+}
+
+/* Só as peças da esteira prendem o dedo: a página continua rolando no resto. */
+[data-peca] {
+  touch-action: none;
+}
+
+/* ---------- A aposta do Nônio: o bilhete amarelo ---------- */
+
+.bilhete {
+  padding: 10px 14px 12px;
+  border: 2px solid var(--tinta);
+  border-radius: 4px;
+  background: var(--bilhete);
+  box-shadow: 0 3px 0 var(--tinta);
+  transform: rotate(-2deg);
+}
+
+.bilhete-texto {
+  color: var(--caneta-escura);
+  font-family: var(--fonte-mao), cursive;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.bilhete-assinatura {
+  margin-top: 4px;
+  color: var(--caneta-escura);
+  font-family: var(--fonte-mao), cursive;
+  font-size: 21px;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* A nota acima da máquina (o bilhete, a chegada da Dália). */
+.palco-nota {
+  grid-area: nota;
+  margin: 14px max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left));
+}
+
+/* ---------- Etapas da missão ---------- */
+
+.etapa {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  list-style: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.etapa-marca {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--tinta);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.etapa[data-estado="feito"] .etapa-marca {
+  border-color: var(--tinta);
+  background: var(--verde);
+  color: var(--folha);
+}
+
+.etapa[data-estado="atual"] {
+  background: var(--caneta-palida);
+  color: var(--caneta-escura);
+}
+
+.etapa[data-estado="atual"] .etapa-marca {
+  background: var(--caneta);
+  color: var(--folha);
+}
+
+.etapa[data-estado="depois"] {
+  color: var(--tinta-suave);
+}
+
+.etapa[data-estado="depois"] .etapa-marca {
+  border: 2px dashed var(--grafite);
+  background: var(--grafite-claro);
+}
+
+/* A alça das folhas que sobem. */
+.alca-folha {
+  align-self: center;
+  width: 44px;
+  height: 5px;
+  margin: 0 auto 8px;
+  border-radius: 3px;
+  background: var(--pauta);
+}
+
 
 .balao-nonio {
   padding: 10px 14px 11px;
@@ -708,8 +1104,8 @@ html[data-animacoes="leves"] .folha-sobe {
   flex: 1;
   min-height: 0;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(150px, 1fr) auto auto auto;
-  grid-template-areas: "pedido" "maquina" "tira" "nonio" "controles";
+  grid-template-rows: auto auto minmax(150px, 1fr) auto auto;
+  grid-template-areas: "pedido" "nota" "maquina" "faixa" "controles";
 }
 
 .palco-pedido {
@@ -723,6 +1119,13 @@ html[data-animacoes="leves"] .folha-sobe {
   background: var(--folha);
 }
 
+/* A faixa do objetivo ocupa o lugar do pedido, em coluna. */
+.palco-pedido:has(> .objetivo) {
+  display: block;
+  padding-top: 9px;
+  padding-bottom: 10px;
+}
+
 .palco-maquina {
   grid-area: maquina;
   position: relative;
@@ -732,14 +1135,19 @@ html[data-animacoes="leves"] .folha-sobe {
   overflow: hidden;
 }
 
-.palco-tira {
-  grid-area: tira;
-  margin: 8px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
+/* A máquina vencida ganha a borda verde, com a sombra verde-escura. */
+.palco[data-retorno="acertou"] .palco-maquina {
+  border-color: var(--verde);
+  box-shadow: 0 4px 0 var(--verde-escuro);
+  transition: border-color var(--t-caneta) var(--curva-firme);
 }
 
-.palco-nonio {
-  grid-area: nonio;
-  margin: 10px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
+.palco-faixa {
+  grid-area: faixa;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
 }
 
 .palco-controles {
@@ -765,12 +1173,12 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (min-width: 1024px) {
   .palco-grade {
     grid-template-columns: minmax(0, 760px) 380px;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
-      "maquina nonio"
-      "maquina controles"
-      "tira controles";
+      "maquina nota"
+      "maquina faixa"
+      "maquina controles";
     justify-content: center;
     column-gap: 24px;
     padding: 20px 28px 26px;
@@ -786,11 +1194,11 @@ html[data-animacoes="leves"] .folha-sobe {
     margin: 0;
     padding: 10px;
   }
-  .palco-tira {
-    margin: 12px 0 0;
-  }
-  .palco-nonio {
+  .palco-faixa {
     margin: 0 0 14px;
+  }
+  .palco-nota {
+    margin: 0 4px 16px;
   }
   .palco-controles {
     align-self: start;
@@ -812,12 +1220,12 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (orientation: landscape) and (min-width: 640px) and (max-width: 1023px) {
   .palco-grade {
     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
-      "maquina nonio"
-      "maquina controles"
-      "tira controles";
+      "maquina nota"
+      "maquina faixa"
+      "maquina controles";
     column-gap: 12px;
     padding: 10px 14px;
   }
@@ -827,8 +1235,7 @@ html[data-animacoes="leves"] .folha-sobe {
     margin-bottom: 8px;
   }
   .palco-maquina,
-  .palco-tira,
-  .palco-nonio {
+  .palco-faixa {
     margin: 0 0 8px;
   }
   .palco-controles,
@@ -868,4 +1275,208 @@ html[data-animacoes="leves"] .folha-sobe {
     box-shadow: 0 4px 0 var(--tinta);
   }
 }
+}
+
+/* ---------- Pergunte ao Nônio (referência 4) ---------- */
+
+.conversa-folha {
+  max-height: calc(100dvh - 120px);
+  min-height: min(560px, calc(100dvh - 120px));
+}
+
+.conversa-lista {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 9px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.conversa-eu,
+.conversa-ele {
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border: 2px solid var(--tinta);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.conversa-eu {
+  align-self: flex-end;
+  max-width: 78%;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--caneta-palida);
+}
+
+.conversa-ele {
+  align-self: flex-start;
+  max-width: 84%;
+  border-radius: 14px 14px 14px 4px;
+  background: var(--folha);
+}
+
+.conversa-ele .balao-nonio-nome {
+  margin-bottom: 2px;
+}
+
+.conversa-reticencias {
+  display: inline-flex;
+  gap: 5px;
+  padding: 4px 2px;
+}
+
+.conversa-reticencias span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tinta-suave);
+  animation: reticencia 1.1s var(--curva-firme) infinite;
+}
+
+.conversa-reticencias span:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.conversa-reticencias span:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes reticencia {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.conversa-sugestoes {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.chip-pergunta {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 11px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chip-pergunta:disabled {
+  opacity: 0.55;
+}
+
+.campo-pergunta {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--folha);
+  color: var(--tinta);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.campo-pergunta:disabled {
+  background: var(--grafite-claro);
+}
+
+.botao-enviar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--caneta);
+  box-shadow: 0 3px 0 var(--tinta);
+  color: var(--folha);
+  transition: transform 90ms var(--curva-firme);
+}
+
+.botao-enviar:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.botao-enviar:disabled {
+  background: var(--grafite-claro);
+  border-color: var(--grafite);
+  box-shadow: none;
+  color: var(--tinta-suave);
+}
+
+@media (min-width: 1024px) {
+  /* No computador: um painel na coluna da direita, da altura da tela. */
+  .conversa-folha {
+    width: 440px;
+    height: calc(100dvh - 32px);
+    max-height: none;
+    margin: 16px;
+  }
+}
+
+/* ---------- Apresentações ---------- */
+
+/* A ferramenta apresentada sobe acima do véu (z 40), com um contorno de caneta. */
+[data-apresentando] {
+  position: relative;
+  z-index: 45;
+  outline: 3px solid var(--caneta);
+  outline-offset: 4px;
+  border-radius: 14px;
+}
+
+.apresentacao-cartao {
+  position: fixed;
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 46;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 12px 14px 14px;
+  border: 2px solid var(--tinta);
+  border-radius: 16px;
+  background: var(--folha);
+  box-shadow: 0 4px 0 var(--tinta);
+}
+
+.apresentacao-cartao[data-lado="baixo"] {
+  bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.apresentacao-cartao[data-lado="cima"] {
+  top: max(12px, env(safe-area-inset-top));
+}
+
+/* Ao lado da ferramenta (computador, paisagem): posição e largura vêm da medida da ferramenta. */
+.apresentacao-cartao[data-lado="direita"],
+.apresentacao-cartao[data-lado="esquerda"] {
+  right: auto;
+  max-width: none;
+  margin: 0;
 }

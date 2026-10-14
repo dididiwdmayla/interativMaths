@@ -7,8 +7,8 @@
  *   tinta = existe e funciona;
  *   caneta azul = o que o jogador mexe e o que ele fez;
  *   marca-texto = funcionou, resultado, destaque;
- *   vermelho = só traço, em sobra e para chamar o olhar (nunca texto, nunca correção);
- *   verde = dominado.
+ *   vermelho = só traço, em sobra, para chamar o olhar e no "ainda não" passageiro (nunca texto);
+ *   verde = acertou e dominado: a cor quer dizer "está certo".
  * Os cinzas puxam para o azul. Grafite e vermelho têm contraste baixo: só traço, nunca texto.
  */
 :root {
@@ -43,9 +43,17 @@
   --vermelho-claro: #ff8a80;
   --vermelho-palido: #ffb9b3;
 
-  /* Dominado */
+  /* Ainda não: fundo da caixa de resposta que não bateu (a borda é --vermelho) */
+  --vermelho-nevoa: #fff1f0;
+
+  /* Acertou e dominado */
+  --verde: #1f9d6f; /* só forma: borda e visto, nunca texto */
   --verde-escuro: #177a5b;
+  --verde-tinta: #135a43; /* texto sobre --verde-palido (6,8:1) */
   --verde-palido: #d3f2e3;
+
+  /* O bilhete amarelo da aposta do Nônio */
+  --bilhete: #ffef8a;
 
   /* Materiais das peles: chapados, sempre com contorno de tinta */
   --pao: #f7c66f;
@@ -66,8 +74,8 @@
   --turmalina: #f08cc1;
   --turmalina-luz: #ffd3ea;
 
-  /* Véu por trás de painéis que sobem */
-  --veu: rgb(27 36 64 / 0.32);
+  /* Véu por trás de folhas que sobem e de apresentações */
+  --veu: rgba(27, 36, 64, 0.32);
 
   /* Ritmos do movimento: passar a limpo, sem quique */
   --t-caneta: 380ms;

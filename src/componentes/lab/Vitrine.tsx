@@ -2,7 +2,8 @@
 
 /**
  * /lab/vitrine: a identidade Quadriculado inteira, para conferir o sistema numa página só.
- * Materiais, tokens, letra, receitas de componente, kit de desenho, peças, Nônio, joias, notação.
+ * Materiais, tokens, letra, receitas de componente, kit de desenho, peças, Nônio, guia (faixa,
+ * selos, objetivo, bilhete, menu de corte, folhas), joias, notação.
  */
 import { useState, type ReactNode } from "react";
 import { racional } from "@/nucleo/racional/racional";
@@ -38,12 +39,14 @@ import { IconeMenu } from "@/componentes/icones/IconeMenu";
 import { IconeRecomecar } from "@/componentes/icones/IconeRecomecar";
 import { IconeVisto } from "@/componentes/icones/IconeVisto";
 import { IconeVoltar } from "@/componentes/icones/IconeVoltar";
+import { VitrineGuia } from "./VitrineGuia";
 
 const TOKENS: { grupo: string; nomes: string[] }[] = [
   { grupo: "Papel", nomes: ["papel", "grade", "grade-suave", "folha", "pauta", "margem"] },
   { grupo: "Tinta e lápis", nomes: ["tinta", "tinta-suave", "grafite", "grafite-claro"] },
   { grupo: "Caneta azul", nomes: ["caneta", "caneta-escura", "caneta-clara", "caneta-palida"] },
-  { grupo: "Marca-texto, vermelho, verde", nomes: ["marca-texto", "marca-texto-palido", "vermelho", "vermelho-claro", "vermelho-palido", "verde-escuro", "verde-palido"] },
+  { grupo: "Marca-texto, bilhete", nomes: ["marca-texto", "marca-texto-palido", "bilhete"] },
+  { grupo: "Acertou e ainda não", nomes: ["verde", "verde-tinta", "verde-escuro", "verde-palido", "vermelho", "vermelho-claro", "vermelho-palido", "vermelho-nevoa", "veu"] },
   { grupo: "Materiais", nomes: ["pao", "pao-miolo", "saca", "madeira", "palha", "agua", "agua-clara"] },
   { grupo: "Joias", nomes: ["granada", "safira", "ametista", "turmalina"] },
 ];
@@ -53,8 +56,8 @@ const MATERIAIS: { nome: string; como: string; significa: string }[] = [
   { nome: "Tinta", como: "Contorno escuro, cor chapada", significa: "Existe e funciona" },
   { nome: "Caneta azul", como: "Preenchimento, traço ou letra azul", significa: "O que o jogador mexe e o que ele fez" },
   { nome: "Marca-texto", como: "Faixa amarela atrás, inclinada", significa: "Funcionou, resultado, destaque" },
-  { nome: "Vermelho", como: "Traço de lápis vermelho: círculo, seta", significa: "Sobra e atenção. Nunca corrige" },
-  { nome: "Verde", como: "Etiqueta verde-clara com visto", significa: "Dominado" },
+  { nome: "Vermelho", como: "Selo com bolinha, borda e névoa; traço de lápis", significa: "Ainda não, por um instante: some no gesto seguinte. Nunca texto vermelho, nunca X" },
+  { nome: "Verde", como: "Selo com visto, borda da máquina, etiqueta", significa: "Acertou, com o que ficou certo; e dominado" },
 ];
 
 const EXPRESSOES: ExpressaoNonio[] = ["neutro", "atento", "medindo", "duvida", "satisfeito", "quieto"];
@@ -338,6 +341,8 @@ export function Vitrine() {
             <Nonio expressao="satisfeito" tamanho={150} rotulo="Nônio grande" />
           </div>
         </Secao>
+
+        <VitrineGuia Secao={Secao} />
 
         <Secao titulo="Joias e estágios">
           <svg viewBox="0 0 300 300" className="traco-fixo block w-full max-w-md" aria-label="Quatro joias em quatro estágios" role="img">

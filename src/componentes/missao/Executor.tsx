@@ -4,16 +4,25 @@
  * Executa uma atividade (missão, prova direta, registro, eco, exposição, cena) na tela.
  * O estado da execução vive no progresso: fechar e reabrir o navegador devolve o mesmo passo,
  * com a máquina no mesmo estado. Girar o aparelho só muda o CSS.
+ *
+ * O Nônio mora numa faixa entre a máquina e a bancada: lê a máquina, diz o retorno de cada
+ * conferência (verde quando acertou; "ainda não", passageiro, quando não bateu) e dá a escada
+ * de ajuda a pedido. Quem decide é o motor; a faixa só fala o que ele decidiu.
  */
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { operarVarias } from "@/nucleo/maquinas/bancada/bancada";
-import type { AcaoBancada, Bancada as EstadoBancada } from "@/nucleo/maquinas/bancada/tipos";
+import { operarVarias, quantidadeNaBica, bicasEmUso } from "@/nucleo/maquinas/bancada/bancada";
+import type { AcaoBancada, Bancada as EstadoBancada, EstadoBancada as EstadoMaquina } from "@/nucleo/maquinas/bancada/tipos";
+import { metasDeComposicao } from "@/nucleo/maquinas/bancada/validadores";
+import type { DiferencaMaquinas } from "@/nucleo/maquinas/bancada/diferenca";
+import { compara } from "@/nucleo/racional/racional";
 import {
   aplicarEntrada,
+  chegadaDoPasso,
   iniciarExecucao,
   medidasVivas,
+  palpiteDoPasso,
   passoAtual,
   passosDoModo,
   resolucaoDoPasso,
@@ -22,35 +31,42 @@ import {
 } from "@/nucleo/missoes/motor";
 import { aplicarEfeitos, chaveExecucao, restaurarExecucao } from "@/nucleo/missoes/efeitos";
 import type { AlvoMaquina, Atividade, Entrada, FaixasExposicao, ModoExecucao, Passo } from "@/nucleo/missoes/tipos";
-import { definirDesvio, iniciarAtividade, type Desvio } from "@/nucleo/progresso";
+import { definirDesvio, iniciarAtividade, marcarApresentacao, type Desvio } from "@/nucleo/progresso";
 import { situacaoConceito } from "@/nucleo/dominio/dominio";
+import { falaDoPasso, PERMANENCIA_MINIMA_MS, type FalaFaixa } from "@/nucleo/tutor/fila";
+import { encurtarFala, falaDeLembrete, falaDeOferta, falaDoEstado, reagir, seloVisivel, textoDoDegrau } from "@/nucleo/tutor/reacoes";
+import { LIMITES_TUTOR, type EntradaTutor } from "@/nucleo/tutor/contrato";
+import { passoDeMaquina, proximoGesto } from "@/nucleo/missoes/gesto";
 import { CATEGORIAS_RUA } from "@/conteudo/rua";
 import { PELES, type Pele } from "@/conteudo/peles";
-import { Bancada, type MarcasBancada } from "@/componentes/maquinas/Bancada";
+import { AJUDA } from "@/conteudo/reacoes";
+import { GESTOS } from "@/conteudo/gestos";
+import { FALHAS_CONVERSA, PERGUNTAS_PADRAO, TEXTOS_CONVERSA } from "@/conteudo/tutor";
+import { Bancada, descreverBancada, type MarcasBancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
-import { TiraMensagem } from "@/componentes/maquinas/Tira";
-import { mensagemDoEvento, type TomTira } from "@/componentes/maquinas/mensagens";
-import { Nonio, type ExpressaoNonio } from "@/componentes/nonio/Nonio";
-import { PainelNonio } from "@/componentes/nonio/PainelNonio";
+import { Nonio } from "@/componentes/nonio/Nonio";
+import { FaixaNonio, type AcaoAjuda } from "@/componentes/nonio/FaixaNonio";
+import { BarraJunto, FolhaCasoParecido } from "@/componentes/nonio/AjudaNonio";
+import { useFalaQuandoCalmo, useFilaNonio } from "@/componentes/nonio/useFila";
+import { ConversaNonio } from "@/componentes/nonio/ConversaNonio";
+import { Apresentacao } from "@/componentes/nonio/Apresentacao";
+import { proximaApresentacao } from "@/nucleo/tutor/apresentacoes";
+import { historicoParaEnviar, perguntar, useConversaDisponivel, type MensagemTela } from "@/componentes/nonio/useConversa";
 import { LinhaNotacao } from "@/componentes/notacao/Notacao";
-import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, SONDAGEM_ATIVA, textoDoEquivoco, textoDoMotivo } from "@/componentes/estado/catalogo";
+import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, SONDAGEM_ATIVA, TEXTOS_REACAO } from "@/componentes/estado/catalogo";
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
-import { BalaoNonio, Falas } from "./Falas";
+import { Bilhete, PainelAposta } from "./Aposta";
+import { BotaoEtapas } from "./Etapas";
+import { FalaDalia, Falas } from "./Falas";
+import { Objetivo, type Etiqueta } from "./Objetivo";
 import { ManualRasgado } from "./Manual";
+import type { MarcaResposta } from "./Respostas";
 import { descreverAcao, NOME_DA_FASE } from "./textos";
-import { FolhaFrase, FolhaNotacao, FolhaRegistro, PainelPalpite, PainelPrever, PainelVencido, Seguir } from "./Vistas";
-
-interface Aviso {
-  texto: string;
-  tom: TomTira;
-  /** seq da máquina quando o aviso nasceu: um evento novo apaga o aviso. */
-  seq: number;
-  equivoco: boolean;
-}
+import { FaixaNaFolha, FolhaFrase, FolhaNotacao, FolhaRegistro, PainelPalpite, PainelPrever, PainelVencido, Seguir } from "./Vistas";
 
 interface Fim {
   via: "guiada" | "prova" | "registro";
@@ -69,6 +85,8 @@ export function Executor({ atividadeId, voltar }: { atividadeId: string; voltar:
   return <ExecutorAtividade key={`${a.id}#${modo}`} a={a} modo={modo} voltar={voltar} />;
 }
 
+const TIPOS_COM_ESCADA: readonly Passo["tipo"][] = ["operar", "prever", "frase", "aposta"];
+
 /** Executa uma atividade dada (também as geradas: revisita e sondagem). */
 export function ExecutorAtividade({
   a,
@@ -86,27 +104,61 @@ export function ExecutorAtividade({
   const { pronto, progresso, atualizar } = useProgresso();
   const [fim, setFim] = useState<Fim | null>(null);
   const [sondagem, setSondagem] = useState<string | null>(null);
-  const [nonioAberto, setNonioAberto] = useState(false);
-  const [aviso, setAviso] = useState<Aviso | null>(null);
   const [cotaEscolhida, setCotaEscolhida] = useState<string | null>(null);
   const [comprimida, setComprimida] = useState<string | null>(null);
-
-  if (!pronto) return <Carregando />;
-  if (fim) return aoTerminar ? <>{aoTerminar()}</> : <TelaFim a={a} fim={fim} voltar={voltar ?? { href: "/mapa", rotulo: "Mapa" }} desvio={progresso.campanha.desvio} />;
+  const [casoAberto, setCasoAberto] = useState(false);
+  /** O jogador mexeu na resposta depois de um "ainda não": o vermelho sai (passageiro). */
+  const [rascunho, setRascunho] = useState<string | null>(null);
+  const postura = progresso.preferencias.postura;
+  const { fila, oferecerFala } = useFilaNonio(postura);
+  // Pergunte ao Nônio: o histórico vive só aqui, na memória da execução aberta.
+  const [conversa, setConversa] = useState<{ mensagens: MensagemTela[]; perguntas: number; esperando: boolean }>({ mensagens: [], perguntas: 0, esperando: false });
+  const [conversaAberta, setConversaAberta] = useState(false);
+  /** O passo em que uma apresentação já apareceu nesta visita (no máximo uma por passo). */
+  const [apresentadaEm, setApresentadaEm] = useState<string | null>(null);
+  const conversaAbertaRef = useRef(false);
+  const conversaPermitida = a.tipo !== "sondagem" && atividadePorId(a.id) !== null && progresso.preferencias.conversa === "ligada";
+  const conversaNoAr = useConversaDisponivel(pronto && conversaPermitida);
 
   const salva = restaurarExecucao(progresso.campanha.execucoes[chaveExecucao(a, modo)], a, (m) => passosDoModo(a, m).length);
   const exec: Execucao = salva && salva.modo === modo ? salva : iniciarExecucao(a, modo);
   const passo = passoAtual(a, exec);
+  const pele = exec.bancada ? PELES[exec.bancada.atual.config.pele] : null;
+  const oferta = pronto && !fim && passo && a.tipo !== "sondagem" ? falaDeOferta(passo, exec, postura, TEXTOS_REACAO) : null;
+  useFalaQuandoCalmo(oferta, fila, oferecerFala, PERMANENCIA_MINIMA_MS + 3500);
+  const gesto = passo ? proximoGesto(passo, exec, { textos: GESTOS, reacoes: TEXTOS_REACAO, pele }) : null;
+  const lembrete = useLembrete(
+    pronto && !fim && passo !== null && passoDeMaquina(passo) && exec.passo.situacao !== "vencido" ? `${passo.id}:${exec.bancada?.atual.seq ?? 0}:${exec.passo.situacao}` : null,
+    (n) => {
+      if (!passo || !gesto || postura === "quieto" || passo.fase === "aplicacao" || a.tipo === "sondagem") return;
+      oferecerFala(falaDeLembrete(passo, gesto.texto, TEXTOS_REACAO, n));
+    },
+  );
+
+  if (!pronto) return <Carregando />;
+  if (fim) return aoTerminar ? <>{aoTerminar()}</> : <TelaFim a={a} fim={fim} voltar={voltar ?? { href: "/mapa", rotulo: "Mapa" }} desvio={progresso.campanha.desvio} />;
   if (!passo) return <Carregando />;
   const total = passosDoModo(a, modo).length;
-  const prefs = progresso.preferencias;
 
   const enviar = (entrada: Entrada) => {
     const agora = agoraDoJogo(progresso);
     const r = aplicarEntrada(a, exec, entrada, { agora, conceitoDoEquivoco });
     atualizar((p, t) => aplicarEfeitos(iniciarAtividade(p, a.id, t), a, r.exec, r.efeitos, t));
-    const pele = r.exec.bancada ? PELES[r.exec.bancada.atual.config.pele] : null;
-    setAviso(avisoDe(r.efeitos, r.exec, pele));
+    const peleDepois = r.exec.bancada ? PELES[r.exec.bancada.atual.config.pele] : pele;
+    const fala = reagir({
+      atividade: a,
+      passo,
+      antes: exec,
+      depois: r.exec,
+      entrada,
+      efeitos: r.efeitos,
+      postura,
+      textos: TEXTOS_REACAO,
+      pele: peleDepois,
+      palpite: palpiteDoPasso(a, r.exec),
+    });
+    if (fala) oferecerFala(fala);
+    if (entrada.tipo === "dica" && r.exec.passo.ajuda === 3 && exec.passo.ajuda < 3) setCasoAberto(true);
     // Duas falhas com o mesmo equívoco, em atividades diferentes: o Nônio pede uma sondagem.
     if (SONDAGEM_ATIVA && a.tipo !== "sondagem") {
       const novas = r.efeitos.flatMap((e) => (e.tipo === "evidencias" ? e.lista : []));
@@ -114,12 +166,15 @@ export function ExecutorAtividade({
         if (ev.resultado !== "falha" || !ev.equivoco) continue;
         const antes = situacaoConceito(ev.conceito, progresso.evidencias, agora);
         const depois = situacaoConceito(ev.conceito, [...progresso.evidencias, ...novas], agora);
-        if (!antes.sondagemPendente && depois.sondagemPendente) setSondagem(ev.conceito);
+        if (!antes.sondagemPendente && depois.sondagemPendente) {
+          setSondagem(ev.conceito);
+          oferecerFala({ id: "sondagem", texto: AJUDA.sondagem, expressao: "medindo", prioridade: "pedida", categoria: "sondagem", passo: passo.id });
+        }
       }
     }
     if (r.exec.indice !== exec.indice) {
       setCotaEscolhida(null);
-      setNonioAberto(false);
+      setCasoAberto(false);
     }
     const concluida = r.efeitos.find((e): e is Extract<Efeito, { tipo: "concluida" }> => e.tipo === "concluida");
     if (concluida) {
@@ -131,6 +186,170 @@ export function ExecutorAtividade({
     }
   };
 
+  /* ---------- A faixa do Nônio ---------- */
+
+  const palpite = palpiteDoPasso(a, exec);
+  const falaAtual: FalaFaixa = falaDoPasso(fila, passo.id) ?? falaDoEstado(a, passo, exec, TEXTOS_REACAO, pele, palpite);
+  const chaveRascunho = `${passo.id}:${exec.passo.respostas}:${exec.passo.tentativas}`;
+  // A sondagem é quieta: sem retorno colorido, sem escada; o Nônio só lê a máquina.
+  const quieta = a.tipo === "sondagem";
+  const selo = quieta || (rascunho === chaveRascunho && exec.passo.retorno === "ainda-nao") ? null : seloVisivel(falaAtual, exec);
+  const retorno = selo ?? "neutro";
+  const sit = exec.passo.situacao;
+  const nivel = exec.passo.ajuda;
+  const temEscada = !quieta && passo.dicas !== undefined && TIPOS_COM_ESCADA.includes(passo.tipo) && (sit === "ativo" || sit === "convite");
+  const podeJunto = passo.tipo === "operar" || passo.tipo === "frase" || passo.tipo === "aposta";
+  const pedirAjuda = () => {
+    if (nivel < 3) enviar({ tipo: "dica" });
+    else if (podeJunto) enviar({ tipo: "junto" });
+    else setCasoAberto(true);
+  };
+  const rotuloAjuda = nivel === 0 ? "Me ajuda" : nivel < 3 ? "Mais ajuda" : podeJunto ? "Resolver junto" : "Ver o caso";
+  const ajudaNaResposta = passo.tipo === "prever" && selo === "ainda-nao";
+  const acaoAjuda: AcaoAjuda | null =
+    temEscada && nivel < 4 && !ajudaNaResposta ? { rotulo: rotuloAjuda, onPedir: pedirAjuda, oferta: falaAtual.categoria === "oferta" } : null;
+  const expressao = quieta || (falaAtual.categoria === "passo" && postura === "quieto") ? "quieto" : falaAtual.expressao;
+
+  /* ---------- Pergunte ao Nônio ---------- */
+
+  const podePerguntar = conversaNoAr && !casoAberto;
+  const avisoConversa = !("conversa" in progresso.apresentacoes);
+  const conversaFechada = conversa.perguntas >= LIMITES_TUTOR.perguntasPorExecucao;
+  const sugestoes = passo.perguntas ?? PERGUNTAS_PADRAO[passo.tipo];
+  const novaMensagem = (m: Omit<MensagemTela, "id">, c: { mensagens: MensagemTela[] }): MensagemTela => ({ ...m, id: (c.mensagens.at(-1)?.id ?? 0) + 1 });
+  /** A última resposta vai para a faixa (pedida) e, com alvo, aponta na máquina. */
+  const levarParaFaixa = (m: MensagemTela | undefined) => {
+    if (!m || m.autor !== "nonio" || m.aviso) return;
+    oferecerFala({
+      id: `conversa:${m.id}`,
+      texto: encurtarFala(m.texto),
+      expressao: m.expressao ?? "neutro",
+      prioridade: "pedida",
+      categoria: "conversa",
+      passo: passo.id,
+      alvo: m.alvo ?? undefined,
+    });
+  };
+  const abrirConversa = () => {
+    conversaAbertaRef.current = true;
+    setConversaAberta(true);
+  };
+  const fecharConversa = () => {
+    conversaAbertaRef.current = false;
+    setConversaAberta(false);
+    levarParaFaixa(conversa.mensagens.at(-1));
+  };
+  const enviarPergunta = async (texto: string) => {
+    if (conversa.esperando || conversaFechada) return;
+    const entrada: EntradaTutor = {
+      atividade: a.id,
+      passo: passo.id,
+      modo,
+      situacao: exec.passo.situacao === "vencido" ? "vencido" : "ativo",
+      degrau: Math.min(4, exec.passo.ajuda),
+      maquina: exec.bancada && pele ? descreverBancada(exec.bancada.atual, pele).slice(0, LIMITES_TUTOR.maquina) : "",
+      equivocos: [...new Set(exec.equivocos)].slice(-LIMITES_TUTOR.equivocos),
+      historico: historicoParaEnviar(conversa.mensagens),
+      pergunta: texto,
+    };
+    setConversa((c) => ({ ...c, esperando: true, mensagens: [...c.mensagens, novaMensagem({ autor: "jogador", texto }, c)] }));
+    const d = await perguntar(entrada);
+    let resposta: Omit<MensagemTela, "id">;
+    if (d.tipo === "resposta") {
+      resposta = { autor: "nonio", texto: d.texto, expressao: d.expressao, alvo: d.alvo };
+    } else if (d.tipo === "recurso") {
+      // A guarda barrou a resposta: no lugar, o degrau seguinte da escada, com as medidas vivas.
+      const degrau = d.degrau ? textoDoDegrau(passo, d.degrau, exec, pele) : null;
+      resposta = { autor: "nonio", texto: degrau?.texto ?? TEXTOS_CONVERSA.semResposta, expressao: "medindo", alvo: degrau?.alvo ?? null };
+    } else {
+      resposta = { autor: "nonio", texto: FALHAS_CONVERSA[d.falha], expressao: "duvida", aviso: true };
+    }
+    setConversa((c) => {
+      const perguntas = c.perguntas + 1;
+      const r = novaMensagem(resposta, c);
+      const mensagens = [...c.mensagens, r];
+      if (perguntas >= LIMITES_TUTOR.perguntasPorExecucao) mensagens.push({ id: r.id + 1, autor: "nonio", texto: TEXTOS_CONVERSA.limite, aviso: true });
+      if (!conversaAbertaRef.current) levarParaFaixa(r);
+      return { mensagens, perguntas, esperando: false };
+    });
+  };
+  const folhaConversa = conversaAberta ? (
+    <ConversaNonio
+      mensagens={conversa.mensagens}
+      esperando={conversa.esperando}
+      sugestoes={sugestoes}
+      fechada={conversaFechada}
+      aviso={avisoConversa}
+      onEntendi={() => atualizar((p, t) => marcarApresentacao(p, "conversa", t))}
+      onEnviar={(t) => void enviarPergunta(t)}
+      onFechar={fecharConversa}
+    />
+  ) : null;
+
+  /* ---------- Apresentações ---------- */
+
+  const apresentar =
+    casoAberto || conversaAberta
+      ? null
+      : proximaApresentacao(a, passo, exec, progresso.apresentacoes, { jaNestePasso: apresentadaEm === passo.id, retornoVisivel: selo !== null });
+  const apresentacao = apresentar ? (
+    <Apresentacao
+      key={apresentar}
+      id={apresentar}
+      onEntendi={() => {
+        setApresentadaEm(passo.id);
+        atualizar((p, t) => marcarApresentacao(p, apresentar, t));
+      }}
+    />
+  ) : null;
+
+  const origemDesvio = progresso.campanha.desvio?.destino === a.id ? atividadePorId(progresso.campanha.desvio.origem) : null;
+  const faixa = (compacta: boolean) => (
+    <>
+      {!compacta && origemDesvio && (
+        <Link href={rotaDe(origemDesvio)} className="block rotate-[-0.6deg] rounded-md border-2 border-tinta bg-marca-texto px-3 py-2 text-[14px] font-semibold" data-desvio="">
+          Desvio. Quando quiser, volte para {origemDesvio.titulo}: a máquina está como você deixou.
+        </Link>
+      )}
+      {!compacta && a.categoria && <CategoriaRua categoria={a.categoria} />}
+      <FaixaNonio
+        fala={falaAtual}
+        selo={selo}
+        retorno={retorno}
+        expressao={expressao}
+        ajuda={acaoAjuda}
+        onPerguntar={podePerguntar ? abrirConversa : null}
+        compacta={compacta}
+        apontando={falaAtual.alvo !== undefined}
+        extra={
+          sondagem ? (
+            <Link
+              href={`/partilha/sondagem?conceito=${encodeURIComponent(sondagem)}&origem=${encodeURIComponent(a.id)}`}
+              className="botao-pequeno mt-2"
+              data-convite-sondagem={sondagem}
+            >
+              Uma pergunta
+            </Link>
+          ) : null
+        }
+      />
+    </>
+  );
+
+  const folhaCaso =
+    casoAberto && passo.dicas ? (
+      <FolhaCasoParecido
+        dica={passo.dicas[2]}
+        medidas={{ ...medidasVivas(exec.bancada?.atual ?? null), feitas: String(exec.passo.solucoes.length) }}
+        podeJunto={podeJunto && sit === "ativo" && nivel < 4}
+        onJunto={() => {
+          setCasoAberto(false);
+          enviar({ tipo: "junto" });
+        }}
+        onFechar={() => setCasoAberto(false)}
+      />
+    ) : null;
+
   const atributos = {
     "data-pronto": "sim",
     "data-tela": "missao",
@@ -138,76 +357,36 @@ export function ExecutorAtividade({
     "data-modo": modo,
     "data-passo": passo.id,
     "data-fase": passo.fase,
-    "data-situacao": exec.passo.situacao,
+    "data-situacao": sit,
+    "data-retorno": retorno,
   };
-
-  const aplicacao = passo.fase === "aplicacao";
-  const tentativasParaOferecer = prefs.postura === "presente" ? 1 : 2;
-  const ofereceAjuda =
-    !aplicacao && prefs.postura !== "quieto" && exec.passo.situacao === "ativo" && exec.passo.ajuda < 3 && exec.passo.tentativas >= tentativasParaOferecer && passo.dicas !== undefined;
-
-  const expressao: ExpressaoNonio = exec.passo.situacao === "vencido" ? "satisfeito" : exec.passo.ajuda >= 2 ? "medindo" : prefs.postura === "quieto" ? "quieto" : "atento";
-  const temDicas = passo.dicas !== undefined && (exec.passo.situacao === "ativo" || exec.passo.situacao === "convite");
-  const comentario = prefs.postura === "presente" && aviso?.equivoco ? aviso.texto : null;
 
   const cabecalho = (
     <CabecalhoLugar
       voltar={voltar}
       lugar={`${lugarDe(a, modo)} · ${NOME_DA_FASE[passo.fase]}`}
       titulo={a.titulo}
-      direita={<BotaoNonio expressao={expressao} temDicas={temDicas} oferta={ofereceAjuda} onAbrir={() => setNonioAberto(true)} />}
+      direita={total > 1 ? <BotaoEtapas passos={passosDoModo(a, modo)} atual={exec.indice} /> : undefined}
     />
   );
 
+  const desafio = passo.tipo === "operar" && sit === "convite" && passo.convite;
+  const etiqueta: Etiqueta =
+    selo === "acertou" && (sit === "vencido" || sit === "conferindo")
+      ? "Feito"
+      : desafio
+        ? "Desafio"
+        : passo.tipo === "prever"
+          ? "Pergunta"
+          : passo.tipo === "palpite"
+            ? "Palpite"
+            : passo.tipo === "aposta"
+              ? "Aposta do Nônio"
+              : passo.tipo === "frase" || passo.tipo === "notacao" || passo.tipo === "registro"
+                ? "Registro"
+                : "Objetivo";
   const pedido = (
-    <>
-      <span className="contador-passo" aria-label={`Passo ${exec.indice + 1} de ${total}`}>
-        {exec.indice + 1}/{total}
-      </span>
-      <p className="m-0 min-w-0 flex-1 text-[15px] font-semibold leading-snug" data-pedido="">
-        {passo.pedido}
-      </p>
-    </>
-  );
-
-  const origemDesvio = progresso.campanha.desvio?.destino === a.id ? atividadePorId(progresso.campanha.desvio.origem) : null;
-  const avisosNonio =
-    ofereceAjuda || comentario || sondagem || origemDesvio || a.categoria ? (
-      <div className="flex flex-col gap-2.5">
-        {(ofereceAjuda || comentario) && (
-          <button type="button" className="block w-full text-left anima-esmaecer" onClick={() => setNonioAberto(true)} data-oferta-nonio="">
-            <BalaoNonio texto={comentario ?? "Travou duas vezes. Quer uma medida?"} expressao={comentario ? "medindo" : "atento"} compacta />
-          </button>
-        )}
-        {sondagem && (
-          <Link href={`/partilha/sondagem?conceito=${encodeURIComponent(sondagem)}&origem=${encodeURIComponent(a.id)}`} className="block anima-esmaecer" data-convite-sondagem={sondagem}>
-            <BalaoNonio texto="A mesma medida escapou duas vezes, em lugares diferentes. Posso conferir uma coisa? Uma pergunta só; depois você volta para cá." expressao="medindo" compacta />
-          </Link>
-        )}
-        {origemDesvio && (
-          <Link href={rotaDe(origemDesvio)} className="block rotate-[-0.6deg] rounded-md border-2 border-tinta bg-marca-texto px-3 py-2 text-[14px] font-semibold" data-desvio="">
-            Desvio. Quando quiser, volte para {origemDesvio.titulo}: a máquina está como você deixou.
-          </Link>
-        )}
-        {a.categoria && <CategoriaRua categoria={a.categoria} />}
-      </div>
-    ) : null;
-
-  const painelNonio = (
-    <PainelNonio
-      aberto={nonioAberto}
-      onFechar={() => setNonioAberto(false)}
-      dicas={passo.dicas}
-      ajuda={exec.passo.ajuda}
-      medidas={{ ...medidasVivas(exec.bancada?.atual ?? null), feitas: String(exec.passo.solucoes.length) }}
-      onPedir={() => enviar({ tipo: "dica" })}
-      onJunto={() => {
-        enviar({ tipo: "junto" });
-        setNonioAberto(false);
-      }}
-      podeJunto={passo.tipo === "operar" || passo.tipo === "frase" || passo.tipo === "prever"}
-      aplicacao={aplicacao}
-    />
+    <Objetivo etiqueta={etiqueta} instrucao={desafio ? (passo.convite.instrucao ?? passo.convite.texto) : passo.instrucao} gesto={gesto} lembrete={lembrete} />
   );
 
   if (passo.tipo === "narrativa" || !exec.bancada) {
@@ -215,7 +394,6 @@ export function ExecutorAtividade({
     return (
       <>
         <TelaNarrativa atributos={atributos} cabecalho={cabecalho} pedido={pedido}>
-          {avisosNonio}
           {passo.tipo === "narrativa" && passo.manual && <ManualRasgado titulo={passo.manual.titulo} linhas={passo.manual.linhas} />}
           {exposicao ? (
             <Recorte>
@@ -229,6 +407,7 @@ export function ExecutorAtividade({
             </>
           )}
           {passo.falasSeMarca && progresso.campanha.marcas.includes(passo.falasSeMarca.marca) && <Falas falas={passo.falasSeMarca.falas} />}
+          <div className="flex flex-col gap-2.5">{faixa(false)}</div>
           {passo.tipo === "registro" ? (
             <FolhaRegistro passo={passo} frase={Object.values(exec.frases).at(-1) ?? ""} onGuardar={() => enviar({ tipo: "seguir" })} />
           ) : passo.tipo === "palpite" ? (
@@ -236,43 +415,68 @@ export function ExecutorAtividade({
               <PainelPalpite passo={passo} onResponder={(v) => enviar({ tipo: "responder", valor: v })} />
             </div>
           ) : (
-            <Seguir rotulo={passo.tipo === "narrativa" ? (passo.botao ?? "Seguir") : "Seguir"} onClick={() => enviar({ tipo: "seguir" })} />
+            <Seguir rotulo={passo.tipo === "narrativa" ? (passo.botao ?? "Continuar") : "Continuar"} onClick={() => enviar({ tipo: "seguir" })} />
           )}
         </TelaNarrativa>
-        {painelNonio}
+        {folhaCaso}
+        {folhaConversa}
+        {apresentacao}
       </>
     );
   }
 
   const bancada = exec.bancada;
-  const pele = PELES[bancada.atual.config.pele];
-  const ultimo = exec.passo.ultimo;
+  const peleMaquina = PELES[bancada.atual.config.pele];
+  const aindaNao = selo === "ainda-nao";
+  const alvo = falaAtual.alvo ?? null;
+  const vencido = sit === "vencido";
   const marcas: MarcasBancada = {
-    aceita: exec.passo.situacao === "vencido" && bancada.atual.fechada,
-    bicasAtencao: ultimo && !ultimo.ok && ultimo.medidas.bica ? [Number(ultimo.medidas.bica) - 1] : [],
-    sobraAtencao: ultimo !== null && !ultimo.ok && ["ficou-carga", "sobra-da-mais-uma-volta", "sobra-pode-ser-cortada", "sobra-diferente", "sobra-nao-fecha"].includes(ultimo.motivo),
+    aceita: vencido && (passo.tipo === "operar" || passo.tipo === "aposta"),
+    fechou: vencido && passo.tipo === "operar" && selo === "acertou",
+    bicasAtencao: aindaNao ? bicasDoAlvo(alvo, bancada.atual) : [],
+    sobraAtencao: aindaNao && alvo === "esteira",
   };
-  const msgEvento = mensagemDoEvento(bancada.atual, pele);
-  const tira = aviso && aviso.seq === bancada.atual.seq ? { texto: aviso.texto, tom: aviso.tom } : msgEvento;
-  const realce = exec.passo.ajuda >= 1 && exec.passo.situacao === "ativo" ? (passo.dicas?.[0].alvo ?? null) : null;
-  const cotaDica = exec.passo.ajuda >= 2 && exec.passo.situacao === "ativo" ? passo.dicas?.[1].cota : undefined;
+  const realce = !aindaNao && alvo && (sit === "ativo" || sit === "convite") ? alvo : null;
+  const cotaDica = nivel >= 2 && sit === "ativo" ? passo.dicas?.[1].cota : undefined;
   const vivas = medidasVivas(bancada.atual);
   const cotaExtra = cotaDica ? { alvo: cotaDica.alvo, texto: textoComMedidas(cotaDica.texto, vivas) } : null;
   const formalizacao = passo.tipo === "frase" || passo.tipo === "notacao" || passo.tipo === "registro";
   const parada = formalizacao || passo.tipo === "palpite" || passo.tipo === "prever";
+  const operavel = (passo.tipo === "operar" || passo.tipo === "aposta") && !vencido;
+  // A máquina nova continua a história: a chegada anima só a diferença, enquanto o passo está intacto.
+  const chegada = chegadaDoPasso(a, exec);
+  const intacto = bancada.atual.seq === exec.passo.inicio?.atual.seq && exec.passo.respostas === 0 && sit === "ativo";
 
   const maquina = (
     <MaquinaDoPasso
+      key={passo.id}
       exec={exec}
       passo={passo}
-      pele={pele}
-      cotas={prefs.cotas === "visiveis" || exec.passo.ajuda >= 2}
-      onAcao={parada || exec.passo.situacao === "vencido" ? undefined : (acao) => enviar({ tipo: "maquina", acao })}
+      pele={peleMaquina}
+      cotas={progresso.preferencias.cotas === "visiveis" || nivel >= 2}
+      onAcao={parada || !operavel ? undefined : (acao) => enviar({ tipo: "maquina", acao })}
       realce={realce}
       cotaExtra={cotaExtra}
       marcas={marcas}
+      chegada={chegada}
+      metas={passo.tipo === "aposta" && !vencido ? metasDeComposicao(passo.objetivo) : undefined}
     />
   );
+
+  // Acima da máquina: o bilhete da aposta; a Dália, quando a máquina muda ou quando abre a conversa.
+  const falasDaDalia = passo.falas?.filter((f) => f.quem === "dalia").map((f) => f.texto) ?? [];
+  const nota =
+    passo.tipo === "aposta" ? (
+      <Bilhete texto={passo.aposta} />
+    ) : passo.chegada && intacto ? (
+      <div className="ficha px-4 pb-3 pt-2" data-chegada={passo.id}>
+        <FalaDalia texto={passo.chegada.fala} compacta />
+      </div>
+    ) : falasDaDalia.length > 0 && intacto ? (
+      <div className="ficha px-4 pb-3 pt-2">
+        <FalaDalia texto={falasDaDalia} compacta />
+      </div>
+    ) : null;
 
   const conta =
     passo.tipo === "operar" && passo.conta ? (
@@ -281,46 +485,73 @@ export function ExecutorAtividade({
       </div>
     ) : null;
 
+  const marcaResposta = {
+    valor: aindaNao ? (exec.passo.resposta ?? null) : null,
+    onRascunho: () => setRascunho(chaveRascunho),
+    ajuda: ajudaNaResposta && temEscada && nivel < 4 ? { rotulo: rotuloAjuda, onPedir: pedirAjuda } : null,
+  };
+
   let controles: React.ReactNode = null;
   let sobreposicao: React.ReactNode = null;
+
+  const junto = (p: Extract<Passo, { tipo: "operar" | "aposta" }>) => {
+    if (exec.passo.junto === null) return null;
+    const proxima = resolucaoDoPasso(p, exec)[exec.passo.junto];
+    if (proxima) return <BarraJunto texto={descreverAcao(proxima, peleMaquina)} onFazer={() => enviar({ tipo: "maquina", acao: proxima })} />;
+    if (p.tipo === "operar" && !p.automatico) return <BarraJunto texto="Agora feche." onFazer={() => enviar({ tipo: "fechar" })} />;
+    return null;
+  };
 
   if (passo.tipo === "palpite") {
     controles = <PainelPalpite passo={passo} onResponder={(v) => enviar({ tipo: "responder", valor: v })} />;
   } else if (passo.tipo === "prever") {
     controles = (
-      <PainelPreverComDemo exec={exec} passo={passo} onResponder={(v) => enviar({ tipo: "responder", valor: v })} onSeguir={() => enviar({ tipo: "seguir" })} />
+      <PainelPreverComDemo exec={exec} passo={passo} marca={marcaResposta} onResponder={(v) => enviar({ tipo: "responder", valor: v })} onSeguir={() => enviar({ tipo: "seguir" })} />
+    );
+  } else if (passo.tipo === "aposta") {
+    controles = (
+      <PainelAposta
+        passo={passo}
+        exec={exec}
+        alavanca={
+          passo.alavanca !== false ? (
+            <PainelBancada estado={bancada.atual} pele={peleMaquina} onAcao={(acao) => enviar({ tipo: "maquina", acao })} soAlavanca />
+          ) : null
+        }
+        junto={junto(passo)}
+        marca={marcaResposta.valor}
+        onRascunho={marcaResposta.onRascunho}
+        onResponder={(v) => enviar({ tipo: "responder", valor: v })}
+        onDesfazer={() => enviar({ tipo: "maquina", acao: { tipo: "desfazer" } })}
+        onSeguir={() => enviar({ tipo: "seguir" })}
+      />
     );
   } else if (passo.tipo === "operar") {
-    if (exec.passo.situacao === "vencido") {
-      const palpiteId = Object.keys(exec.palpites).at(-1);
+    if (vencido) {
       controles = (
         <PainelVencido
           falas={passo.aoConcluir}
-          palpite={palpiteId && exec.indice <= 3 && passosDoModo(a, modo).find((p) => p.id === palpiteId)?.tipo === "palpite" ? palpiteParaMostrar(a, palpiteId, exec.palpites[palpiteId]) : null}
+          palpite={palpite}
           convite={passo.convite && exec.passo.convite === null ? passo.convite.texto : null}
           onConvite={(aceitar) => enviar({ tipo: "convite", aceitar })}
           onSeguir={() => enviar({ tipo: "seguir" })}
-          extra={exec.passo.convite === "feito" ? <p className="m-0 font-semibold"><span className="grifo">Numa volta só.</span> A máquina agradece.</p> : null}
         />
       );
     } else {
-      const resolucao = resolucaoDoPasso(passo, exec);
-      const proximaJunto = exec.passo.junto !== null ? resolucao[exec.passo.junto] : undefined;
       controles = (
         <div className="flex flex-col gap-3">
-          {exec.passo.situacao === "convite" && passo.convite && <p className="m-0 font-bold"><span className="grifo">{passo.convite.texto}</span></p>}
+          {sit === "convite" && passo.convite && <p className="m-0 font-bold"><span className="grifo">{passo.convite.texto}</span></p>}
           {exec.passo.solucoes.length > 0 && passo.objetivo.validador === "partilha.solucoes-distintas" && (
             <p className="m-0 font-semibold" data-solucoes={exec.passo.solucoes.length}>
               Jeitos aceitos: <span className="grifo font-extrabold">{exec.passo.solucoes.length} de {String(passo.objetivo.params?.n ?? 2)}</span>.
             </p>
           )}
-          {proximaJunto && <Junto texto={descreverAcao(proximaJunto, pele)} onFazer={() => enviar({ tipo: "maquina", acao: proximaJunto })} />}
-          {exec.passo.junto !== null && !proximaJunto && <Junto texto="Agora feche." onFazer={() => enviar({ tipo: "fechar" })} />}
+          {junto(passo)}
           <PainelBancada
             estado={bancada.atual}
-            pele={pele}
+            pele={peleMaquina}
             onAcao={(acao) => enviar({ tipo: "maquina", acao })}
-            onFechar={() => enviar({ tipo: "fechar" })}
+            onFechar={passo.automatico ? undefined : () => enviar({ tipo: "fechar" })}
             rotuloFechar={passo.rotuloFechar}
           />
         </div>
@@ -329,6 +560,7 @@ export function ExecutorAtividade({
   } else if (passo.tipo === "frase") {
     sobreposicao = (
       <FolhaSobe>
+        <FaixaNaFolha>{faixa(true)}</FaixaNaFolha>
         <FolhaFrase
           passo={passo}
           exec={exec}
@@ -349,6 +581,7 @@ export function ExecutorAtividade({
     const frase = Object.values(exec.frases).at(-1) ?? "";
     sobreposicao = (
       <FolhaSobe>
+        <FaixaNaFolha>{faixa(true)}</FaixaNaFolha>
         <FolhaNotacao
           passo={passo}
           frase={frase}
@@ -364,6 +597,7 @@ export function ExecutorAtividade({
   } else if (passo.tipo === "registro") {
     sobreposicao = (
       <FolhaSobe>
+        <FaixaNaFolha>{faixa(true)}</FaixaNaFolha>
         <FolhaRegistro passo={passo} frase={Object.values(exec.frases).at(-1) ?? ""} onGuardar={() => enviar({ tipo: "seguir" })} />
       </FolhaSobe>
     );
@@ -375,18 +609,20 @@ export function ExecutorAtividade({
         atributos={{ ...atributos, "data-cena": a.tipo === "cena" ? "sim" : "nao" }}
         cabecalho={cabecalho}
         pedido={pedido}
+        nota={nota}
         maquina={
           <>
             {conta}
             {maquina}
           </>
         }
-        tira={!formalizacao ? <TiraMensagem texto={tira?.texto ?? null} tom={tira?.tom} /> : undefined}
-        nonio={!formalizacao ? avisosNonio : undefined}
+        faixa={faixa(false)}
         controles={controles}
         sobreposicao={sobreposicao}
       />
-      {painelNonio}
+      {folhaCaso}
+      {folhaConversa}
+      {apresentacao}
     </>
   );
 }
@@ -395,25 +631,42 @@ function textoComMedidas(modelo: string, vivas: Record<string, string>): string 
   return modelo.replace(/\{(\w+)\}/g, (_, k: string) => vivas[k] ?? "");
 }
 
-/** O palpite e o que a máquina deu; num palpite de opções, o texto da opção no lugar do id. */
-function palpiteParaMostrar(a: Atividade, passoId: string, valor: string | null): { valor: string | null; certo: string } {
-  const p = a.passos.find((x) => x.id === passoId);
-  if (!p || p.tipo !== "palpite") return { valor, certo: "" };
-  const opcoes = p.resposta.tipo === "opcoes" ? p.resposta.opcoes : null;
-  const texto = (v: string) => opcoes?.find((o) => o.id === v)?.texto ?? v;
-  return { valor: valor === null ? null : texto(valor), certo: texto(p.certo) };
+/** As bicas que o "ainda não" circula: a do motivo, ou a de mais e a de menos carga. */
+function bicasDoAlvo(alvo: AlvoMaquina | null, e: EstadoMaquina): number[] {
+  if (!alvo) return [];
+  if (alvo.startsWith("bica:")) return [Number(alvo.slice(5))];
+  if (alvo !== "bicas") return [];
+  const uso = bicasEmUso(e);
+  if (uso.length < 2) return uso;
+  const ordenadas = [...uso].sort((x, y) => compara(quantidadeNaBica(e.bicas[x]), quantidadeNaBica(e.bicas[y])));
+  const menor = ordenadas[0];
+  const maior = ordenadas[ordenadas.length - 1];
+  if (compara(quantidadeNaBica(e.bicas[menor]), quantidadeNaBica(e.bicas[maior])) === 0) return [];
+  return [menor, maior];
 }
 
-function avisoDe(efeitos: readonly Efeito[], exec: Execucao, pele: Pele | null): Aviso | null {
-  const seq = exec.bancada?.atual.seq ?? -1;
-  const eq = efeitos.find((e): e is Extract<Efeito, { tipo: "equivoco" }> => e.tipo === "equivoco");
-  if (eq) return { texto: textoDoEquivoco(eq.id, eq.medidas), tom: "atencao", seq, equivoco: true };
-  const r = efeitos.find((e): e is Extract<Efeito, { tipo: "resultado" }> => e.tipo === "resultado");
-  if (r && pele) {
-    if (r.resultado.ok) return { texto: "Partilha fechada.", tom: "feito", seq, equivoco: false };
-    return { texto: textoDoMotivo(r.resultado.motivo, r.resultado.medidas, pele), tom: r.resultado.parcial ? "feito" : "atencao", seq, equivoco: false };
-  }
-  return null;
+/**
+ * 25 s sem gesto num passo de máquina: a linha do gesto pulsa uma vez (devolve um número novo) e
+ * o Nônio pode repetir o gesto. Qualquer gesto (a chave muda) recomeça a conta. Nenhum relógio
+ * aparece na tela.
+ */
+const LEMBRETE_MS = 25_000;
+
+function useLembrete(chave: string | null, aoLembrar: (vez: number) => void): number {
+  const [vez, setVez] = useState<{ chave: string | null; n: number }>({ chave: null, n: 0 });
+  useEffect(() => {
+    // Uma vez por parada: depois do lembrete, só um gesto novo (chave nova) arma outro.
+    if (!chave || vez.chave === chave) return;
+    const t = setTimeout(() => {
+      const n = vez.n + 1;
+      setVez({ chave, n });
+      aoLembrar(n);
+    }, LEMBRETE_MS);
+    return () => clearTimeout(t);
+    // O lembrete só recomeça quando a chave (passo, máquina, situação) muda.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chave, vez]);
+  return vez.chave === chave ? vez.n : 0;
 }
 
 /* ---------- Peças da tela ---------- */
@@ -441,34 +694,6 @@ function lugarDe(a: Atividade, modo: ModoExecucao): string {
   return `${distrito} · ${tipo}`;
 }
 
-function BotaoNonio({ expressao, temDicas, oferta, onAbrir }: { expressao: ExpressaoNonio; temDicas: boolean; oferta: boolean; onAbrir: () => void }) {
-  return (
-    <button
-      type="button"
-      className="botao-icone relative w-12"
-      onClick={onAbrir}
-      disabled={!temDicas}
-      aria-label={temDicas ? "Pedir uma medida ao Nônio" : "Nônio (sem medida para este passo)"}
-      data-acao="nonio"
-    >
-      <Nonio expressao={temDicas ? expressao : "quieto"} tamanho={34} rotulo="" pes={false} />
-      {oferta && <span className="anima-oferta absolute -right-1.5 -top-1.5 h-3.5 w-3.5 rounded-full border-2 border-tinta bg-marca-texto" aria-hidden="true" />}
-    </button>
-  );
-}
-
-function Junto({ texto, onFazer }: { texto: string; onFazer: () => void }) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border-2 border-caneta bg-caneta-palida px-3 py-2" data-junto="">
-      <span className="letra-mao shrink-0 text-[22px]">juntos</span>
-      <span className="min-w-0 flex-1 text-[15px] font-semibold">{texto}</span>
-      <button type="button" className="botao-secundario shrink-0" onClick={onFazer} data-acao="fazer-junto">
-        Fazer
-      </button>
-    </div>
-  );
-}
-
 /** A folha pautada sobe da borda de baixo, por cima da folha quadriculada. */
 function FolhaSobe({ children }: { children: React.ReactNode }) {
   const [aberta, setAberta] = useState(false);
@@ -493,6 +718,8 @@ function MaquinaDoPasso({
   realce,
   cotaExtra,
   marcas,
+  chegada,
+  metas,
 }: {
   exec: Execucao;
   passo: Passo;
@@ -502,6 +729,8 @@ function MaquinaDoPasso({
   realce: AlvoMaquina | null;
   cotaExtra: { alvo: AlvoMaquina; texto: string } | null;
   marcas: MarcasBancada;
+  chegada: DiferencaMaquinas | null;
+  metas?: Readonly<Record<number, string>>;
 }) {
   const demo = useDemonstracao(passo.tipo === "prever" && exec.passo.situacao === "conferindo" ? passo : null, exec.passo.inicio);
   const estado = demo ?? exec.bancada;
@@ -515,6 +744,8 @@ function MaquinaDoPasso({
       realce={realce}
       cotaExtra={cotaExtra}
       marcas={demo ? { aceita: false } : passo.tipo === "prever" && exec.passo.situacao === "conferindo" ? { aceita: true } : marcas}
+      chegada={demo ? null : chegada}
+      metas={metas}
     />
   );
 }
@@ -545,11 +776,13 @@ function PainelPreverComDemo({
   passo,
   onResponder,
   onSeguir,
+  marca,
 }: {
   exec: Execucao;
   passo: Extract<Passo, { tipo: "prever" }>;
   onResponder: (v: string | null) => void;
   onSeguir: () => void;
+  marca: MarcaResposta;
 }) {
   const [pronto, setPronto] = useState(exec.passo.situacao !== "conferindo");
   const conferindo = exec.passo.situacao === "conferindo";
@@ -558,7 +791,7 @@ function PainelPreverComDemo({
     const t = setTimeout(() => setPronto(true), 700 * (passo.demonstracao.length + 1));
     return () => clearTimeout(t);
   }, [conferindo, passo.demonstracao.length]);
-  return <PainelPrever passo={passo} exec={exec} demonstrando={conferindo && !pronto} onResponder={onResponder} onSeguir={onSeguir} />;
+  return <PainelPrever passo={passo} exec={exec} demonstrando={conferindo && !pronto} onResponder={onResponder} onSeguir={onSeguir} marca={marca} />;
 }
 
 function TelaNarrativa({

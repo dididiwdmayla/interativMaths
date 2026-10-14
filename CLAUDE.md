@@ -26,6 +26,9 @@ A referência visual aprovada mora em `docs/referencia-visual/`; toda tela nova 
 - Nenhuma chave no navegador: nada de `NEXT_PUBLIC_` com segredo. Correção matemática é do motor.
 - Ids publicados (conceito, missão, passo) não mudam. Renomear exige migração do progresso.
 - Raiz de cada tela expõe `data-pronto`, `data-passo`, `data-fase` para teste.
+- Todo passo tem `instrucao` com verbo no imperativo primeiro (até 80 caracteres, termina em ponto).
+- A IA só conversa: passa pelas guardas e nunca dá a resposta do passo; correção é do motor.
+- Verde é acertou; vermelho é ainda não, passageiro, nunca em texto (sem X, sem "errado").
 
 ## Testes em camadas (gaste onde há risco)
 1. `npm run tipos`, `npm run lint`, `npm run build`.

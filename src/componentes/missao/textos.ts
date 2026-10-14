@@ -24,6 +24,12 @@ export function descreverAcao(a: AcaoBancada, pele: Pele): string {
       return `No fatiador, escolha cortar em ${a.valor}.`;
     case "fatiar":
       return a.quantidade === "todas" ? "Corte todas as peças da pilha." : "Corte uma peça.";
+    case "cortar":
+      return `Corte ${a.quantidade === "todas" ? "todas as peças" : "uma peça"} em ${a.partes}.`;
+    case "colocar":
+      return `Ponha uma peça na ${pele.receptor.singular} ${a.bica + 1}.`;
+    case "devolver":
+      return `Devolva uma peça da ${pele.receptor.singular} ${a.bica + 1}.`;
     case "repartir":
       return `Aperte ${pele.repartir}.`;
     case "fechar":

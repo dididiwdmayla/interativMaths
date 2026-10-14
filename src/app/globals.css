@@ -20,8 +20,13 @@
   --color-marca-texto: var(--marca-texto);
   --color-marca-texto-palido: var(--marca-texto-palido);
   --color-vermelho: var(--vermelho);
+  --color-vermelho-nevoa: var(--vermelho-nevoa);
+  --color-verde: var(--verde);
   --color-verde-escuro: var(--verde-escuro);
+  --color-verde-tinta: var(--verde-tinta);
   --color-verde-palido: var(--verde-palido);
+  --color-bilhete: var(--bilhete);
+  --color-veu: var(--veu);
 
   --font-interface: var(--fonte-interface);
   --font-mao: var(--fonte-mao);
@@ -82,6 +87,7 @@
   }
 }
 
+svg :focus,
 svg :focus-visible {
   outline: none;
 }
@@ -218,6 +224,27 @@ svg [data-focavel]:focus-visible .anel-foco {
   animation: oferta 2.4s ease-in-out infinite;
 }
 
+/* Lembrete: a linha do gesto pulsa uma vez. Nenhum relógio aparece. */
+@keyframes lembrete {
+  0%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  35% {
+    opacity: 0.45;
+    transform: translateX(4px);
+  }
+  70% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.anima-lembrete {
+  animation: lembrete 900ms var(--curva-firme) 1;
+}
+
 /* A faixa amarela cresce da esquerda para a direita. */
 .anima-marca-texto {
   transform-box: fill-box;
@@ -312,6 +339,43 @@ html[data-animacoes="leves"] .anima-oferta {
   animation: voo 560ms var(--curva-firme) forwards;
 }
 
+/* A mão: a peça desliza até a mesa (ou volta para a esteira). */
+.anima-pousa {
+  animation: voo 220ms var(--curva-firme) forwards;
+}
+
+/* A chegada: as peças novas entram pela esteira. */
+@keyframes chegada {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.anima-chegada {
+  animation: chegada 640ms var(--curva-saida) both;
+}
+
+/* O corte separa a peça em fatias, com um pequeno escalonamento. */
+@keyframes fatia-sai {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.anima-fatia {
+  animation: fatia-sai 260ms var(--curva-saida) both;
+}
+
 .anima-engasgo {
   animation: engasgo 460ms var(--curva-firme);
 }
@@ -326,8 +390,13 @@ html[data-animacoes="leves"] .anima-lamina {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anima-voo {
+  .anima-voo,
+  .anima-pousa {
     animation: voo-leve 400ms linear forwards;
+  }
+  .anima-fatia,
+  .anima-chegada {
+    animation: esmaecer-entrar 260ms linear both;
   }
   .anima-engasgo,
   .anima-lamina,
@@ -345,5 +414,8 @@ html[data-animacoes="leves"] .anima-lamina {
   }
   .anima-marca-texto {
     animation: esmaecer-entrar 320ms linear both;
+  }
+  .anima-lembrete {
+    animation: oferta 900ms linear 1;
   }
 }

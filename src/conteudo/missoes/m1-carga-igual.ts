@@ -3,7 +3,7 @@
  */
 import type { ConfigBancada } from "@/nucleo/maquinas/bancada/tipos";
 import type { Atividade, Entrada } from "@/nucleo/missoes/tipos";
-import { CONFERIR, FECHAR, LOTE_2, LOTE_5, LOTE_6, LOTE_7, MAQUINA_MONTAR_SACAS, REPARTIR, SEGUIR } from "./comum";
+import { CONFERIR, FECHAR, LOTE_5, LOTE_6, LOTE_7, MAQUINA_MONTAR_SACAS, REPARTIR, SEGUIR, UMA_EM_CADA_4 } from "./comum";
 
 const MAQUINA: ConfigBancada = {
   pele: "sacas-carrocas",
@@ -13,6 +13,12 @@ const MAQUINA: ConfigBancada = {
 
 /** Do começo até a partilha da experimentação (parte comum às soluções). */
 const ABERTURA: Entrada[] = [SEGUIR, { tipo: "responder", valor: "5" }];
+
+/** Uma saca em cada carroça, com a mão: o passo vence sozinho no quarto toque. */
+const A_MAO: readonly Entrada[] = UMA_EM_CADA_4;
+
+/** As outras vinte sacas, à mão: cinco voltas de quatro toques. */
+const TUDO_A_MAO: readonly Entrada[] = [...A_MAO, ...A_MAO, ...A_MAO, ...A_MAO, ...A_MAO];
 
 /** Só os passos de formalização (o que o modo registro roda). */
 const REGISTRO: Entrada[] = [
@@ -48,6 +54,7 @@ export const MISSAO_1: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Leia o pedido da Dália.",
+      instrucao: "Leia o pedido da Dália e aceite o serviço.",
       falas: [
         { quem: "dalia", texto: "Vinte e quatro sacas de farinha, quatro carroças. Todas saem com a mesma carga, senão a balança da ponte trava." },
         { quem: "dalia", texto: "O manual manda ajustar o lote. A página com o número rasgou faz tempo." },
@@ -63,19 +70,55 @@ export const MISSAO_1: Atividade = {
       tipo: "palpite",
       fase: "palpite",
       pedido: "Antes de ligar, um palpite.",
+      instrucao: "Diga quantas sacas você acha que cada carroça vai levar.",
       maquina: { config: MAQUINA },
       pergunta: "Quantas sacas você acha que cada carroça vai levar?",
       resposta: { tipo: "numero", minimo: 0, maximo: 24, unidade: "sacas" },
       certo: "6",
     },
     {
+      id: "a-mao",
+      tipo: "operar",
+      fase: "experimentacao",
+      pedido: "Uma saca em cada carroça, à mão.",
+      instrucao: "Ponha uma saca em cada carroça, com a mão.",
+      nonio: "Antes da alavanca, a mão: toque numa saca na esteira e depois numa carroça.",
+      acerto: "Uma saca em cada carroça, posta à mão. Na esteira ainda há {sobraNome}.",
+      maquina: { config: MAQUINA },
+      objetivo: { validador: "partilha.inteiras-por-bica", params: { n: 1 } },
+      automatico: true,
+      resolucao: [
+        { tipo: "colocar", tamanho: "1/1", bica: 0 },
+        { tipo: "colocar", tamanho: "1/1", bica: 1 },
+        { tipo: "colocar", tamanho: "1/1", bica: 2 },
+        { tipo: "colocar", tamanho: "1/1", bica: 3 },
+      ],
+      dicas: [
+        { texto: "Toque numa saca na esteira: ela fica escolhida, com um anel azul. Depois toque numa carroça.", alvo: "esteira" },
+        { texto: "São {abertas} carroças: {abertas} toques numa carroça, uma saca de cada vez.", cota: { alvo: "bicas", texto: "{abertas} carroças · 1 em cada" } },
+        {
+          texto: "Com outros números: 6 sacas, 3 carroças. Uma saca na primeira, uma na segunda, uma na terceira.",
+          caso: {
+            maquina: { pele: "sacas-carrocas", pecas: { quantidade: 6 }, bicas: { quantidade: 3, ajustavel: false } },
+            acoes: [
+              { tipo: "colocar", tamanho: "1/1", bica: 0 },
+              { tipo: "colocar", tamanho: "1/1", bica: 1 },
+              { tipo: "colocar", tamanho: "1/1", bica: 2 },
+            ],
+          },
+        },
+      ],
+      equivocos: ["lote-maior-que-cabe"],
+    },
+    {
       id: "repartir",
       tipo: "operar",
       fase: "experimentacao",
       pedido: "24 sacas, 4 carroças, todas iguais.",
-      maquina: { config: MAQUINA },
+      instrucao: "Termine com Repartir: carroças iguais, esteira vazia.",
+      nonio: "Agora a alavanca. O lote diz quantas sacas cada carroça recebe a cada volta.",
       objetivo: { validador: "partilha.fechada" },
-      resolucao: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }],
+      resolucao: [{ tipo: "lote", valor: 5 }, { tipo: "repartir" }],
       dicas: [
         { texto: "Repare nos medidores das carroças: todos precisam parar na mesma altura, e a esteira precisa ficar vazia.", alvo: "bicas" },
         {
@@ -94,7 +137,8 @@ export const MISSAO_1: Atividade = {
       evidencias: [{ conceito: "div.partilha", tipo: "experimento" }],
       aoConcluir: [{ quem: "dalia", texto: "Seis em cada. A balança da ponte nem piscou." }],
       convite: {
-        texto: "Dá para fazer numa volta só?",
+        texto: "fechar numa volta só",
+        instrucao: "Feche numa volta só: um lote que esvazie a esteira de uma vez.",
         objetivo: { validador: "partilha.fechada", params: { voltasMax: 1 } },
       },
     },
@@ -103,7 +147,11 @@ export const MISSAO_1: Atividade = {
       tipo: "prever",
       fase: "descoberta",
       pedido: "Chegaram 30 sacas e abriu mais uma bica.",
-      falas: [{ quem: "dalia", texto: "Chegaram trinta sacas, e a quinta bica voltou a abrir. Cinco carroças." }],
+      instrucao: "Responda quantas sacas vão em cada carroça, antes de girar.",
+      chegada: {
+        fala: "Chegaram mais seis sacas, e a quinta bica voltou a abrir. Cinco carroças agora.",
+        texto: "Mais sacas e mais uma carroça. A conta muda; o jeito de repartir, não. Pense antes de girar.",
+      },
       maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 30 }, bicas: { quantidade: 5, ajustavel: false } } },
       pergunta: "Antes de girar: quantas sacas vão em cada carroça?",
       resposta: { tipo: "numero", minimo: 0, maximo: 30, unidade: "sacas" },
@@ -128,6 +176,7 @@ export const MISSAO_1: Atividade = {
       tipo: "frase",
       fase: "formalizacao",
       pedido: "Toque numa cota, depois na lacuna.",
+      instrucao: "Complete a frase com os números da máquina parada.",
       falas: [{ quem: "dalia", texto: "Escreve no Caderno. Quero entender o que eu fazia de cor." }],
       maquina: { config: MAQUINA, acoes: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }] },
       frase: "{a} sacas repartidas entre {b} carroças dão {c} em cada.",
@@ -148,6 +197,7 @@ export const MISSAO_1: Atividade = {
       tipo: "notacao",
       fase: "formalizacao",
       pedido: "Comprima a frase em notação.",
+      instrucao: "Comprima a frase em notação.",
       linhas: ["24 ÷ 4 = 6", "4 × 6 = 24"],
       falas: [{ quem: "nonio", texto: "As palavras saem, os números ficam, os sinais aparecem. E a volta: quatro carroças de seis dão vinte e quatro." }],
     },
@@ -156,6 +206,7 @@ export const MISSAO_1: Atividade = {
       tipo: "operar",
       fase: "formalizacao",
       pedido: "Caminho de volta: monte 18 ÷ 3.",
+      instrucao: "Monte a conta 18 ÷ 3 na máquina.",
       conta: "18 ÷ 3",
       maquina: { config: MAQUINA_MONTAR_SACAS },
       objetivo: { validador: "maquina.mostra-divisao", params: { dividendo: 18, divisor: 3 } },
@@ -172,6 +223,7 @@ export const MISSAO_1: Atividade = {
       tipo: "registro",
       fase: "formalizacao",
       pedido: "Guarde a página no Caderno.",
+      instrucao: "Guarde a página no Caderno.",
       pagina: {
         id: "partilha.arco1.carga-igual",
         titulo: "Repartir igualmente",
@@ -187,6 +239,7 @@ export const MISSAO_1: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Prova direta: uma encomenda sem manual.",
+      instrucao: "Leia a encomenda e aceite.",
       falas: [{ quem: "dalia", texto: "Pelo que o Nônio mediu, você já reparte. Então: 35 sacas, 7 carroças, numa volta só." }],
       botao: "Aceitar",
     },
@@ -195,6 +248,7 @@ export const MISSAO_1: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "35 sacas, 7 carroças, numa volta só.",
+      instrucao: "Reparta 35 sacas entre 7 carroças, numa volta só.",
       maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 35 }, bicas: { quantidade: 7, ajustavel: false }, voltasMax: 1 } },
       objetivo: { validador: "partilha.fechada", params: { voltasMax: 1 } },
       resolucao: [{ tipo: "lote", valor: 5 }, { tipo: "repartir" }],
@@ -209,12 +263,14 @@ export const MISSAO_1: Atividade = {
     },
   ],
   solucoesDeTeste: [
-    { nome: "de 1 em 1 (seis voltas)", modo: "guiada", entradas: [...ABERTURA, REPARTIR, REPARTIR, REPARTIR, REPARTIR, REPARTIR, REPARTIR, FECHAR, SEGUIR, ...FORMALIZACAO] },
-    { nome: "de 2 em 2 (três voltas)", modo: "guiada", entradas: [...ABERTURA, LOTE_2, REPARTIR, REPARTIR, REPARTIR, FECHAR, SEGUIR, ...FORMALIZACAO] },
+    { nome: "à mão, depois de 1 em 1", modo: "guiada", entradas: [...ABERTURA, ...A_MAO, SEGUIR, REPARTIR, REPARTIR, REPARTIR, REPARTIR, REPARTIR, FECHAR, SEGUIR, ...FORMALIZACAO] },
+    { nome: "à mão, depois lote 5", modo: "guiada", entradas: [...ABERTURA, ...A_MAO, SEGUIR, LOTE_5, REPARTIR, FECHAR, SEGUIR, ...FORMALIZACAO] },
+    { nome: "tudo à mão", modo: "guiada", entradas: [...ABERTURA, ...A_MAO, SEGUIR, ...TUDO_A_MAO, FECHAR, SEGUIR, ...FORMALIZACAO] },
+    { nome: "a primeira volta com a alavanca", modo: "guiada", entradas: [...ABERTURA, REPARTIR, SEGUIR, LOTE_5, REPARTIR, FECHAR, SEGUIR, ...FORMALIZACAO] },
     {
-      nome: "de 6 em 6, aceitando o convite",
+      nome: "lote 5, aceitando o desafio",
       modo: "guiada",
-      entradas: [...ABERTURA, LOTE_6, REPARTIR, FECHAR, { tipo: "convite", aceitar: true }, LOTE_6, REPARTIR, FECHAR, SEGUIR, ...FORMALIZACAO],
+      entradas: [...ABERTURA, ...A_MAO, SEGUIR, LOTE_5, REPARTIR, FECHAR, { tipo: "convite", aceitar: true }, LOTE_5, REPARTIR, FECHAR, SEGUIR, ...FORMALIZACAO],
     },
     { nome: "prova direta", modo: "prova", entradas: [SEGUIR, LOTE_5, REPARTIR, FECHAR, SEGUIR] },
     {
@@ -224,8 +280,9 @@ export const MISSAO_1: Atividade = {
     },
   ],
   sabotagens: [
-    { nome: "lote 7 pede 28", modo: "guiada", entradas: [...ABERTURA, LOTE_7, REPARTIR], equivoco: "lote-maior-que-cabe" },
-    { nome: "fecha com 4 na esteira", modo: "guiada", entradas: [...ABERTURA, LOTE_5, REPARTIR, FECHAR], equivoco: "parou-cedo" },
+    { nome: "no passo da mão, lote 7 pede 28", modo: "guiada", entradas: [...ABERTURA, LOTE_7, REPARTIR], equivoco: "lote-maior-que-cabe" },
+    { nome: "depois da mão, lote 6 pede 24", modo: "guiada", entradas: [...ABERTURA, ...A_MAO, SEGUIR, LOTE_6, REPARTIR], equivoco: "lote-maior-que-cabe" },
+    { nome: "fecha com 4 na esteira", modo: "guiada", entradas: [...ABERTURA, ...A_MAO, SEGUIR, { tipo: "maquina", acao: { tipo: "lote", valor: 4 } }, REPARTIR, FECHAR], equivoco: "parou-cedo" },
     { nome: "prova com lote 6", modo: "prova", entradas: [SEGUIR, LOTE_6, REPARTIR], equivoco: "lote-maior-que-cabe" },
   ],
 };

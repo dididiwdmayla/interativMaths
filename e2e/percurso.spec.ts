@@ -16,6 +16,13 @@ async function passo(page: Page, id: string) {
   await expect(v(page, `[data-tela=missao][data-passo="${id}"]`)).toBeVisible();
 }
 
+/** A primeira vez com uma ferramenta: a apresentação, e "Entendi". */
+async function entender(page: Page, id: string) {
+  await expect(v(page, `[data-apresentacao="${id}"]`)).toBeVisible();
+  await tocar(page, "[data-acao=entendi]");
+  await expect(page.locator(`[data-apresentacao="${id}"]`)).toHaveCount(0);
+}
+
 async function mais(page: Page, seletor: string, vezes: number) {
   for (let i = 0; i < vezes; i++) await tocar(page, `[data-seletor=${seletor}] button[aria-label$="mais um"]`);
 }
@@ -47,18 +54,45 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await expect(v(page, "[data-estacao='partilha.arco1.carga-igual']")).toHaveAttribute("data-status", "disponivel");
   await tocar(page, "[data-estacao='partilha.arco1.carga-igual'] [data-acao=entrar]");
 
-  // Missão 1.
+  // Missão 1. A faixa do Nônio se apresenta na primeira vez.
   await passo(page, "pedido");
+  await entender(page, "faixa");
   await tocar(page, "[data-acao=seguir]");
   await passo(page, "palpite");
   await mais(page, "resposta", 4);
   await tocar(page, "[data-acao=responder]");
+
+  // A mão: tocar numa saca e depois numa carroça, quatro vezes.
+  await passo(page, "a-mao");
+  await entender(page, "mao-livre");
+  for (const bica of ["0", "1", "2", "3"]) {
+    await tocar(page, "[data-peca='1/1']");
+    await tocar(page, `[data-receptor='${bica}']`);
+  }
+  await expect(v(page, "[data-tela=missao][data-situacao=vencido]")).toBeVisible();
+  await expect(v(page, "[data-tela=missao]")).toHaveAttribute("data-retorno", "acertou");
+  await tocar(page, "[data-acao=seguir]");
+
   await passo(page, "repartir");
+  // Sem chave no servidor, a conversa não aparece: a faixa tem só o Me ajuda.
+  await expect(v(page, "[data-acao=nonio]")).toBeVisible();
+  await expect(page.locator("[data-acao=perguntar]")).toHaveCount(0);
+
+  // Um fechamento desigual: "ainda não", passageiro; o gesto seguinte volta a neutro.
+  const tela = v(page, "[data-tela=missao]");
+  await tocar(page, "[data-peca='1/1']");
+  await tocar(page, "[data-receptor='0']");
+  await expect(v(page, "[data-bica='0']")).toHaveAttribute("data-quantidade", "2");
+  await tocar(page, "[data-acao=fechar]");
+  await expect(tela).toHaveAttribute("data-retorno", "ainda-nao");
+  await tocar(page, "[data-receptor='0']");
+  await expect(v(page, "[data-bica='0']")).toHaveAttribute("data-quantidade", "1");
+  await expect(tela).toHaveAttribute("data-retorno", "neutro");
+
   await mais(page, "lote", 7);
   await tocar(page, "[data-acao=repartir]");
   await expect(v(page, "[data-visor]")).toContainText("Uma volta de 8 em 4 bicas pede 32");
-  await tocar(page, '[data-seletor=lote] button[aria-label$="menos um"]');
-  await tocar(page, '[data-seletor=lote] button[aria-label$="menos um"]');
+  for (let i = 0; i < 3; i++) await tocar(page, '[data-seletor=lote] button[aria-label$="menos um"]');
   await tocar(page, "[data-acao=repartir]");
   await expect(v(page, "[data-bica='0']")).toHaveAttribute("data-quantidade", "6");
 
@@ -69,6 +103,7 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
 
   await tocar(page, "[data-acao=fechar]");
   await expect(v(page, "[data-tela=missao][data-situacao=vencido]")).toBeVisible();
+  await expect(v(page, "[data-tela=missao]")).toHaveAttribute("data-retorno", "acertou");
   await tocar(page, "[data-acao=seguir]");
 
   await passo(page, "trinta");
@@ -95,6 +130,7 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await tocar(page, "[data-acao=seguir]");
 
   await passo(page, "volta");
+  await entender(page, "bicas");
   await mais(page, "carga", 8);
   await tocar(page, '[data-seletor=bicas] button[aria-label$="menos um"]');
   await mais(page, "lote", 5);

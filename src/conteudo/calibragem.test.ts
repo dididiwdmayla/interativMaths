@@ -6,6 +6,7 @@ import { comoRacional, igual } from "@/nucleo/racional/racional";
 import { CONCEITOS } from "./conceitos";
 import { ITENS_CALIBRAGEM, REGRAS_CALIBRAGEM } from "./calibragem";
 import { ATIVIDADES } from "./atividades";
+import { problemasDaInstrucao } from "@/nucleo/missoes/instrucao";
 
 describe("conteúdo: calibragem", () => {
   it("seis degraus, em ordem, com conceitos existentes", () => {
@@ -38,5 +39,11 @@ describe("conteúdo: calibragem", () => {
 
   it("pedidos cabem numa linha", () => {
     for (const i of ITENS_CALIBRAGEM) expect(i.pedido.length).toBeLessThanOrEqual(44);
+  });
+});
+
+describe("calibragem diz o que fazer", () => {
+  it("todo degrau tem instrução com verbo", () => {
+    for (const item of ITENS_CALIBRAGEM) expect(problemasDaInstrucao(item.instrucao), `degrau ${item.degrau}: "${item.instrucao}"`).toEqual([]);
   });
 });

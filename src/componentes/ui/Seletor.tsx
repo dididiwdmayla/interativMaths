@@ -16,6 +16,7 @@ export function Seletor({
   desabilitado = false,
   exibicao,
   idTeste,
+  marcado = false,
 }: {
   rotulo: string;
   valor: number;
@@ -25,6 +26,8 @@ export function Seletor({
   desabilitado?: boolean;
   exibicao?: ReactNode;
   idTeste?: string;
+  /** O valor não bateu com a máquina: borda vermelha e névoa (passageiro). */
+  marcado?: boolean;
 }) {
   const mudar = (v: number) => {
     if (desabilitado) return;
@@ -45,7 +48,7 @@ export function Seletor({
         <IconeMenos />
       </button>
       <output
-        className="passo-valor-quadro"
+        className={`passo-valor-quadro ${marcado ? "caixa-ainda-nao" : ""}`}
         aria-live="polite"
         aria-label={`${rotulo}: ${valor}`}
         tabIndex={desabilitado ? -1 : 0}

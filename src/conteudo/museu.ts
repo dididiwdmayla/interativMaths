@@ -51,6 +51,7 @@ export const EXPOSICAO_AHMES: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Museu das Descobertas.",
+      instrucao: "Leia a vitrine e vá à bancada.",
       falas: [
         { quem: "nonio", texto: "Esta sala guarda um problema de mais de três mil anos: repartir seis pães entre dez trabalhadores." },
         { quem: "dalia", texto: "Dez cestos, seis pães. Primeiro do seu jeito." },
@@ -62,6 +63,7 @@ export const EXPOSICAO_AHMES: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "6 pães, 10 cestos, do seu jeito.",
+      instrucao: "Reparta 6 pães entre 10 cestos, do seu jeito.",
       maquina: { config: PAES },
       objetivo: { validador: "partilha.fechada" },
       resolucao: [{ tipo: "partes", valor: 5 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 3 }, { tipo: "repartir" }],
@@ -85,6 +87,7 @@ export const EXPOSICAO_AHMES: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "À maneira de um escriba.",
+      instrucao: "Leia como o escriba repartia.",
       falas: [
         { quem: "nonio", texto: "Os escribas do Egito escreviam frações como soma de pedaços de numerador 1, todos diferentes: nada de três quintos, nada de repetir um tamanho." },
         { quem: "dalia", texto: "Então cada cesto só pode ter pedaços de numerador 1, e nenhum tamanho duas vezes." },
@@ -100,6 +103,7 @@ export const EXPOSICAO_AHMES: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "Só pedaços de numerador 1, sem repetir.",
+      instrucao: "Reparta de novo só com pedaços de numerador 1, sem repetir.",
       maquina: { config: PAES },
       objetivo: { validador: "partilha.unitarias-distintas" },
       resolucao: [
@@ -132,6 +136,7 @@ export const EXPOSICAO_AHMES: Atividade = {
       tipo: "narrativa",
       fase: "retencao",
       pedido: "A legenda da exposição.",
+      instrucao: "Leia a legenda da exposição.",
       faixas: {
         sabe: [
           "O Papiro de Rhind foi copiado por volta de 1550 a.C. pelo escriba Ahmes, a partir de um texto mais antigo. As datas variam um pouco conforme a fonte.",

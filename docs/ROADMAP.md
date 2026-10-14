@@ -56,11 +56,43 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
 - Verificação: `npm run verificar`, `npm run e2e` (a degustação nos três layouts até "Quero
   continuar"; embutida numa página de teste, com as mensagens certas, e uma origem não permitida
   que nem embute nem recebe nada), capturas em `docs/capturas/degustacao/`.
+- v0.3 — **O Nônio guia e a missão viva** (referência nova em `docs/referencia-visual/guia.html`):
+  - Base: tokens de acertou e ainda não (`--verde`, `--verde-tinta`, `--vermelho-nevoa`), bilhete e
+    véu; mão livre no núcleo (colocar, devolver, cortar, com eventos e testes de propriedade);
+    validadores `partilha.inteiras-por-bica` e `partilha.composicao`; execução v2 (assinatura dos
+    passos) e progresso v2 (apresentações, preferência da conversa) com migração testada contra um
+    progresso real da v0.2.
+  - Faixa do Nônio sempre na missão (fila de falas, reações com os números do momento, apontar);
+    verde quando acertou, "ainda não" passageiro (some no gesto seguinte), escada dentro da faixa.
+  - Toda tela diz o que fazer: `instrucao` com verbo em todo passo (checada), linha do gesto,
+    etapas ("2/9"), botões que dizem o que fazem, lembrete de 25 s.
+  - Mão livre na tela: tocar e arrastar peças, devolver, menu de corte, teclado, alvos de 44 px.
+  - Passos novos: aposta do Nônio (nas Missões 2, 3 e 4; na 2 ele tem razão), chegada (peças e bica
+    que chegam), desafio; as cinco missões revistas com soluções e sabotagens.
+  - Pergunte ao Nônio: rota com o SDK oficial, contexto pelo servidor, resiliência com orçamento,
+    guardas (não entregar, conta certa, voz), simulações, folha da referência 4, aviso de
+    privacidade, preferência no menu. Testes da rota sem rede.
+  - Fecho: apresentações (uma ferramenta por passo), calibragem com instrução e sondagem quieta,
+    laboratório (faixa em todos os estados, mão livre, zerar apresentações), documentos, percurso
+    de navegador ampliado e capturas em `docs/capturas/v0.3/`.
+  - Junção com a degustação (PR #3): instrução com verbo nos oito passos, faixa do Nônio, mão livre
+    e retorno verde e ainda não, como na Missão 4; a conversa fica fora (a degustação não está no
+    catálogo e é pública, sem limite de uso no servidor). O palpite de opções mostra o texto da
+    opção e tem gesto próprio. Percurso da degustação refeito para a mão livre, nos três layouts e
+    embutida; capturas de `docs/capturas/degustacao/` refeitas.
+  - Apresentações no computador e em paisagem: o cartão saiu de dentro do véu (lá ficava abaixo da
+    ferramenta em destaque e a máquina cobria o "Entendi") e vai para o lado da ferramenta quando há
+    espaço. Gesto antes de qualquer volta, quando as inteiras não dão uma para cada: "toque numa
+    peça e escolha em quantas partes cortar" (não fala em sobra).
 
 ## Parcialmente implementado
-- Fala da Dália no passo "forno" da Missão 5 (passo de máquina com `falas`): o conteúdo existe, mas
-  a tela não mostra falas de passos de máquina (já era assim na v0.1). Anotado, não corrigido: é
-  mudança de comportamento, não de visual.
+- Pergunte ao Nônio: verificado com simulação e testes da rota; **não exercitado contra a API real
+  nesta sessão** (sem chave no ambiente). A primeira prévia com `ANTHROPIC_API_KEY` na Vercel é o
+  teste de verdade (latência, tom, guardas com respostas reais).
+- Revisitas (atividades geradas) ficam sem a conversa: o servidor só monta contexto de atividades
+  do catálogo.
+- Laboratório: os saltos de `/lab/progresso` não marcam apresentações como vistas (elas aparecem de
+  novo; há o botão de zerar e, para a captura, basta tocar em Entendi).
 - Planta: as linhas de dependência são curvas e podem passar por trás de outras etiquetas quando
   dois conceitos estão na mesma coluna; legível, mas um traçado com desvio seria melhor.
 - Joias: contratos, estágios e campos no progresso prontos; só a Joia do Ábaco é encontrada (fim do
@@ -68,9 +100,11 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
 - Equivalência de frações: aparece como prévia (Missão 4, comparação; Missão 5, dois jeitos), sem
   formalização nem conceito ativo.
 - Palpites: guardados no progresso para a futura Joia da Estimativa; ainda não geram evidência.
-- Tutor por conversa: contrato e rota prontos; sem integração com modelo.
 
 ## Planejado
+- Conversa: limite de uso por servidor (hoje o limite de 20 perguntas por execução é do cliente);
+  medir latência e custo reais na prévia.
+- Som, que a v0.3 ainda deixa de fora.
 - Treino das joias, começando pelo soroban (sessão própria).
 - Arco 2 de A Partilha: equivalência, comparação, fração de quantidade, razão e proporção.
 - O Contrapeso (incógnitas e equações) e os outros distritos.
@@ -96,5 +130,6 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
 - Sem som no jogo (fora do escopo): a regra "sons só depois do primeiro toque" não tem o que aplicar.
 
 ## Fora do escopo atual
-- Som; chamada a modelo generativo; conta, login, banco, sincronização; multiplayer, ranking, loja,
-  economia; aplicativo nativo; editor de fases; simulador físico genérico.
+- Conta, login, banco, sincronização; multiplayer, ranking, loja, economia; aplicativo nativo;
+  editor de fases; simulador físico genérico. IA corrigindo ou pontuando: nunca (a correção é do
+  motor; a IA só conversa).

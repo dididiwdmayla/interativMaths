@@ -28,10 +28,11 @@ import { useProgresso } from "@/componentes/estado/useProgresso";
 import { Bancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
-import { TiraMensagem } from "@/componentes/maquinas/Tira";
+import { FaixaNonio } from "@/componentes/nonio/FaixaNonio";
 import { mensagemDoEvento } from "@/componentes/maquinas/mensagens";
 import { EntradaResposta } from "@/componentes/missao/Respostas";
 import { Nonio } from "@/componentes/nonio/Nonio";
+import { Objetivo } from "@/componentes/missao/Objetivo";
 import { Carregando } from "@/componentes/ui/Carregando";
 
 type Fase = "convite" | "medindo" | "resultado";
@@ -123,11 +124,8 @@ export function Calibragem() {
       </button>
     </header>
   );
-  const pedido = (
-    <p className="m-0 min-w-0 flex-1 text-[15px] font-semibold leading-snug" data-pedido="">
-      {item.pedido}
-    </p>
-  );
+  // Instrução com verbo, sem gesto nem escada: a calibragem mede, não ensina.
+  const pedido = <Objetivo etiqueta="Medida" instrucao={item.instrucao} gesto={null} />;
 
   const controlesAnotado = anotado !== null && (
     <div className="flex flex-col gap-3" role="status" data-anotado={anotado}>
@@ -151,7 +149,7 @@ export function Calibragem() {
                 <FiguraMedidas {...item.figura} />
               </div>
             )}
-            {controlesAnotado || <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Pronto" />}
+            {controlesAnotado || <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Responder" />}
           </section>
         </div>
       </main>
@@ -169,7 +167,7 @@ export function Calibragem() {
       cabecalho={cabecalho}
       pedido={pedido}
       maquina={<Bancada estado={b.atual} pele={pele} onAcao={item.tipo === "maquina" && anotado === null ? (a) => setBancada(operar(b, a)) : undefined} />}
-      tira={<TiraMensagem texto={msg?.texto ?? item.fala} tom={msg?.tom} />}
+      faixa={<FaixaNonio fala={{ id: "leitura", texto: msg?.texto ?? item.fala, categoria: "evento", atencao: msg?.tom === "atencao" }} selo={null} retorno="neutro" expressao="quieto" compacta />}
       controles={
         controlesAnotado ||
         (item.tipo === "maquina" ? (
@@ -178,7 +176,7 @@ export function Calibragem() {
             pele={pele}
             onAcao={(a) => setBancada(operar(b, a))}
             onFechar={() => responder(validarBancada(item.objetivo.validador, item.objetivo.params ?? {}, b.atual).ok ? "sucesso" : "falha")}
-            rotuloFechar="Pronto"
+            rotuloFechar="Fechar a partilha"
             extra={
               <button type="button" className="botao-secundario w-full" onClick={() => responder("nao_sei")} data-acao="nao-sei">
                 Não sei ainda
@@ -188,7 +186,7 @@ export function Calibragem() {
         ) : (
           <div className="flex flex-col gap-3">
             <p className="m-0 text-[16px] font-medium">{item.fala}</p>
-            <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Pronto" />
+            <EntradaResposta tipo={item.resposta} onResponder={(v) => responder(resultadoResposta(item, v))} rotuloConferir="Responder" />
           </div>
         ))
       }

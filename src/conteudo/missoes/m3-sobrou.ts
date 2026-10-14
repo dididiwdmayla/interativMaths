@@ -20,7 +20,10 @@ const TRANSPORTE: ConfigBancada = {
 
 const ABERTURA: Entrada[] = [SEGUIR, { tipo: "responder", valor: "6" }];
 
-const DESCOBERTA: Entrada[] = [{ tipo: "responder", valor: "3" }, SEGUIR, { tipo: "responder", valor: "nao" }, SEGUIR, SEGUIR];
+/** A aposta do Nônio: mais uma volta de 1 tira a prova; ele não tinha razão. */
+const APOSTA: Entrada[] = [{ tipo: "maquina", acao: { tipo: "lote", valor: 1 } }, REPARTIR, { tipo: "responder", valor: "nao" }, SEGUIR];
+
+const DESCOBERTA: Entrada[] = [{ tipo: "responder", valor: "3" }, SEGUIR, ...APOSTA, SEGUIR];
 
 const TRANSPORTE_OK: Entrada[] = [
   LOTE_6,
@@ -65,6 +68,7 @@ export const MISSAO_3: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Leia o pedido da Dália.",
+      instrucao: "Leia o pedido da Dália e aceite o serviço.",
       falas: [
         { quem: "dalia", texto: "Vinte e seis sacas, quatro carroças, todas iguais. O manual diz para jogar o resto no rio." },
         { quem: "dalia", texto: "Nunca joguei. Também nunca soube o que fazer com ele." },
@@ -80,6 +84,7 @@ export const MISSAO_3: Atividade = {
       tipo: "palpite",
       fase: "palpite",
       pedido: "Antes de ligar, um palpite.",
+      instrucao: "Diga quantas sacas você acha que vão em cada carroça.",
       maquina: { config: PARTILHA },
       pergunta: "Quantas sacas você acha que vão em cada carroça?",
       resposta: { tipo: "numero", minimo: 0, maximo: 26, unidade: "sacas" },
@@ -90,6 +95,7 @@ export const MISSAO_3: Atividade = {
       tipo: "operar",
       fase: "experimentacao",
       pedido: "26 sacas, 4 carroças, todas iguais.",
+      instrucao: "Reparta as 26 sacas entre as 4 carroças, todas iguais.",
       maquina: { config: PARTILHA },
       objetivo: { validador: "partilha.fechada" },
       resolucao: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }],
@@ -107,6 +113,7 @@ export const MISSAO_3: Atividade = {
           },
         },
       ],
+      nonio: "Vinte e seis sacas, quatro carroças. Repare no que fica na esteira.",
       equivocos: ["parou-cedo", "lote-maior-que-cabe"],
       evidencias: [
         { conceito: "div.resto", tipo: "experimento" },
@@ -119,6 +126,11 @@ export const MISSAO_3: Atividade = {
       tipo: "prever",
       fase: "descoberta",
       pedido: "Outro dia, outra carga.",
+      instrucao: "Responda quanto sobra de 27 sacas para 4 carroças.",
+      chegada: {
+        fala: "Outro dia, outra carga: chegou uma saca a mais. Vinte e sete, as mesmas quatro carroças.",
+        texto: "Uma saca a mais muda a sobra? Pense antes de girar.",
+      },
       maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 27 }, bicas: { quantidade: 4, ajustavel: false } } },
       pergunta: "27 sacas, 4 carroças. Quanto sobra?",
       resposta: { tipo: "numero", minimo: 0, maximo: 27, unidade: "sacas" },
@@ -141,29 +153,37 @@ export const MISSAO_3: Atividade = {
     },
     {
       id: "pode-sobrar-quatro",
-      tipo: "prever",
+      tipo: "aposta",
       fase: "descoberta",
-      pedido: "Uma pergunta sobre a bandeja.",
+      pedido: "Uma aposta sobre a bandeja.",
+      instrucao: "Mostre na máquina se o Nônio tem razão.",
+      nonio: "Seis em cada, e quatro na esteira. Tenho uma aposta sobre o que fica na bandeja.",
+      aposta: "Aposto que, com 4 carroças, dá para sobrar 4 sacas na bandeja.",
+      gesto: "Agora: veja se as 4 sacas da esteira ainda dão uma volta.",
       maquina: {
         config: { pele: "sacas-carrocas", pecas: { quantidade: 28 }, bicas: { quantidade: 4, ajustavel: false } },
         acoes: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }],
       },
-      pergunta: "Com 4 carroças, pode sobrar 4 na bandeja?",
+      objetivo: { validador: "partilha.fechada" },
+      resolucao: [{ tipo: "lote", valor: 1 }, { tipo: "repartir" }],
+      pergunta: "Depois de tirar a prova: o Nônio tinha razão?",
       resposta: {
         tipo: "opcoes",
         opcoes: [
-          { id: "sim", texto: "Pode" },
-          { id: "nao", texto: "Não pode" },
+          { id: "sim", texto: "Tinha razão" },
+          { id: "nao", texto: "Não tinha" },
         ],
       },
       esperado: "nao",
-      demonstracao: [{ tipo: "lote", valor: 1 }, { tipo: "repartir" }],
-      explicacao: "Com 4 na esteira e 4 carroças, fecha mais uma volta. O resto é sempre menor que o número de carroças.",
+      respostasEquivoco: [{ resposta: "sim", equivoco: "parou-cedo" }],
+      nonioTemRazao: false,
+      explicacao: "Perdi. Com 4 na esteira e 4 carroças, cabe mais uma volta. O que sobra é sempre menos que o número de carroças.",
       dicas: [
         { texto: "Olhe a esteira: há 4 sacas e 4 carroças.", alvo: "esteira" },
-        { texto: "Uma volta de 1 em cada pede 4. Há 4." },
-        { texto: "Com outros números: com 3 carroças, a bandeja nunca guarda 3." },
+        { texto: "Uma volta de 1 em cada pede {abertas}. Na esteira há {ha}.", cota: { alvo: "pilha", texto: "volta de 1: pede {abertas} · há {ha}" } },
+        { texto: "Com outros números: com 3 carroças, a bandeja nunca guarda 3. Três sacas ainda dão uma volta." },
       ],
+      equivocos: ["parou-cedo"],
       evidencias: [{ conceito: "div.resto", tipo: "descoberta" }],
     },
     {
@@ -171,6 +191,7 @@ export const MISSAO_3: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Mesmos números, outra situação.",
+      instrucao: "Leia a situação nova e chame as carroças.",
       falas: [
         { quem: "dalia", texto: "Hoje é diferente: as 26 precisam sair todas. Cada carroça leva até 6, não mais." },
         { quem: "dalia", texto: "As cargas não precisam ser iguais. Quantas carroças você chama?" },
@@ -182,6 +203,7 @@ export const MISSAO_3: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "Tudo sai, até 6 por carroça.",
+      instrucao: "Faça sair as 26 sacas, até 6 por carroça.",
       maquina: { config: TRANSPORTE },
       objetivo: { validador: "transporte.tudo-saiu", params: { teto: 6 } },
       resolucao: [
@@ -203,6 +225,7 @@ export const MISSAO_3: Atividade = {
           },
         },
       ],
+      nonio: "Hoje o que sobra precisa sair. A linha vermelha é o teto de cada carroça.",
       equivocos: ["arredondou-para-baixo"],
       evidencias: [
         { conceito: "div.medida", tipo: "aplicacao" },
@@ -215,6 +238,7 @@ export const MISSAO_3: Atividade = {
       tipo: "frase",
       fase: "formalizacao",
       pedido: "Toque numa cota, depois na lacuna.",
+      instrucao: "Complete a frase com os números da máquina parada.",
       maquina: { config: PARTILHA, acoes: [{ tipo: "lote", valor: 6 }, { tipo: "repartir" }] },
       frase: "{a} sacas entre {b} carroças dão {c} em cada, e sobram {d}.",
       lacunas: [
@@ -235,6 +259,7 @@ export const MISSAO_3: Atividade = {
       tipo: "notacao",
       fase: "formalizacao",
       pedido: "Comprima a frase em notação.",
+      instrucao: "Comprima a frase em notação.",
       linhas: ["26 ÷ 4 = 6, resto 2", "26 = 4 × 6 + 2"],
       falas: [{ quem: "nonio", texto: "O resto é sempre menor que o divisor. Se não for, cabe mais uma volta." }],
     },
@@ -243,6 +268,7 @@ export const MISSAO_3: Atividade = {
       tipo: "operar",
       fase: "formalizacao",
       pedido: "Caminho de volta: monte 23 ÷ 5.",
+      instrucao: "Monte a conta 23 ÷ 5 na máquina.",
       conta: "23 ÷ 5",
       maquina: { config: MAQUINA_MONTAR_SACAS },
       objetivo: { validador: "maquina.mostra-divisao", params: { dividendo: 23, divisor: 5 } },
@@ -259,6 +285,7 @@ export const MISSAO_3: Atividade = {
       tipo: "registro",
       fase: "formalizacao",
       pedido: "Guarde a página no Caderno.",
+      instrucao: "Guarde a página no Caderno.",
       pagina: {
         id: "partilha.arco1.sobrou",
         titulo: "O que sobra",
@@ -274,6 +301,7 @@ export const MISSAO_3: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Prova direta: duas encomendas.",
+      instrucao: "Leia as duas encomendas e aceite.",
       falas: [{ quem: "dalia", texto: "Trinta e uma sacas. Primeiro entre quatro carroças iguais. Depois, todas saindo, até sete por carroça." }],
       botao: "Aceitar",
     },
@@ -282,6 +310,7 @@ export const MISSAO_3: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "31 sacas entre 4 carroças, todas iguais.",
+      instrucao: "Reparta 31 sacas entre 4 carroças, todas iguais.",
       maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 31 }, bicas: { quantidade: 4, ajustavel: false } } },
       objetivo: { validador: "partilha.fechada" },
       resolucao: [{ tipo: "lote", valor: 7 }, { tipo: "repartir" }],
@@ -298,6 +327,7 @@ export const MISSAO_3: Atividade = {
       tipo: "operar",
       fase: "aplicacao",
       pedido: "31 sacas, todas saem, até 7 por carroça.",
+      instrucao: "Faça sair as 31 sacas, até 7 por carroça.",
       maquina: { config: { pele: "sacas-carrocas", pecas: { quantidade: 31 }, bicas: { quantidade: 4, ajustavel: true, vagas: 7 }, teto: 7 } },
       objetivo: { validador: "transporte.tudo-saiu", params: { teto: 7 } },
       resolucao: [
@@ -319,6 +349,27 @@ export const MISSAO_3: Atividade = {
     },
   ],
   solucoesDeTeste: [
+    {
+      nome: "transporte com as duas últimas à mão",
+      modo: "guiada",
+      entradas: [
+        ...ABERTURA,
+        LOTE_6,
+        REPARTIR,
+        FECHAR,
+        SEGUIR,
+        ...DESCOBERTA,
+        LOTE_6,
+        REPARTIR,
+        { tipo: "maquina", acao: { tipo: "bicas", abertas: 0 } },
+        { tipo: "maquina", acao: { tipo: "bica", indice: 4 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 4 } },
+        { tipo: "maquina", acao: { tipo: "colocar", tamanho: "1/1", bica: 4 } },
+        FECHAR,
+        SEGUIR,
+        ...REGISTRO,
+      ],
+    },
     { nome: "seis de uma vez, depois transporte", modo: "guiada", entradas: [...ABERTURA, LOTE_6, REPARTIR, FECHAR, SEGUIR, ...DESCOBERTA, ...TRANSPORTE_OK, ...REGISTRO] },
     {
       nome: "quocientes parciais: 5 e depois 1",
@@ -371,6 +422,12 @@ export const MISSAO_3: Atividade = {
   sabotagens: [
     { nome: "fecha com 6 na esteira", modo: "guiada", entradas: [...ABERTURA, LOTE_5, REPARTIR, FECHAR], equivoco: "parou-cedo" },
     { nome: "diz que não sobra nada", modo: "guiada", entradas: [...ABERTURA, LOTE_6, REPARTIR, FECHAR, SEGUIR, { tipo: "responder", valor: "0" }], equivoco: "resto-jogado-fora" },
+    {
+      nome: "na aposta, responde como o bilhete",
+      modo: "guiada",
+      entradas: [...ABERTURA, LOTE_6, REPARTIR, FECHAR, SEGUIR, { tipo: "responder", valor: "3" }, SEGUIR, { tipo: "maquina", acao: { tipo: "lote", valor: 1 } }, REPARTIR, { tipo: "responder", valor: "sim" }],
+      equivoco: "parou-cedo",
+    },
     {
       nome: "chama 4 carroças e deixa 2 no pátio",
       modo: "guiada",

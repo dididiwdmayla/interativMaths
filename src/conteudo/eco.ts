@@ -18,6 +18,7 @@ export const ECO_ARCO_1: Atividade = {
       tipo: "narrativa",
       fase: "problema",
       pedido: "Um chamado da caixa-d'água.",
+      instrucao: "Leia o chamado da caixa-d'água.",
       falas: [
         { quem: "dalia", texto: "A caixa-d'água do alto mandou três tonéis cheios para cinco casas, e quer tudo repartido por igual." },
         { quem: "nonio", texto: "Desta vez, a resposta antes. Sem máquina: só as fichas. Depois ela confere." },
@@ -29,6 +30,7 @@ export const ECO_ARCO_1: Atividade = {
       tipo: "prever",
       fase: "retencao",
       pedido: "3 tonéis, 5 casas: quanto em cada?",
+      instrucao: "Responda quanto de tonel cada casa recebe: 3 tonéis, 5 casas.",
       maquina: {
         config: {
           pele: "toneis-casas",
@@ -55,6 +57,7 @@ export const ECO_ARCO_1: Atividade = {
       tipo: "narrativa",
       fase: "retencao",
       pedido: "A caixa-d'água agradece.",
+      instrucao: "Leia e volte ao distrito.",
       falas: [{ quem: "nonio", texto: "Broa, tonel, pizza: o traço da fração não muda de roupa." }],
       botao: "Voltar",
     },

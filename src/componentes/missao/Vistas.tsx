@@ -5,7 +5,7 @@
  * e a folha pautada da formalização, que sobe por cima da folha quadriculada.
  */
 import type { ReactNode } from "react";
-import { comoRacional } from "@/nucleo/racional/racional";
+import { comoRacional, igual } from "@/nucleo/racional/racional";
 import type { Execucao } from "@/nucleo/missoes/motor";
 import { preencher, valoresDasFichas } from "@/nucleo/missoes/motor";
 import type { Fala, PassoFrase, PassoNotacao, PassoPalpite, PassoPrever, PassoRegistro } from "@/nucleo/missoes/tipos";
@@ -14,7 +14,9 @@ import { LinhaNotacao } from "@/componentes/notacao/Notacao";
 import { Compressao } from "@/componentes/notacao/Compressao";
 import { Falas } from "./Falas";
 import { FolhaPautada, NotaDalia } from "./Papel";
-import { EntradaResposta } from "./Respostas";
+import { IconeEstrela } from "@/componentes/icones/IconeEstrela";
+import { IconeVisto } from "@/componentes/icones/IconeVisto";
+import { EntradaResposta, type MarcaResposta } from "./Respostas";
 
 export function Seguir({ rotulo = "Seguir", onClick, destaque = true }: { rotulo?: string; onClick: () => void; destaque?: boolean }) {
   return (
@@ -25,11 +27,11 @@ export function Seguir({ rotulo = "Seguir", onClick, destaque = true }: { rotulo
 }
 
 export function PainelPalpite({ passo, onResponder }: { passo: PassoPalpite; onResponder: (v: string | null) => void }) {
+  const dalia = passo.falas?.filter((f) => f.quem === "dalia") ?? [];
   return (
     <div className="flex flex-col gap-3" data-painel="palpite">
-      {passo.falas && <Falas falas={passo.falas} compacta />}
+      {dalia.length > 0 && <Falas falas={dalia} compacta />}
       <p className="m-0 text-[17px] font-bold leading-snug">{passo.pergunta}</p>
-      <p className="m-0 text-[14px] font-medium text-tinta-suave">Palpite não vale ponto. Fica guardado para comparar com a máquina.</p>
       <EntradaResposta tipo={passo.resposta} onResponder={onResponder} rotuloConferir="Ligar a máquina" rotuloNaoSei="Não faço ideia" />
     </div>
   );
@@ -41,22 +43,25 @@ export function PainelPrever({
   demonstrando,
   onResponder,
   onSeguir,
+  marca,
 }: {
   passo: PassoPrever;
   exec: Execucao;
   demonstrando: boolean;
   onResponder: (v: string | null) => void;
   onSeguir: () => void;
+  marca?: MarcaResposta;
 }) {
   const conferindo = exec.passo.situacao === "conferindo";
   const resposta = exec.passo.resposta;
   const opcao = passo.resposta.tipo === "opcoes" ? passo.resposta.opcoes : null;
   const textoResposta = (v: string) => (opcao ? (opcao.find((o) => o.id === v)?.texto ?? v) : null);
+  const dalia = passo.falas?.filter((f) => f.quem === "dalia") ?? [];
   return (
     <div className="flex flex-col gap-3" data-painel="prever" data-situacao={exec.passo.situacao}>
-      {passo.falas && !conferindo && <Falas falas={passo.falas} compacta />}
+      {dalia.length > 0 && !conferindo && exec.passo.respostas === 0 && <Falas falas={dalia} compacta />}
       <p className="m-0 text-[17px] font-bold leading-snug">{passo.pergunta}</p>
-      {!conferindo && <EntradaResposta tipo={passo.resposta} onResponder={onResponder} />}
+      {!conferindo && <EntradaResposta tipo={passo.resposta} onResponder={onResponder} rotuloConferir={exec.passo.respostas > 0 ? "Conferir de novo" : "Conferir"} marca={marca} />}
       {conferindo && (
         <div className="flex flex-col gap-3" role="status" aria-live="polite">
           {demonstrando ? (
@@ -69,15 +74,12 @@ export function PainelPrever({
                 ) : (
                   <span>
                     Você disse:{" "}
-                    <strong className={`font-extrabold text-caneta ${exec.passo.respostaCerta ? "grifo" : ""}`}>
-                      {opcao ? textoResposta(resposta) : <Numero valor={comoRacional(resposta)} />}
-                    </strong>
-                    {exec.passo.respostaCerta ? ". A máquina deu o mesmo." : "."}
+                    <strong className="font-extrabold text-caneta">{opcao ? textoResposta(resposta) : <Numero valor={comoRacional(resposta)} />}</strong>
+                    {exec.passo.respostaCerta ? ". A máquina deu o mesmo." : ". A máquina mostra o que dá."}
                   </span>
                 )}
               </p>
-              {passo.explicacao && <p className="m-0 text-[15px] text-tinta-suave">{passo.explicacao}</p>}
-              <Seguir onClick={onSeguir} />
+              <Seguir rotulo="Continuar" onClick={onSeguir} />
             </>
           )}
         </div>
@@ -101,35 +103,59 @@ export function PainelVencido({
   onSeguir: () => void;
   extra?: ReactNode;
 }) {
+  const dalia = falas?.filter((f) => f.quem === "dalia") ?? [];
+  const mosca = palpite && palpite.valor !== null && mesmoValor(palpite.valor, palpite.certo);
   return (
-    <div className="flex flex-col gap-3" data-painel="vencido" role="status">
-      {falas && <Falas falas={falas} compacta />}
+    <div className="flex flex-col gap-3" data-painel="vencido">
+      {dalia.length > 0 && <Falas falas={dalia} compacta />}
       {palpite && (
-        <p className="m-0 text-[15px] font-medium">
-          Seu palpite: <strong className="font-extrabold text-caneta">{palpite.valor ?? "nenhum"}</strong>. A máquina deu <span className="grifo font-extrabold">{palpite.certo}</span>.
+        <p className="m-0 flex flex-wrap items-center gap-2 text-[15px] font-medium" data-palpite={mosca ? "na-mosca" : "outro"}>
+          {mosca ? (
+            <>
+              <span className="selo" data-selo="acertou">
+                <IconeVisto />
+                Na mosca.
+              </span>
+              <span>
+                Seu palpite: <strong className="font-extrabold text-caneta">{palpite.valor}</strong>
+              </span>
+            </>
+          ) : (
+            <span>
+              Seu palpite: <strong className="font-extrabold text-caneta">{palpite.valor ?? "nenhum"}</strong> · A máquina: <span className="grifo font-extrabold">{palpite.certo}</span>
+            </span>
+          )}
         </p>
       )}
       {extra}
-      {convite && onConvite ? (
-        <div className="flex flex-col gap-3">
-          <p className="m-0 font-semibold">{convite}</p>
-          <div className="grid grid-cols-2 gap-2">
-            <button type="button" className="botao-secundario min-h-[50px]" onClick={() => onConvite(true)} data-acao="aceitar-convite">
-              Tentar
-            </button>
-            <button type="button" className="botao-principal" onClick={() => onConvite(false)} data-acao="seguir">
-              Seguir
-            </button>
-          </div>
-        </div>
-      ) : (
-        <Seguir onClick={onSeguir} />
+      <Seguir rotulo="Continuar" onClick={onSeguir} />
+      {convite && onConvite && (
+        <button type="button" className="botao-secundario w-full" onClick={() => onConvite(true)} data-acao="aceitar-convite">
+          <IconeEstrela />
+          Desafio: {convite}
+        </button>
       )}
     </div>
   );
 }
 
+function mesmoValor(a: string, b: string): boolean {
+  try {
+    return igual(comoRacional(a), comoRacional(b));
+  } catch {
+    return a === b;
+  }
+}
+
 /* ---------- Formalização: a folha pautada ---------- */
+
+/** A folha sobe com a faixa do Nônio colada em cima: os cantos de cima ficam com a faixa. */
+const CANTOS = "rounded-none border-t-0 lg:rounded-b-[18px]";
+
+/** A faixa do Nônio, compacta, no topo da folha que sobe. */
+export function FaixaNaFolha({ children }: { children: ReactNode }) {
+  return <div className="faixa-na-folha">{children}</div>;
+}
 
 export function FolhaFrase({
   passo,
@@ -153,7 +179,7 @@ export function FolhaFrase({
   const partes = passo.frase.split(/(\{\w+\})/);
   const completas = passo.lacunas.every((l) => exec.passo.lacunas[l.id] !== undefined);
   return (
-    <FolhaPautada titulo="Caderno" className="rounded-t-[18px] lg:rounded-[18px]">
+    <FolhaPautada titulo="Caderno" className={CANTOS}>
       <div className="flex flex-col gap-[14px] pt-[14px]" data-folha="frase">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Cotas da máquina">
           {fichas.map((f) => (
@@ -176,12 +202,14 @@ export function FolhaFrase({
             if (!m) return <span key={i}>{p}</span>;
             const id = m[1];
             const valor = exec.passo.lacunas[id];
-            const pendente = exec.passo.lacunasErradas.includes(id) || valor === undefined;
+            const naoBate = exec.passo.retorno === "ainda-nao" && exec.passo.lacunasErradas.includes(id) && valor !== undefined;
+            const pendente = valor === undefined;
             return (
               <button
                 key={i}
                 type="button"
-                className={`lacuna mx-0.5 align-middle ${pendente ? "" : "lacuna-preenchida"}`}
+                className={`lacuna mx-0.5 align-middle ${pendente ? "" : "lacuna-preenchida"} ${naoBate ? "caixa-ainda-nao" : ""}`}
+                data-ainda-nao={naoBate ? "" : undefined}
                 onClick={() => onColocar(id)}
                 disabled={vencido}
                 aria-label={`Lacuna: ${valor ?? "vazia"}`}
@@ -192,14 +220,9 @@ export function FolhaFrase({
             );
           })}
         </p>
-        {exec.passo.lacunasErradas.length > 0 && (
-          <p className="m-0 text-[15px] font-semibold leading-[28px]" role="status">
-            {exec.passo.lacunasErradas.length === 1 ? "Uma lacuna não bate com a máquina." : "Algumas lacunas não batem com a máquina."} Olhe as cotas de novo.
-          </p>
-        )}
         {vencido ? (
           <button type="button" className="botao-principal w-full" onClick={onSeguir} data-acao="seguir">
-            Seguir
+            Continuar
           </button>
         ) : (
           <button type="button" className="botao-principal w-full" disabled={!completas} onClick={onConferir} data-acao="conferir-frase">
@@ -225,13 +248,13 @@ export function FolhaNotacao({
   onSeguir: () => void;
 }) {
   return (
-    <FolhaPautada titulo="Caderno" className="rounded-t-[18px] lg:rounded-[18px]">
+    <FolhaPautada titulo="Caderno" className={CANTOS}>
       <div className="flex flex-col gap-[14px] pt-[14px]" data-folha="notacao" data-comprimida={comprimida ? "sim" : "nao"}>
         <Compressao frase={frase} linhas={passo.linhas} comprimida={comprimida} />
         {comprimida && passo.falas && <Falas falas={passo.falas} compacta />}
         {comprimida ? (
           <button type="button" className="botao-principal w-full" onClick={onSeguir} data-acao="seguir">
-            Seguir
+            Continuar
           </button>
         ) : (
           <button type="button" className="botao-principal w-full" onClick={onComprimir} data-acao="comprimir">
@@ -246,7 +269,7 @@ export function FolhaNotacao({
 export function FolhaRegistro({ passo, frase, onGuardar }: { passo: PassoRegistro; frase: string; onGuardar: () => void }) {
   const p = passo.pagina;
   return (
-    <FolhaPautada titulo={p.titulo} className="rounded-t-[18px] lg:rounded-[18px]">
+    <FolhaPautada titulo={p.titulo} className={CANTOS}>
       <div className="flex flex-col gap-[14px] pt-[14px]" data-folha="registro">
         {(p.frase ?? frase) && <p className="m-0 text-[16px] font-medium leading-[28px] text-tinta">{p.frase ?? frase}</p>}
         <div className="quadro-notacao self-start">

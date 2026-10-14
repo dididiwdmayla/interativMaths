@@ -37,6 +37,23 @@ describe("higiene", () => {
     expect(infratores).toEqual([]);
   });
 
+  it("nenhuma variável NEXT_PUBLIC_: segredo nenhum vai para o navegador", () => {
+    const infratores = todos.filter((f) => /NEXT_PUBLIC_/.test(readFileSync(f, "utf8"))).map((f) => relative(RAIZ, f));
+    expect(infratores).toEqual([]);
+  });
+
+  it("o código de servidor nunca é importado por componente de cliente", () => {
+    const infratores = todos
+      .filter((f) => /\.(ts|tsx)$/.test(f) && !relative(RAIZ, f).startsWith("servidor"))
+      .filter((f) => {
+        const texto = readFileSync(f, "utf8");
+        const cliente = /^["']use client["']/m.test(texto) || relative(RAIZ, f).split(/[\\/]/)[0] === "componentes";
+        return cliente && /from ["']@\/servidor/.test(texto);
+      })
+      .map((f) => relative(RAIZ, f));
+    expect(infratores).toEqual([]);
+  });
+
   it("conteúdo é só dado: nada de função nem JSX em src/conteudo", () => {
     const infratores = todos
       .filter((f) => relative(RAIZ, f).split(/[\\/]/)[0] === "conteudo")

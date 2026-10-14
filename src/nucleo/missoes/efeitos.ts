@@ -15,7 +15,7 @@ import {
   salvarExecucao,
   type Progresso,
 } from "../progresso";
-import type { Efeito, Execucao } from "./motor";
+import { assinaturaDosPassos, VERSAO_EXECUCAO, type Efeito, type EstadoPasso, type Execucao } from "./motor";
 import type { Atividade } from "./tipos";
 
 /** Onde a execução fica guardada: guiada pelo id; prova e registro com sufixo, para não se atropelarem. */
@@ -60,14 +60,28 @@ export function aplicarEfeitos(p: Progresso, a: Atividade, exec: Execucao, efeit
   return salvarExecucao(q, chave, exec, agora);
 }
 
-/** Lê uma execução salva; devolve null se não servir mais (atividade mudou, formato antigo). */
+/** Campos do passo que a v2 acrescentou: uma execução antiga ganha os valores de começo. */
+const PASSO_V2: Pick<EstadoPasso, "retorno" | "respostas" | "cumprido"> = { retorno: null, respostas: 0, cumprido: false };
+
+/**
+ * Lê uma execução salva; devolve null se não servir mais: atividade ou passos mudaram, formato
+ * desconhecido. Execução v1 (até a v0.2) de missão recomeça do primeiro passo, porque os passos
+ * das missões mudaram na v0.3; de eco, revisita, exposição e cena, segue de onde estava.
+ * Conclusões, evidências, Caderno e joias não moram aqui e não são tocados.
+ */
 export function restaurarExecucao(salva: unknown, a: Atividade, passosNoModo: (modo: Execucao["modo"]) => number): Execucao | null {
   if (typeof salva !== "object" || salva === null) return null;
-  const e = salva as Partial<Execucao>;
-  if (e.versao !== 1 || e.atividade !== a.id) return null;
+  const e = salva as Omit<Partial<Execucao>, "versao"> & { versao?: unknown };
+  if (e.atividade !== a.id) return null;
   if (e.modo !== "guiada" && e.modo !== "prova" && e.modo !== "registro") return null;
   if (typeof e.indice !== "number" || e.indice < 0 || e.indice >= passosNoModo(e.modo)) return null;
   if (typeof e.passo !== "object" || e.passo === null) return null;
   if (e.concluida) return null;
-  return e as Execucao;
+  const assinatura = assinaturaDosPassos(a, e.modo);
+  if (e.versao === 1) {
+    if (a.tipo === "missao") return null;
+    return { ...(e as Omit<Execucao, "versao">), versao: VERSAO_EXECUCAO, assinatura, passo: { ...PASSO_V2, ...e.passo } };
+  }
+  if (e.versao !== VERSAO_EXECUCAO || e.assinatura !== assinatura) return null;
+  return { ...(e as Omit<Execucao, "versao">), versao: VERSAO_EXECUCAO, passo: { ...PASSO_V2, ...e.passo } };
 }
