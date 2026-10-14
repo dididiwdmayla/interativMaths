@@ -1,7 +1,7 @@
 /*
  * Receitas de componente da identidade Quadriculado. A força dela é a repetição exata:
  * toda tela usa estas mesmas peças, com os mesmos raios, bordas e sombras.
- * A única sombra do jogo é a sombra dura de tinta das fichas e dos botões.
+ * A única sombra do jogo é a sombra dura (--sombra) das fichas e dos botões; bordas em --contorno.
  * Sem cor literal: tudo vem de tokens.css.
  */
 
@@ -42,15 +42,15 @@
 
 .ficha {
   background: var(--folha);
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 16px;
-  box-shadow: 0 4px 0 var(--tinta);
+  box-shadow: 0 4px 0 var(--sombra);
 }
 
 .ficha-quadriculada {
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 16px;
-  box-shadow: 0 4px 0 var(--tinta);
+  box-shadow: 0 4px 0 var(--sombra);
   background-color: var(--folha);
   background-image:
     linear-gradient(var(--grade-suave) 1px, transparent 1px),
@@ -68,7 +68,7 @@
 /* Uma caixa dentro da ficha, só quando o de dentro é um objeto de verdade. */
 .caixa {
   background: var(--folha);
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
 }
 
@@ -94,11 +94,11 @@
 .botao-principal {
   min-height: 50px;
   padding: 6px 18px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 14px;
   background: var(--caneta);
-  box-shadow: 0 4px 0 var(--tinta);
-  color: var(--folha);
+  box-shadow: 0 4px 0 var(--sombra);
+  color: var(--sobre-caneta);
   font-size: 18px;
   font-weight: 700;
 }
@@ -111,7 +111,7 @@
 .botao-secundario {
   min-height: 46px;
   padding: 6px 14px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
   color: var(--tinta);
@@ -162,7 +162,7 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
   color: var(--tinta);
@@ -179,6 +179,7 @@
 
 .botao-icone[aria-current="page"] {
   background: var(--marca-texto);
+  color: var(--sobre-marca);
 }
 
 /* Botão pequeno de dentro do balão e do cabeçalho (Me ajuda, Perguntar, etapas). O desenho tem
@@ -191,7 +192,7 @@
   gap: 6px;
   height: 38px;
   padding: 0 11px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -200,6 +201,14 @@
   line-height: 1;
   white-space: nowrap;
   transition: transform 90ms var(--curva-firme);
+}
+
+/* As etapas da missão: só "2/9", na altura dos botões do cabeçalho (referência 1). */
+.botao-etapas {
+  height: 44px;
+  padding: 0 10px;
+  border-radius: 12px;
+  font-weight: 700;
 }
 
 .botao-pequeno::after {
@@ -232,7 +241,7 @@
   gap: 6px;
   min-height: 44px;
   padding: 4px 10px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -245,8 +254,8 @@
 .opcao[aria-checked="true"],
 .opcao[aria-pressed="true"] {
   background: var(--caneta);
-  box-shadow: 0 3px 0 var(--tinta);
-  color: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--sobre-caneta);
 }
 
 .opcao:active:not(:disabled) {
@@ -258,7 +267,7 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -303,7 +312,7 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
   color: var(--tinta);
@@ -322,7 +331,7 @@
   min-width: 48px;
   height: 46px;
   padding: 0 8px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--marca-texto-palido);
   color: var(--tinta);
@@ -353,10 +362,10 @@
   align-items: center;
   gap: 6px;
   padding: 3px 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
-  box-shadow: 0 3px 0 var(--tinta);
+  box-shadow: 0 3px 0 var(--sombra);
   color: var(--tinta);
   font-size: 14px;
   font-weight: 600;
@@ -378,7 +387,7 @@
   align-items: center;
   height: 34px;
   padding: 0 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -395,6 +404,7 @@
 
 .etiqueta-nav[aria-current="page"] {
   background: var(--marca-texto);
+  color: var(--sobre-marca);
 }
 
 .etiqueta-nav[data-material="lapis"] {
@@ -409,7 +419,7 @@
   isolation: isolate;
   display: inline-block;
   padding: 1px 8px;
-  color: var(--tinta);
+  color: var(--sobre-marca);
   transform: rotate(-1.5deg);
 }
 
@@ -432,6 +442,7 @@
   padding: 1px 5px;
   border-radius: 4px;
   background: var(--marca-texto);
+  color: var(--sobre-marca);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
@@ -455,7 +466,7 @@
   align-items: center;
   gap: 5px;
   padding: 2px 9px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 8px;
   background: var(--folha);
   color: var(--tinta);
@@ -493,10 +504,10 @@
   align-items: center;
   justify-content: center;
   padding: 5px 6px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
-  box-shadow: 0 3px 0 var(--tinta);
+  box-shadow: 0 3px 0 var(--sombra);
   color: var(--tinta);
   font-size: 13px;
   font-weight: 700;
@@ -534,7 +545,7 @@
   align-items: center;
   gap: 5px;
   padding: 2px 9px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
@@ -561,62 +572,6 @@
 }
 
 /* ---------- Nônio, cabeçalho, bancada ---------- */
-
-/* A faixa do Nônio: rosto à esquerda, balão com nome, selo, fala e ações. */
-.faixa-nonio {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.faixa-balao {
-  padding: 9px 13px 11px;
-}
-
-.faixa-fala {
-  margin: 2px 0 0;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.35;
-}
-
-.faixa-balao > .selo + .faixa-fala {
-  margin-top: 6px;
-}
-
-.faixa-ponto {
-  display: inline-flex;
-  margin-right: 6px;
-  vertical-align: 1px;
-}
-
-.faixa-acoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 9px;
-}
-
-.faixa-nonio[data-compacta="sim"] .faixa-balao {
-  padding: 7px 11px 8px;
-}
-
-.faixa-nonio[data-compacta="sim"] .faixa-fala {
-  font-size: 14px;
-}
-
-.faixa-nonio[data-compacta="sim"] .faixa-acoes {
-  margin-top: 6px;
-}
-
-/* A faixa do Nônio colada no topo da folha que sobe. */
-.faixa-na-folha {
-  padding: 10px 14px 10px;
-  border: 2px solid var(--tinta);
-  border-bottom: 1.5px solid var(--pauta);
-  border-radius: 18px 18px 0 0;
-  background: var(--folha);
-}
 
 /* ---------- A faixa do objetivo ---------- */
 
@@ -652,16 +607,25 @@
 
 .objetivo-etiqueta[data-etiqueta="Feito"] {
   background: var(--verde-escuro);
+  color: var(--sobre-verde);
 }
 
 .objetivo-etiqueta[data-etiqueta="Aposta do Nônio"] {
   background: var(--marca-texto);
-  box-shadow: inset 0 0 0 2px var(--tinta);
+  box-shadow: inset 0 0 0 2px var(--contorno);
+  color: var(--sobre-marca);
+}
+
+/* O "ainda não" passageiro: a palavra e o ponto vermelho, até o gesto seguinte. Nunca texto vermelho. */
+.objetivo-etiqueta[data-etiqueta="Ainda não"] {
+  background: var(--folha);
+  box-shadow: inset 0 0 0 2px var(--vermelho);
   color: var(--tinta);
 }
 
 .objetivo-etiqueta[data-etiqueta="Desafio"] {
   background: var(--caneta);
+  color: var(--sobre-caneta);
 }
 
 .objetivo-gesto {
@@ -691,10 +655,10 @@
   flex-direction: column;
   gap: 5px;
   padding: 7px 9px 9px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
-  box-shadow: 0 3px 0 var(--tinta);
+  box-shadow: 0 3px 0 var(--sombra);
 }
 
 .menu-corte-seta {
@@ -723,7 +687,7 @@
 .menu-corte-botao,
 .menu-corte-quantas {
   position: relative;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 9px;
   background: var(--folha);
   color: var(--tinta);
@@ -754,7 +718,7 @@
 
 .menu-corte-quantas[aria-checked="true"] {
   background: var(--caneta);
-  color: var(--folha);
+  color: var(--sobre-caneta);
 }
 
 .menu-corte-botao:active,
@@ -771,15 +735,15 @@
 
 .bilhete {
   padding: 10px 14px 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 4px;
   background: var(--bilhete);
-  box-shadow: 0 3px 0 var(--tinta);
+  box-shadow: 0 3px 0 var(--sombra);
   transform: rotate(-2deg);
 }
 
 .bilhete-texto {
-  color: var(--caneta-escura);
+  color: var(--bilhete-tinta);
   font-family: var(--fonte-mao), cursive;
   font-size: 25px;
   font-weight: 700;
@@ -788,7 +752,7 @@
 
 .bilhete-assinatura {
   margin-top: 4px;
-  color: var(--caneta-escura);
+  color: var(--bilhete-tinta);
   font-family: var(--fonte-mao), cursive;
   font-size: 21px;
   font-weight: 700;
@@ -822,16 +786,16 @@
   justify-content: center;
   width: 26px;
   height: 26px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
 }
 
 .etapa[data-estado="feito"] .etapa-marca {
-  border-color: var(--tinta);
+  border-color: var(--contorno);
   background: var(--verde);
-  color: var(--folha);
+  color: var(--sobre-verde);
 }
 
 .etapa[data-estado="atual"] {
@@ -841,7 +805,7 @@
 
 .etapa[data-estado="atual"] .etapa-marca {
   background: var(--caneta);
-  color: var(--folha);
+  color: var(--sobre-caneta);
 }
 
 .etapa[data-estado="depois"] {
@@ -866,7 +830,7 @@
 
 .balao-nonio {
   padding: 10px 14px 11px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 14px 14px 14px 4px;
   background: var(--folha);
 }
@@ -883,7 +847,7 @@
   align-items: center;
   gap: 10px;
   min-height: 60px;
-  border-bottom: 2px solid var(--tinta);
+  border-bottom: 2px solid var(--contorno);
   background: var(--folha);
 }
 
@@ -896,7 +860,7 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  border-bottom: 2px solid var(--tinta);
+  border-bottom: 2px solid var(--contorno);
   background: var(--folha);
 }
 
@@ -905,7 +869,7 @@
 }
 
 .bancada-controles {
-  border-top: 2px solid var(--tinta);
+  border-top: 2px solid var(--contorno);
   border-radius: 18px 18px 0 0;
   background: var(--folha);
 }
@@ -917,7 +881,7 @@
   gap: 10px;
   min-height: 40px;
   padding: 6px 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -934,7 +898,7 @@
 
 .opcao.ficha-cota[aria-pressed="true"] {
   background: var(--caneta);
-  color: var(--folha);
+  color: var(--sobre-caneta);
 }
 
 /* Lacuna da frase: caixa tracejada (a lápis) até receber o número do jogador, a caneta. */
@@ -962,7 +926,7 @@
 /* Recorte colado na folha (a exposição do museu), com fita adesiva nos cantos. */
 .recorte {
   position: relative;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 6px;
   background: var(--folha);
   transform: rotate(-0.6deg);
@@ -1038,7 +1002,7 @@
   flex-direction: column;
   gap: 6px;
   padding: 8px 16px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--marca-texto-palido);
 }
@@ -1104,8 +1068,8 @@ html[data-animacoes="leves"] .folha-sobe {
   flex: 1;
   min-height: 0;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto minmax(150px, 1fr) auto auto;
-  grid-template-areas: "pedido" "nota" "maquina" "faixa" "controles";
+  grid-template-rows: auto auto minmax(150px, 1fr) auto;
+  grid-template-areas: "pedido" "nota" "maquina" "controles";
 }
 
 .palco-pedido {
@@ -1115,7 +1079,7 @@ html[data-animacoes="leves"] .folha-sobe {
   gap: 10px;
   min-height: 48px;
   padding: 6px max(14px, env(safe-area-inset-right)) 6px max(14px, env(safe-area-inset-left));
-  border-bottom: 2px solid var(--tinta);
+  border-bottom: 2px solid var(--contorno);
   background: var(--folha);
 }
 
@@ -1142,14 +1106,6 @@ html[data-animacoes="leves"] .folha-sobe {
   transition: border-color var(--t-caneta) var(--curva-firme);
 }
 
-.palco-faixa {
-  grid-area: faixa;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 12px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
-}
-
 .palco-controles {
   grid-area: controles;
   position: relative;
@@ -1157,7 +1113,7 @@ html[data-animacoes="leves"] .folha-sobe {
   margin-top: 12px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 16px max(14px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  padding: 12px max(14px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
 }
 
 .palco-folha {
@@ -1173,11 +1129,10 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (min-width: 1024px) {
   .palco-grade {
     grid-template-columns: minmax(0, 760px) 380px;
-    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
       "maquina nota"
-      "maquina faixa"
       "maquina controles";
     justify-content: center;
     column-gap: 24px;
@@ -1186,16 +1141,13 @@ html[data-animacoes="leves"] .folha-sobe {
   .palco-pedido {
     margin-bottom: 14px;
     padding: 10px 14px;
-    border: 2px solid var(--tinta);
+    border: 2px solid var(--contorno);
     border-radius: 16px;
-    box-shadow: 0 4px 0 var(--tinta);
+    box-shadow: 0 4px 0 var(--sombra);
   }
   .palco-maquina {
     margin: 0;
     padding: 10px;
-  }
-  .palco-faixa {
-    margin: 0 0 14px;
   }
   .palco-nota {
     margin: 0 4px 16px;
@@ -1205,9 +1157,9 @@ html[data-animacoes="leves"] .folha-sobe {
     max-height: 100%;
     margin: 0;
     padding: 16px;
-    border: 2px solid var(--tinta);
+    border: 2px solid var(--contorno);
     border-radius: 18px;
-    box-shadow: 0 4px 0 var(--tinta);
+    box-shadow: 0 4px 0 var(--sombra);
   }
   .palco-folha {
     align-self: start;
@@ -1220,29 +1172,27 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (orientation: landscape) and (min-width: 640px) and (max-width: 1023px) {
   .palco-grade {
     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
-    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
       "maquina nota"
-      "maquina faixa"
       "maquina controles";
     column-gap: 12px;
     padding: 10px 14px;
   }
   .palco-pedido {
-    border: 2px solid var(--tinta);
+    border: 2px solid var(--contorno);
     border-radius: 12px;
     margin-bottom: 8px;
   }
-  .palco-maquina,
-  .palco-faixa {
+  .palco-maquina {
     margin: 0 0 8px;
   }
   .palco-controles,
   .palco-folha {
     max-height: 100%;
     margin: 0;
-    border: 2px solid var(--tinta);
+    border: 2px solid var(--contorno);
     border-radius: 16px;
   }
 }
@@ -1262,7 +1212,7 @@ html[data-animacoes="leves"] .folha-sobe {
 
 /* Painel que sobe por cima da tela (Nônio, detalhe da Planta). */
 .painel-sobe {
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-bottom: 0;
   border-radius: 18px 18px 0 0;
   background: var(--folha);
@@ -1270,35 +1220,557 @@ html[data-animacoes="leves"] .folha-sobe {
 
 @media (min-width: 1024px) {
   .painel-sobe {
-    border-bottom: 2px solid var(--tinta);
+    border-bottom: 2px solid var(--contorno);
     border-radius: 18px;
-    box-shadow: 0 4px 0 var(--tinta);
+    box-shadow: 0 4px 0 var(--sombra);
   }
 }
 }
 
-/* ---------- Pergunte ao Nônio (referência 4) ---------- */
+/* ---------- O Nônio flutuante (v04.html, referências 1 a 4) ---------- */
 
-.conversa-folha {
-  max-height: calc(100dvh - 120px);
-  min-height: min(560px, calc(100dvh - 120px));
+/* O canto inferior direito da máquina é do Nônio: a bolinha a 10 px das bordas e o recado à
+   esquerda dela, alinhado ao meio. O resto do canto deixa o toque passar para a máquina. */
+.nonio-canto {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  pointer-events: none;
 }
 
-.conversa-lista {
+.nonio-canto > * {
+  pointer-events: auto;
+}
+
+/* Passo sem máquina: o mesmo lugar, no canto da tela. */
+.nonio-canto-fixo {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 20;
+}
+
+/* Na apresentação, a bolinha sobe acima do véu junto com o canto. */
+.nonio-canto-fixo:has([data-apresentando]) {
+  z-index: 45;
+}
+
+/* Na vitrine, o canto fica no fluxo. */
+.nonio-canto.nonio-canto-vitrine {
+  position: static;
+  width: 100%;
+}
+
+.bolha-nonio {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  padding: 2px 0 0;
+  border: 2px solid var(--contorno);
+  border-radius: 50%;
+  background: var(--folha);
+  box-shadow: 0 4px 0 var(--sombra);
+  transition: transform 90ms var(--curva-firme);
+}
+
+.bolha-nonio:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--sombra);
+}
+
+.bolha-nonio[aria-expanded="true"] {
+  background: var(--caneta-palida);
+}
+
+/* O ponto de fala nova: marca-texto com contorno, no canto de cima. */
+.bolha-ponto {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--contorno);
+  border-radius: 50%;
+  background: var(--marca-texto);
+}
+
+/* A antena balança devagar a cada uns 8 s; parada com movimento reduzido e no modo leve. */
+@keyframes antena-balanca {
+  0%,
+  86%,
+  100% {
+    transform: rotate(0deg);
+  }
+  89% {
+    transform: rotate(-10deg);
+  }
+  92% {
+    transform: rotate(8deg);
+  }
+  95% {
+    transform: rotate(-4deg);
+  }
+}
+
+.nonio-antena-viva {
+  transform-origin: 28px -28px;
+  animation: antena-balanca 8s var(--curva-firme) infinite;
+}
+
+html[data-animacoes="leves"] .nonio-antena-viva,
+[data-ambiente="pausado"] .nonio-antena-viva {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nonio-antena-viva {
+    animation: none;
+  }
+}
+
+/* O recado: uma fala curta, com o canto de baixo à direita apontando para a bolinha. */
+.recado-nonio {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  max-width: 300px;
+  padding: 7px 11px;
+  border: 2px solid var(--contorno);
+  border-radius: 14px 14px 4px 14px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.recado-nonio .selo {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 7px;
+  font-size: 12.5px;
+}
+
+.recado-nonio .selo[data-selo="acertou"] {
+  border-width: 0;
+}
+
+/* A janelinha: folha que sobe de baixo (celular), metade direita (deitado), painel (computador). */
+.janela-nonio-veu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  padding: 0;
+  border: 0;
+  background: var(--veu);
+  cursor: default;
+}
+
+.janela-nonio {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 42;
+  display: flex;
+  flex-direction: column;
+  height: 60dvh;
+  min-height: min(440px, 88dvh);
+  max-height: 88dvh;
+  padding: 8px 16px max(16px, env(safe-area-inset-bottom));
+  border-top: 2px solid var(--contorno);
+  border-radius: 22px 22px 0 0;
+  background: var(--folha);
+  color: var(--tinta);
+}
+
+.janela-nonio[data-arrastando] {
+  animation: none;
+}
+
+.janela-nonio-pega {
+  flex: none;
+  padding-bottom: 10px;
+  touch-action: none;
+}
+
+.janela-nonio-corpo {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 9px;
+  gap: 12px;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding: 2px 2px 6px;
 }
+
+.janela-balao {
+  flex: none;
+  padding: 10px 13px 12px;
+  border: 2px solid var(--contorno);
+  border-radius: 14px 14px 14px 4px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  font-size: 15.5px;
+  font-weight: 500;
+  line-height: 1.38;
+}
+
+.janela-antes {
+  color: var(--tinta-suave);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.janela-degrau {
+  width: 22px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--grade);
+}
+
+.janela-degrau[data-feito="sim"] {
+  background: var(--caneta);
+}
+
+.janela-separador {
+  flex: none;
+  height: 2px;
+  background: var(--grade);
+}
+
+/* Enquanto o Nônio aponta com a janelinha aberta, a máquina fica acima do véu, abaixo da folha. */
+.palco[data-nonio-apontando="sim"] .palco-maquina {
+  z-index: 41;
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .bolha-nonio {
+    width: 44px;
+    height: 44px;
+  }
+  .bolha-nonio svg {
+    width: 34px;
+    height: auto;
+  }
+  .janela-nonio {
+    left: 50%;
+    top: 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    border-top: 0;
+    border-left: 2px solid var(--contorno);
+    border-radius: 18px 0 0 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .janela-nonio-veu {
+    background: transparent;
+  }
+  .janela-nonio {
+    left: auto;
+    right: var(--janela-direita, 28px);
+    bottom: var(--janela-base, 120px);
+    width: 400px;
+    height: auto;
+    min-height: 0;
+    max-height: var(--janela-altura, 70dvh);
+    padding-bottom: 16px;
+    border: 2px solid var(--contorno);
+    border-radius: 18px;
+    box-shadow: 0 4px 0 var(--sombra);
+  }
+  .janela-nonio .alca-folha {
+    display: none;
+  }
+}
+
+/* ---------- O rascunho a lápis e a conta passada a caneta (v04.html, referências 1, 3 e 4) ---------- */
+
+.rascunho {
+  position: relative;
+  padding-left: 20px;
+}
+
+.rascunho-lapis {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  display: flex;
+  color: var(--grafite);
+}
+
+.rascunho-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rascunho-linha {
+  color: var(--tinta-suave);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.38;
+  font-variant-numeric: tabular-nums;
+}
+
+.rascunho-linha > span {
+  padding-bottom: 1px;
+  border-bottom: 1.5px dashed var(--grafite);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Só nas duas colunas (computador, celular deitado): no celular em pé, a máquina vem primeiro. */
+.so-em-colunas,
+.palco-nota:has(> .so-em-colunas) {
+  display: none;
+}
+
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 640px) {
+  .so-em-colunas,
+  .palco-nota:has(> .so-em-colunas) {
+    display: block;
+  }
+}
+
+/* No celular, as duas últimas linhas; nas duas colunas, todas. */
+.rascunho-linha:not(:nth-last-child(-n + 2)) {
+  display: none;
+}
+
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 640px) {
+  .rascunho-linha:not(:nth-last-child(-n + 2)) {
+    display: block;
+  }
+}
+
+.conta-caneta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 14px 10px;
+  border: 2px solid var(--contorno);
+  border-radius: 14px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--tinta);
+}
+
+.conta-rotulo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--caneta);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.conta-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 10px;
+  row-gap: 4px;
+}
+
+.conta-coluna {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.conta-num,
+.conta-op,
+.conta-palavra,
+.conta-ou {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  line-height: 1;
+}
+
+.conta-num {
+  font-size: 30px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.conta-num .fracao {
+  font-size: 0.6em;
+}
+
+.conta-misto {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.conta-misto .fracao {
+  font-size: 0.5em;
+}
+
+.conta-resultado {
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+}
+
+.conta-op {
+  color: var(--caneta);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.conta-palavra {
+  color: var(--tinta-suave);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.conta-virgula {
+  display: inline-flex;
+  align-items: flex-end;
+  min-height: 32px;
+  margin-left: -8px;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.conta-ou {
+  color: var(--tinta-suave);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.conta-nome {
+  min-height: 15px;
+  padding-top: 3px;
+  color: var(--tinta-suave);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.conta-nota {
+  color: var(--tinta-suave);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.conta-nota strong,
+.conta-nomes strong {
+  color: var(--tinta);
+  font-weight: 800;
+}
+
+.conta-forma {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.conta-nomes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--tinta-suave);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+/* A chave: menos, números da esquerda, a barra e os quocientes parciais. */
+.chave {
+  display: grid;
+  flex: none;
+  grid-template-columns: 20px 54px 2px 74px;
+  grid-auto-rows: 25px;
+  align-items: center;
+  font-size: 21px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.chave-r {
+  padding-right: 8px;
+  text-align: right;
+}
+
+.chave-q {
+  padding-left: 10px;
+}
+
+.chave-menos {
+  color: var(--caneta);
+  font-weight: 700;
+  text-align: right;
+}
+
+.chave-traco {
+  border-bottom: 2px solid var(--contorno);
+}
+
+.chave-barra {
+  align-self: stretch;
+  border-left: 2px solid var(--contorno);
+}
+
+.chave-soma {
+  margin-right: 30px;
+}
+
+.chave-mais {
+  color: var(--caneta);
+}
+
+.marca-chave {
+  padding: 0 5px;
+  border-radius: 5px;
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+}
+
+.chave-lado {
+  padding-top: 26px;
+  color: var(--tinta-suave);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* ---------- Pergunte ao Nônio (referência 4) ---------- */
 
 .conversa-eu,
 .conversa-ele {
   box-sizing: border-box;
   padding: 9px 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   font-size: 15px;
   font-weight: 500;
   line-height: 1.35;
@@ -1368,7 +1840,7 @@ html[data-animacoes="leves"] .folha-sobe {
   align-items: center;
   min-height: 44px;
   padding: 0 11px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 10px;
   background: var(--folha);
   color: var(--tinta);
@@ -1387,7 +1859,7 @@ html[data-animacoes="leves"] .folha-sobe {
   height: 48px;
   box-sizing: border-box;
   padding: 0 12px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--folha);
   color: var(--tinta);
@@ -1408,11 +1880,11 @@ html[data-animacoes="leves"] .folha-sobe {
   width: 48px;
   height: 48px;
   padding: 0;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 12px;
   background: var(--caneta);
-  box-shadow: 0 3px 0 var(--tinta);
-  color: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--sobre-caneta);
   transition: transform 90ms var(--curva-firme);
 }
 
@@ -1425,16 +1897,6 @@ html[data-animacoes="leves"] .folha-sobe {
   border-color: var(--grafite);
   box-shadow: none;
   color: var(--tinta-suave);
-}
-
-@media (min-width: 1024px) {
-  /* No computador: um painel na coluna da direita, da altura da tela. */
-  .conversa-folha {
-    width: 440px;
-    height: calc(100dvh - 32px);
-    max-height: none;
-    margin: 16px;
-  }
 }
 
 /* ---------- Apresentações ---------- */
@@ -1459,10 +1921,10 @@ html[data-animacoes="leves"] .folha-sobe {
   max-width: 520px;
   margin: 0 auto;
   padding: 12px 14px 14px;
-  border: 2px solid var(--tinta);
+  border: 2px solid var(--contorno);
   border-radius: 16px;
   background: var(--folha);
-  box-shadow: 0 4px 0 var(--tinta);
+  box-shadow: 0 4px 0 var(--sombra);
 }
 
 .apresentacao-cartao[data-lado="baixo"] {
@@ -1479,4 +1941,245 @@ html[data-animacoes="leves"] .folha-sobe {
   right: auto;
   max-width: none;
   margin: 0;
+}
+
+/* ---------- O Manual (referências 5, 6 e 7 de v04.html): papel impresso, não caderno ---------- */
+
+.manual-contagem {
+  flex: none;
+  padding: 2px 9px;
+  border: 2px solid var(--contorno);
+  border-radius: 8px;
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.manual-secao {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin: 6px 0 0;
+}
+
+.manual-secao-t {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.manual-secao[data-lapis] .manual-secao-t {
+  color: var(--tinta-suave);
+}
+
+.manual-secao-s {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tinta-suave);
+}
+
+.manual-pag {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border: 2px solid var(--contorno);
+  border-radius: 14px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--tinta);
+  text-decoration: none;
+}
+
+a.manual-pag:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--sombra);
+}
+
+.manual-pag[data-rasgada],
+.manual-pag[data-lapis] {
+  border-style: dashed;
+  border-color: var(--grafite);
+  box-shadow: none;
+  background: var(--grafite-claro);
+  color: var(--tinta-suave);
+}
+
+.manual-pag[data-lapis] {
+  opacity: 0.85;
+}
+
+.manual-pag-t {
+  display: block;
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.manual-pag-s {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tinta-suave);
+}
+
+.manual-selo {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 7px;
+  background: var(--verde-palido);
+  color: var(--verde-tinta);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.folha-manual {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 14px 16px 24px;
+  border: 2px solid var(--contorno);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--folha);
+  color: var(--tinta);
+}
+
+.manual-rot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--tinta-suave);
+}
+
+.manual-txt {
+  margin: 3px 0 0;
+  font-size: 15.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.manual-forma {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 2px solid var(--contorno);
+  border-radius: 12px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+}
+
+.manual-termos {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  text-align: center;
+}
+
+.manual-termo-n {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.manual-termo-t {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--tinta-suave);
+}
+
+.manual-marca {
+  display: inline-flex;
+  padding: 0 6px;
+  border-radius: 5px;
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+}
+
+
+.manual-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 3px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.manual-lista li {
+  display: flex;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.38;
+}
+
+.manual-termo {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 14.5px;
+  line-height: 1.35;
+}
+
+.manual-termo dt {
+  font-weight: 800;
+}
+
+.manual-termo dd {
+  font-weight: 500;
+}
+
+.manual-chip {
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 2px solid var(--contorno);
+  border-radius: 10px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.manual-rasgado {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 2px dashed var(--grafite);
+  border-radius: 12px;
+  background: var(--grafite-claro);
+  color: var(--tinta-suave);
+}
+
+.manual-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 9px;
+  border: 2px solid var(--contorno);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.manual-tag[data-conteudo] {
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
 }

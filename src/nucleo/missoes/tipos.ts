@@ -100,6 +100,12 @@ interface PassoBase {
   readonly nonio?: string;
   /** O que o Nônio diz quando o passo é vencido: o que ficou certo, com os números. */
   readonly acerto?: string;
+  /**
+   * Recados curtos (até 60 caracteres) para as falas do passo cuja primeira frase não cabe no
+   * recado da bolinha: a de abertura (`nonio`) e a de acerto (`acerto`, a do Nônio ao concluir ou
+   * a `explicacao` de uma previsão ou aposta). Uma checagem de conteúdo confere todos.
+   */
+  readonly recados?: { readonly abertura?: string; readonly acerto?: string };
   /** Nova máquina. Sem ela, o passo continua a máquina do passo anterior. */
   readonly maquina?: MaquinaDoPasso;
   readonly dicas?: EscadaDicas;
@@ -295,6 +301,11 @@ export interface Atividade {
   readonly titulo: string;
   /** Rótulo curto do que ensina ("dividir repartindo"). */
   readonly ideia: string;
+  /**
+   * O conteúdo formal, quando o dos conceitos não basta ("Frações: aplicação"). Sem ele, o nome
+   * vem dos conceitos.
+   */
+  readonly conteudoFormal?: string;
   readonly conceitos: readonly IdConceito[];
   readonly passos: readonly Passo[];
   /** Desafio de aplicação para quem a calibragem liberou. */

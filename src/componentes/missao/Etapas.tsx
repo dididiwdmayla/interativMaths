@@ -5,8 +5,8 @@
  * Feitos com visto verde, o atual a caneta, os seguintes a lápis, cada um com o rótulo curto.
  */
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { Passo } from "@/nucleo/missoes/tipos";
-import { IconeEtapas } from "@/componentes/icones/IconeEtapas";
 import { IconeFechar } from "@/componentes/icones/IconeFechar";
 import { IconeVisto } from "@/componentes/icones/IconeVisto";
 
@@ -16,18 +16,18 @@ export function BotaoEtapas({ passos, atual }: { passos: readonly Passo[]; atual
     <>
       <button
         type="button"
-        className="botao-pequeno"
+        className="botao-pequeno botao-etapas"
         aria-label={`Etapas da missão: ${atual + 1} de ${passos.length}`}
         aria-haspopup="dialog"
         onClick={() => setAberta(true)}
         data-etapas="botao"
       >
-        <IconeEtapas />
         <span className="algarismos">
           {atual + 1}/{passos.length}
         </span>
       </button>
-      {aberta && <FolhaEtapas passos={passos} atual={atual} onFechar={() => setAberta(false)} />}
+      {/* No corpo do documento: dentro do cabeçalho, a folha ficaria presa à camada dele. */}
+      {aberta && createPortal(<FolhaEtapas passos={passos} atual={atual} onFechar={() => setAberta(false)} />, document.body)}
     </>
   );
 }

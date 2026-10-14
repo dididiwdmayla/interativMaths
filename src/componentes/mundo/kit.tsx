@@ -59,8 +59,8 @@ export function Engrenagem({
   }
   return (
     <g className={girando ? "ambiente-girar" : undefined}>
-      <polygon points={pontos.join(" ")} fill={cor} stroke="var(--tinta)" strokeWidth={TRACO} strokeLinejoin="round" />
-      <circle cx={x} cy={y} r={r * 0.24} fill="var(--tinta)" stroke="var(--tinta)" strokeWidth={1} />
+      <polygon points={pontos.join(" ")} fill={cor} stroke="var(--contorno)" strokeWidth={TRACO} strokeLinejoin="round" />
+      <circle cx={x} cy={y} r={r * 0.24} fill="var(--contorno)" stroke="var(--contorno)" strokeWidth={1} />
     </g>
   );
 }
@@ -76,7 +76,7 @@ export function Esteira({ id, x0, x1, y, altura = 14, andando = true }: { id: st
           <rect x={x0 + altura / 2} y={y} width={Math.max(0, largura - altura)} height={altura} />
         </clipPath>
       </defs>
-      <rect x={x0} y={y} width={largura} height={altura} rx={altura / 2} fill="var(--folha)" stroke="var(--tinta)" strokeWidth={TRACO} />
+      <rect x={x0} y={y} width={largura} height={altura} rx={altura / 2} fill="var(--folha)" stroke="var(--contorno)" strokeWidth={TRACO} />
       {andando && (
         <g clipPath={`url(#${id})`}>
           <g className="ambiente-esteira">
@@ -87,7 +87,7 @@ export function Esteira({ id, x0, x1, y, altura = 14, andando = true }: { id: st
         </g>
       )}
       {Array.from({ length: roletes }, (_, i) => (
-        <circle key={i} cx={x0 + altura / 2 + ((largura - altura) * i) / (roletes - 1)} cy={y + altura / 2} r={1.7} fill="var(--tinta)" stroke="none" />
+        <circle key={i} cx={x0 + altura / 2 + ((largura - altura) * i) / (roletes - 1)} cy={y + altura / 2} r={1.7} fill="var(--contorno)" stroke="none" />
       ))}
     </g>
   );
@@ -95,15 +95,15 @@ export function Esteira({ id, x0, x1, y, altura = 14, andando = true }: { id: st
 
 /** Trilho das bicas: faixa clara de contorno de tinta. */
 export function Trilho({ x0, x1, y }: { x0: number; x1: number; y: number }) {
-  return <rect x={x0} y={y} width={x1 - x0} height={8} rx={4} fill="var(--grade)" stroke="var(--tinta)" strokeWidth={TRACO} />;
+  return <rect x={x0} y={y} width={x1 - x0} height={8} rx={4} fill="var(--grade)" stroke="var(--contorno)" strokeWidth={TRACO} />;
 }
 
 /** Bica: caixa azul presa ao trilho e o bico claro por baixo. */
 export function Bica({ cx, y }: { cx: number; y: number }) {
   return (
     <g>
-      <rect x={cx - 4} y={y + 13} width={8} height={7} fill="var(--caneta-clara)" stroke="var(--tinta)" strokeWidth={TRACO} strokeLinejoin="round" />
-      <rect x={cx - 8} y={y} width={16} height={15} rx={3} fill="var(--caneta)" stroke="var(--tinta)" strokeWidth={TRACO} />
+      <rect x={cx - 4} y={y + 13} width={8} height={7} fill="var(--caneta-clara)" stroke="var(--contorno)" strokeWidth={TRACO} strokeLinejoin="round" />
+      <rect x={cx - 8} y={y} width={16} height={15} rx={3} fill="var(--caneta)" stroke="var(--contorno)" strokeWidth={TRACO} />
     </g>
   );
 }
@@ -151,9 +151,9 @@ export function Medidor({
         <line key={k} x1={x + largura * 0.55} x2={x + largura} y1={y + altura * (1 - m)} y2={y + altura * (1 - m)} stroke="var(--tinta-suave)" strokeWidth={1.2} />
       ))}
       {teto !== undefined && (
-        <line x1={x - 4} x2={x + largura + 4} y1={y + altura * (1 - teto)} y2={y + altura * (1 - teto)} stroke="var(--tinta)" strokeWidth={2} strokeDasharray="3 3" />
+        <line x1={x - 4} x2={x + largura + 4} y1={y + altura * (1 - teto)} y2={y + altura * (1 - teto)} stroke="var(--contorno)" strokeWidth={2} strokeDasharray="3 3" />
       )}
-      <rect x={x} y={y} width={largura} height={altura} rx={r} fill="none" stroke="var(--tinta)" strokeWidth={TRACO} />
+      <rect x={x} y={y} width={largura} height={altura} rx={r} fill="none" stroke="var(--contorno)" strokeWidth={TRACO} />
     </g>
   );
 }

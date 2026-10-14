@@ -82,7 +82,7 @@ describe("normalização", () => {
       },
       AGORA,
     );
-    expect(p.preferencias).toEqual({ postura: "disponivel", cotas: "escondidas", animacoes: "completas", conversa: "ligada" });
+    expect(p.preferencias).toEqual({ postura: "disponivel", cotas: "escondidas", animacoes: "completas", conversa: "ligada", aparencia: "automatico" });
     expect(p.evidencias).toHaveLength(1);
     expect(p.caderno).toHaveLength(1);
     expect(p.joias.abaco.estagio).toBe(3);

@@ -9,25 +9,29 @@ Desenho em SVG e DOM (nada de canvas ou motor de jogo). Progresso em `localStora
 src/
   nucleo/        TypeScript puro, sem React, determinístico
     racional/    Racional exato, leitura por extenso, notação com papéis
-    curriculo/   conceitos e dependências (consultas)
+    curriculo/   conceitos e dependências (consultas); nome formal (área e conteúdo)
     dominio/     evidências → estados; frases em português comum
     progresso/   documento versionado: tipos, normalização, migrações, ações puras, relógio
-    maquinas/    a bancada de partilha: regras, validadores, medidas, viabilidade de corte
+    maquinas/    a bancada de partilha: regras, validadores, medidas, viabilidade de corte, rascunho
     missoes/     contrato de atividade, motor (entrada → execução + efeitos), conferência de respostas,
-                 gesto (o próximo gesto), segredos (o que o passo esconde), instrução, referência
+                 gesto (o próximo gesto), segredos (o que o passo esconde), instrução, referência,
+                 conta (a conta passada a caneta, em linha e armada)
+    manual/      o contrato das páginas, a restauração e a checagem das igualdades
     calibragem/  a escada adaptativa D1–D6
     campanha/    situação derivada (missões disponíveis, eco, revisita, sondagem)
     geradores/   aleatório com semente, questões e atividades geradas (revisita, sondagem)
     tutor/       fila de falas, reações, guardas, apresentações, contrato da conversa
     joias.ts     contrato das joias
-  conteudo/      SÓ DADOS: conceitos, missões, calibragem, equívocos, peles, joias, museu, rua, eco,
-                 reações e gestos (modelos de fala), tutor (instrução de sistema), apresentações
+  conteudo/      SÓ DADOS: conceitos (com nome formal), áreas, missões, calibragem, equívocos, peles,
+                 joias, museu, rua, eco, reações e gestos (modelos de fala), tutor, apresentações,
+                 rascunho e conta (modelos), manual (as páginas)
   servidor/      só servidor, nunca importado por cliente: tutor/ (contexto, cliente da Anthropic,
                  resiliência, simulações)
-  componentes/   maquinas, missao, mundo, nonio, notacao, caderno, joias, estado, lab, ui, icones
+  componentes/   maquinas, missao, mundo, nonio, notacao, caderno, manual, joias, estado, lab, ui
+                 (tema, tela cheia, cabeçalho), icones
                  (identidade Quadriculado: docs/DESIGN-SYSTEM.md e docs/referencia-visual/)
-  tema/          tokens.css (única cor literal) e componentes.css (receitas: ficha, botões, etiquetas,
-                 folha pautada, palco)
+  tema/          tokens.css (única cor literal; claro e escuro) e componentes.css (receitas: ficha,
+                 botões, etiquetas, folha pautada, palco, Nônio flutuante, rascunho, conta, Manual)
   app/           rotas (cada página só monta um componente)
 ```
 
@@ -69,15 +73,57 @@ quando o objetivo se cumpre, sem fechar.
 
 ## O Nônio guia (`nucleo/tutor`, `componentes/nonio`)
 
-- **Fila** (`fila.ts`): uma fala por vez na faixa. Importante (retorno, chegada, leitura da
+- **Fila** (`fila.ts`): uma fala por vez (na bolinha e na janelinha). Importante (retorno, chegada, leitura da
   máquina) entra na hora; pedida (Me ajuda, conversa) espera a importante ficar 2,5 s; automática
-  (oferta, lembrete, comentário) só com a faixa calma, conforme a postura.
+  (oferta, lembrete, comentário) só com o Nônio calmo, conforme a postura.
 - **Reações** (`reacoes.ts` + `conteudo/reacoes.ts`): de evento e efeito para fala, com os números
   do momento e o alvo para apontar. Até 160 caracteres, sem exclamação.
 - **Gesto** (`missoes/gesto.ts`): o próximo gesto ("Agora: ...") a partir do estado; nunca contém
   um segredo do passo (teste de propriedade). **Segredos** (`missoes/segredos.ts`): o que o passo
   esconde (esperado, medidas da resolução, lacunas vazias), menos o que o enunciado já mostra.
 - **Apresentações** (`apresentacoes.ts`): uma ferramenta nova por passo, nunca sobre um retorno.
+
+- **O Nônio flutuante** (v0.4, a faixa saiu): `useNonio` junta fila, recado e janelinha;
+  `BolhaNonio` no canto da máquina (`cantoNonio` tira a bandeja do canto), `RecadoNonio` com o
+  recado curto (`tutor/recado.ts`: até 60 caracteres; a fala longa traz `recado` no conteúdo),
+  `JanelaNonio` com a fala inteira, "Antes, neste passo", a escada e a conversa.
+
+## Rascunho e conta
+
+- **Rascunho** (`maquinas/bancada/rascunho.ts`): `rascunhoDaBancada(bancada, pele, modelos)`
+  lê o histórico da bancada (`passado` + `atual`) e devolve uma linha por gesto que mexeu na carga
+  (volta, à mão, corte, devolução, engasgo); desfazer tira a linha. Textos em `conteudo/rascunho.ts`.
+- **Conta** (`missoes/conta.ts`): `contaDoAcerto(passo, execucao, ctx)` só existe depois do
+  acerto, calculada do estado final da máquina (partilha, medida, resto, fração, transporte,
+  comparação, parte). Na divisão com resto, `contaArmada` faz a chave com as voltas do jogador
+  como quocientes parciais. `contaVerdadeira` confere tudo com `Racional` (teste com todas as
+  soluções de teste).
+
+## O Manual e o nome formal
+
+- **Nome formal** (`curriculo/formal.ts`): área do distrito (`conteudo/areas.ts`) e conteúdo dos
+  conceitos (`formal`, `formalCurto`, `aspecto`; `conteudoFormal` na atividade quando precisa).
+  O cabeçalho mostra a linha cheia e troca pela curta (sem a área) quando não cabe.
+- **Páginas** (`conteudo/manual.ts`): uma por conceito que alguma missão ensina; as outras a
+  lápis, com o arco previsto. Checagens: exemplo e forma verdadeiros (`igualdadeVerdadeira`), o
+  desenho "Na máquina" (config + ações, montado pelo núcleo) mostra os números do exemplo, todo
+  equívoco citado existe e tem o texto do Manual.
+- **Restauração** (`manual/manual.ts`): `paginasRestauradas(progresso, atividades)`: página no
+  Caderno de uma missão que ensina o conceito, ou conceito dominado ou consolidado. O fim da
+  missão compara antes e depois e diz "Uma página do Manual voltou". `ReferenciaMissao` (o livro
+  no cabeçalho) mostra nomes e páginas; não existe na sondagem; na degustação, só os nomes.
+
+## Tema, tela cheia e app
+
+- **Tema** (`componentes/ui/tema.ts`, `Tema.tsx`): `SCRIPT_TEMA` no `<head>` põe `data-tema`
+  antes da primeira pintura (`?tema=`, a chave `interativmaths:aparencia`, o aparelho);
+  `AplicarTema` aplica a preferência `aparencia`, segue o aparelho no automático e acerta
+  `theme-color`. A degustação ignora a escolha guardada.
+- **Tela cheia** (`componentes/ui/TelaCheia.tsx`): Fullscreen API no documento; botão só com
+  `document.fullscreenEnabled`; no iPhone sem a API e fora do app instalado, o Menu ensina a
+  instalar.
+- **Instalável**: `app/manifest.ts` (standalone, cores do claro), ícones em `app/icones/*`
+  e `apple-icon.tsx`, todos de `app/desenhoIcone.tsx`. Sem service worker.
 
 ## A conversa com IA (`POST /api/tutor`, `servidor/tutor`)
 
@@ -131,19 +177,20 @@ ponto; um teste confere), `perguntas?` (sugestões da conversa), `chegada?`, `no
    validadores por propriedade e testes (inclusive invariantes).
 2. Estenda `MaquinaDoPasso`/`Objetivo` para aceitar a nova máquina (hoje o motor conhece a bancada).
 3. Na tela, um componente SVG em `componentes/maquinas` composto com o kit (`componentes/mundo/kit`)
-   e um painel de controles; use `Palco` (objetivo, nota, máquina, faixa do Nônio, bancada; duas
+   e um painel de controles; use `Palco` (objetivo, nota, máquina com a bolinha do Nônio, rascunho, bancada; duas
    colunas a partir de 1024 px). Bica fechada e lugar vazio ficam a lápis (`.a-lapis`, `PassarACaneta`).
 4. Uma peça nova do kit entra na `/lab/vitrine`.
 
 ## Progresso (`nucleo/progresso`)
 
-Documento único versionado (`VERSAO_PROGRESSO`, hoje 2), lido com proteção (ilegível vira começo novo e o
+Documento único versionado (`VERSAO_PROGRESSO`, hoje 3), lido com proteção (ilegível vira começo novo e o
 original fica guardado à parte), normalizado campo a campo e migrado por cadeia testada. Guarda
 preferências, calibragem, campanha (atividades, execuções, desvio, conclusões, marcas, palpites),
 evidências (teto 1500), Caderno, joias, museu, cenas, revisitas, o deslocamento do relógio e,
 desde a v2, as apresentações vistas (id e momento) e a preferência `conversa` (ligada ou
-desligada). A migração 1 → 2 é testada com um progresso real gravado pela v0.2
-(`nucleo/progresso/amostras/progresso-v1.json`). O histórico da conversa nunca é salvo.
+desligada); desde a v3, a preferência `aparencia` (automático, claro, escuro), espelhada em
+`interativmaths:aparencia` para o script do tema. As migrações 1 → 2 e 2 → 3 são testadas com
+progressos reais gravados (`nucleo/progresso/amostras/`). O histórico da conversa nunca é salvo.
 A loja do navegador (`componentes/estado/loja.ts`) usa `useSyncExternalStore`: no servidor e na
 hidratação o estado é "carregando", então a primeira pintura nunca diverge.
 
@@ -151,8 +198,10 @@ hidratação o estado é "carregando", então a primeira pintura nunca diverge.
 
 `/` (porta), `/abertura`, `/calibragem`, `/mapa`, `/partilha`, `/partilha/[atividade]`
 (`?modo=prova|registro`), `/partilha/revisita`, `/partilha/sondagem`, `/museu/[exposicao]`,
-`/rua/[cena]`, `/caderno`, `/planta`, `/relicario`, `/menu`, `/lab`, `/lab/maquinas`,
-`/lab/progresso`, `/lab/vitrine`, `POST /api/tutor`, `/degustacao` (`?embed=1`).
+`/rua/[cena]`, `/caderno`, `/manual`, `/manual/[pagina]`, `/planta`, `/relicario`, `/menu`,
+`/lab`, `/lab/maquinas`, `/lab/progresso`, `/lab/vitrine`, `POST /api/tutor`, `/degustacao`
+(`?embed=1`, `?tema=claro|escuro`), `/manifest.webmanifest`, `/icones/192`, `/icones/512`,
+`/icones/mascaravel`.
 
 ## A degustação (`/degustacao`)
 
@@ -173,5 +222,7 @@ nos testes de navegador, filtre por elementos visíveis.
 2. Núcleo: `src/nucleo/**/*.test.ts`; servidor: `src/servidor/**/*.test.ts` (a rota do tutor com a
    tentativa injetada, sem rede).
 3. Conteúdo: `src/conteudo/**/*.test.ts` e `src/higiene.test.ts`.
-4. Navegador: `npm run e2e` (`e2e/percurso.spec.ts`, build de produção, 390×844 com toque).
+4. Navegador: `npm run e2e` (`e2e/percurso.spec.ts` e `e2e/degustacao.spec.ts`, build de
+   produção): o percurso confere bolinha, rascunho, conta, Manual restaurado, escuro depois de
+   recarregar; a degustação nos três layouts, embutida e com `?tema=`.
 Não rode `next build` com o `next dev` aberto: os dois disputam a pasta `.next`.

@@ -2,6 +2,7 @@
  * Conceitos desta versão e os em projeto. SÓ DADOS.
  * Ids estáveis: uma vez publicados, não mudam.
  * Posição na Planta: x de 0 a 6, y de 0 (topo) a 7 (base); a Planta converte em desenho.
+ * Nome formal: área e conteúdo, como na escola, nunca ano escolar, série ou código da BNCC.
  */
 import type { Conceito } from "@/nucleo/curriculo/curriculo";
 
@@ -9,6 +10,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "mul.grupos",
     nome: "Multiplicar como grupos",
+    formal: "Multiplicação como grupos iguais",
+    formalCurto: "Multiplicação",
     linha: "Vários grupos do mesmo tamanho: 4 bicas com 3 cada são 12.",
     dependeDe: [],
     situacao: "pre_requisito",
@@ -19,6 +22,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "div.partilha",
     nome: "Repartir igualmente",
+    formal: "Divisão exata: repartir em partes iguais",
+    formalCurto: "Divisão exata",
     linha: "Dividir é repartir em partes iguais: 24 entre 4 dá 6 para cada.",
     dependeDe: ["mul.grupos"],
     situacao: "ativo",
@@ -29,6 +34,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "div.medida",
     nome: "Quantos cabem",
+    formal: "Divisão exata: quantas vezes cabe",
+    formalCurto: "Divisão: quantos cabem",
     linha: "Dividir também é perguntar quantos grupos de um tamanho cabem: 30 em grupos de 6 são 5.",
     dependeDe: ["div.partilha"],
     situacao: "ativo",
@@ -39,6 +46,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "div.resto",
     nome: "O que sobra",
+    formal: "Divisão com resto",
+    formalCurto: "Divisão com resto",
     linha: "Quando não fecha, sobra um resto menor que o divisor; a situação decide o que fazer com ele.",
     dependeDe: ["div.partilha"],
     situacao: "ativo",
@@ -49,6 +58,9 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "fra.parte",
     nome: "Fração como parte",
+    formal: "Fração como parte de um inteiro",
+    formalCurto: "Frações",
+    aspecto: "parte",
     linha: "Cortar um inteiro em partes iguais dá nome ao pedaço: em 4 partes, cada uma é 1/4.",
     dependeDe: ["div.partilha"],
     situacao: "ativo",
@@ -59,6 +71,9 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "fra.quociente",
     nome: "Fração como divisão",
+    formal: "Fração como divisão",
+    formalCurto: "Frações",
+    aspecto: "divisão",
     linha: "O traço da fração é uma divisão: 3 broas entre 4 mesas dão 3/4 para cada.",
     dependeDe: ["fra.parte", "div.resto"],
     situacao: "ativo",
@@ -69,6 +84,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "fra.equivalencia",
     nome: "Frações equivalentes",
+    formal: "Frações equivalentes",
+    formalCurto: "Frações equivalentes",
     linha: "Pedaços diferentes, mesma quantidade: 2/4 e 1/2 enchem o medidor até a mesma altura.",
     dependeDe: ["fra.quociente"],
     situacao: "em_projeto",
@@ -79,6 +96,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "fra.comparacao",
     nome: "Comparar frações",
+    formal: "Comparação de frações",
+    formalCurto: "Comparar frações",
     linha: "Qual pedaço é maior, olhando o tamanho e não o número de pedaços.",
     dependeDe: ["fra.equivalencia"],
     situacao: "em_projeto",
@@ -89,6 +108,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "fra.de-quantidade",
     nome: "Fração de uma quantidade",
+    formal: "Fração de uma quantidade",
+    formalCurto: "Fração de quantidade",
     linha: "Três quartos de 24 sacas: repartir em 4 e tomar 3 partes.",
     dependeDe: ["fra.parte", "div.partilha"],
     situacao: "em_projeto",
@@ -99,6 +120,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "raz.razao",
     nome: "Razão",
+    formal: "Razão",
+    formalCurto: "Razão",
     linha: "Comparar duas quantidades pela divisão: 2 medidas de A para cada 3 de B.",
     dependeDe: ["div.medida", "fra.quociente"],
     situacao: "em_projeto",
@@ -109,6 +132,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "pro.proporcao",
     nome: "Proporção",
+    formal: "Proporção",
+    formalCurto: "Proporção",
     linha: "Manter a mesma razão ao aumentar: 2 para 3 é o mesmo que 6 para 9.",
     dependeDe: ["raz.razao", "mul.grupos"],
     situacao: "em_projeto",
@@ -119,6 +144,8 @@ export const CONCEITOS: readonly Conceito[] = [
   {
     id: "est.plausibilidade",
     nome: "Estimativa",
+    formal: "Estimativa",
+    formalCurto: "Estimativa",
     linha: "Saber antes de fazer se um resultado é plausível.",
     dependeDe: ["mul.grupos", "div.partilha"],
     situacao: "em_projeto",

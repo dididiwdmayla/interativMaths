@@ -44,6 +44,7 @@ export const MISSAO_5: Atividade = {
   numero: 5,
   titulo: "Encomenda sem manual",
   ideia: "aplicação, sem dica automática",
+  conteudoFormal: "Frações: aplicação",
   conceitos: ["fra.parte", "fra.quociente"],
   joia: "abaco",
   passos: [

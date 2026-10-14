@@ -68,9 +68,18 @@ function unidadesDaPilha(p: Pilha): number {
 }
 
 /**
- * @param proporcao altura/largura desejada (a área da tela). Entre 0,5 e 1,7.
+ * A faixa de baixo da máquina, onde fica a bandeja da sobra. Com o Nônio flutuante, o canto
+ * inferior direito (cerca de 72 × 72 px na tela) é dele: a bandeja vai para a esquerda e a faixa
+ * cresce o bastante para a bolinha não cobrir os números das bicas.
  */
-export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0.62): LayoutBancada {
+const FAIXA_BANDEJA = 58;
+const FAIXA_BANDEJA_COM_NONIO = 76;
+
+/**
+ * @param proporcao altura/largura desejada (a área da tela). Entre 0,5 e 1,7.
+ * @param cantoNonio o canto inferior direito fica livre para a bolinha do Nônio.
+ */
+export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0.62, cantoNonio = false): LayoutBancada {
   const vagas = e.bicas.length;
   const linhas = vagas >= 9 ? 2 : 1;
   const porLinha = Math.ceil(vagas / linhas);
@@ -81,7 +90,8 @@ export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0
   const alturaRotulo = forma === "saco" ? 30 : 58;
   const pilhasY = 56;
   const fixoLinha = 34 + 2 + ALTURA_RECEPTOR + 6 + alturaRotulo;
-  const fixo = pilhasY + 14 + 30 + linhas * fixoLinha + 58 + 8;
+  const faixaBandeja = cantoNonio ? FAIXA_BANDEJA_COM_NONIO : FAIXA_BANDEJA;
+  const fixo = pilhasY + 14 + 30 + linhas * fixoLinha + faixaBandeja + 8;
   const sobra = Math.max(0, H - fixo);
   const zonaPilhas = Math.min(116, Math.max(44, sobra * 0.36));
   const zonaConteudo = Math.min(150, Math.max(44, (sobra - zonaPilhas) / linhas));
@@ -158,8 +168,8 @@ export function calcularLayout(e: EstadoBancada, forma: FormaPeca, proporcao = 0
     }
   }
   const fimBicas = trilhoY + linhas * alturaLinha;
-  const bandeja = { x: LARGURA - MARGEM - 170, y: fimBicas + 4, largura: 166, altura: 46 };
-  const altura = Math.max(H, bandeja.y + bandeja.altura + 8);
+  const bandeja = { x: cantoNonio ? MARGEM + 4 : LARGURA - MARGEM - 170, y: fimBicas + 4, largura: 166, altura: 46 };
+  const altura = Math.max(H, cantoNonio ? fimBicas + faixaBandeja + 4 : bandeja.y + bandeja.altura + 8);
 
   // Escala do medidor: o que caberia em cada bica aberta no começo, ou o teto, ou o maior atual.
   const abertasNoInicio = Math.max(1, e.config.bicas.quantidade);

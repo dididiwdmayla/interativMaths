@@ -29,6 +29,10 @@ A referência visual aprovada mora em `docs/referencia-visual/`; toda tela nova 
 - Todo passo tem `instrucao` com verbo no imperativo primeiro (até 80 caracteres, termina em ponto).
 - A IA só conversa: passa pelas guardas e nunca dá a resposta do passo; correção é do motor.
 - Verde é acertou; vermelho é ainda não, passageiro, nunca em texto (sem X, sem "errado").
+- Borda e traço usam `--contorno`, sombra usa `--sombra`, texto sobre cor usa `sobre-*`; `--tinta` é só texto.
+- No escuro, papel e tinta invertem e objetos não (Nônio, pão, saca, madeira, marca-texto, joias).
+- A conta passada a caneta só aparece depois do acerto; antes, o rascunho a lápis.
+- Nome formal é área e conteúdo ("Missão 4 · Aritmética · Frações"), nunca ano escolar nem código.
 
 ## Testes em camadas (gaste onde há risco)
 1. `npm run tipos`, `npm run lint`, `npm run build`.

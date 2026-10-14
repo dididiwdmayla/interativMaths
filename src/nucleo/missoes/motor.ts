@@ -104,7 +104,8 @@ export interface ContextoMotor {
   readonly conceitoDoEquivoco: (id: string) => string | null;
 }
 
-const TETO_HISTORICO_SALVO = 24;
+/** Estados guardados para desfazer e para o rascunho (uma missão inteira à mão cabe). */
+const TETO_HISTORICO_SALVO = 48;
 
 /** v2 (v0.3): mão livre, retorno passageiro, aposta. Execuções v1 de missão recomeçam. */
 export const VERSAO_EXECUCAO = 2;

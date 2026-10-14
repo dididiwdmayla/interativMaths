@@ -47,7 +47,21 @@ const DE_1_PARA_2: Migracao = {
   },
 };
 
-export const MIGRACOES: readonly Migracao[] = [DE_0_PARA_1, DE_1_PARA_2];
+/**
+ * v0.4: a preferência de aparência (automático, claro ou escuro), automático por padrão.
+ * Nada mais muda: os passos publicados são os mesmos, e as execuções seguem de onde estavam.
+ */
+const DE_2_PARA_3: Migracao = {
+  de: 2,
+  descricao: "preferência de aparência",
+  migrar: (doc) => {
+    const prefs = ehObjeto(doc.preferencias) ? doc.preferencias : {};
+    const aparencia = prefs.aparencia === "claro" || prefs.aparencia === "escuro" ? prefs.aparencia : "automatico";
+    return { ...doc, preferencias: { ...prefs, aparencia } };
+  },
+};
+
+export const MIGRACOES: readonly Migracao[] = [DE_0_PARA_1, DE_1_PARA_2, DE_2_PARA_3];
 
 export function versaoDe(doc: Documento): number {
   const v = doc.versao;

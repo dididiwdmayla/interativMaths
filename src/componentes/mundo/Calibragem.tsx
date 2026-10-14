@@ -28,7 +28,7 @@ import { useProgresso } from "@/componentes/estado/useProgresso";
 import { Bancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
-import { FaixaNonio } from "@/componentes/nonio/FaixaNonio";
+import { LeituraMaquina } from "@/componentes/maquinas/Leitura";
 import { mensagemDoEvento } from "@/componentes/maquinas/mensagens";
 import { EntradaResposta } from "@/componentes/missao/Respostas";
 import { Nonio } from "@/componentes/nonio/Nonio";
@@ -167,7 +167,7 @@ export function Calibragem() {
       cabecalho={cabecalho}
       pedido={pedido}
       maquina={<Bancada estado={b.atual} pele={pele} onAcao={item.tipo === "maquina" && anotado === null ? (a) => setBancada(operar(b, a)) : undefined} />}
-      faixa={<FaixaNonio fala={{ id: "leitura", texto: msg?.texto ?? item.fala, categoria: "evento", atencao: msg?.tom === "atencao" }} selo={null} retorno="neutro" expressao="quieto" compacta />}
+      nota={<LeituraMaquina texto={msg?.texto ?? item.fala} atencao={msg?.tom === "atencao"} />}
       controles={
         controlesAnotado ||
         (item.tipo === "maquina" ? (
@@ -210,7 +210,7 @@ function Regua({ atual }: { atual: number }) {
     <div className="flex items-center gap-1.5" role="img" aria-label={`Marca ${atual} de 6`}>
       {Array.from({ length: 6 }, (_, i) => {
         const d = i + 1;
-        const cor = d === atual ? "border-tinta bg-caneta" : d < atual ? "border-tinta bg-tinta" : "border-grafite border-dashed bg-folha";
+        const cor = d === atual ? "border-contorno bg-caneta" : d < atual ? "border-contorno bg-tinta" : "border-grafite border-dashed bg-folha";
         return <span key={d} className={`block h-2.5 w-6 rounded-full border-2 ${cor}`} />;
       })}
     </div>
@@ -220,7 +220,7 @@ function Regua({ atual }: { atual: number }) {
 /** Desenho simples das medidas: 2 de farinha para 3 de água; com 6 de farinha, quantas de água? */
 function FiguraMedidas({ a, b, rotuloA, rotuloB, dadoA }: { a: number; b: number; rotuloA: string; rotuloB: string; dadoA: number }) {
   const copo = (x: number, y: number, cor: string, chave: string) => (
-    <path key={chave} d={`M ${x} ${y} L ${x + 16} ${y} L ${x + 14} ${y + 20} L ${x + 2} ${y + 20} Z`} fill={cor} stroke="var(--tinta)" strokeWidth={2} strokeLinejoin="round" />
+    <path key={chave} d={`M ${x} ${y} L ${x + 16} ${y} L ${x + 14} ${y + 20} L ${x + 2} ${y + 20} Z`} fill={cor} stroke="var(--contorno)" strokeWidth={2} strokeLinejoin="round" />
   );
   return (
     <svg viewBox="0 0 300 150" className="block w-full max-w-md" role="img" aria-label={`Receita: ${a} medidas de ${rotuloA} para ${b} de ${rotuloB}. Agora, ${dadoA} de ${rotuloA}.`}>
@@ -229,7 +229,7 @@ function FiguraMedidas({ a, b, rotuloA, rotuloB, dadoA }: { a: number; b: number
       {Array.from({ length: b }, (_, i) => copo(70 + i * 20, 24, "var(--agua)", `b${i}`))}
       <text x="10" y="62" fontSize="12" fontWeight={600} fill="var(--tinta)">{rotuloA}</text>
       <text x="70" y="62" fontSize="12" fontWeight={600} fill="var(--tinta)">{rotuloB}</text>
-      <line x1="8" x2="292" y1="74" y2="74" stroke="var(--tinta)" strokeWidth={1.6} />
+      <line x1="8" x2="292" y1="74" y2="74" stroke="var(--contorno)" strokeWidth={1.6} />
       <text x="8" y="92" fontSize="12" fontWeight={600} fill="var(--tinta-suave)">hoje</text>
       {Array.from({ length: dadoA }, (_, i) => copo(10 + i * 20, 100, "var(--pao-miolo)", `c${i}`))}
       <rect x="140" y="99" width="152" height="24" rx="6" fill="var(--folha)" stroke="var(--caneta)" strokeWidth={2} strokeDasharray="5 4" />

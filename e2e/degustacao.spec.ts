@@ -33,21 +33,28 @@ async function cortar(alvo: Alvo, peca: string, partes: number, todas = false) {
   await tocar(alvo, `[data-menu-corte] [data-cortar-em='${partes}']`);
 }
 
-/** A ilhota inteira, do pedido da Dália à tela final, com a faixa do Nônio e a mão livre (v0.3). */
+/** A ilhota inteira, do pedido da Dália à tela final, com o Nônio flutuante e a mão livre. */
 async function jogar(alvo: Alvo) {
   await passo(alvo, "chegada");
-  await entender(alvo, "faixa");
+  await entender(alvo, "bolha");
   await tocar(alvo, "[data-acao=seguir]");
 
   // 5 broas, 4 mesas: uma para cada, e a que sobra, cortada em 4 pelo menu sobre ela.
   await passo(alvo, "cinco-broas");
   await entender(alvo, "mao-livre");
-  // A degustação fica fora do catálogo: sem conversa com IA, com ou sem chave no servidor.
-  await expect(v(alvo, "[data-acao=nonio]")).toBeVisible();
-  await expect(alvo.locator("[data-acao=perguntar]")).toHaveCount(0);
+  // O Nônio é uma bolinha no canto da máquina; tocar abre a janelinha com o Me ajuda.
+  // A degustação fica fora do catálogo: sem o Pergunte por escrito, com ou sem chave no servidor.
+  await tocar(alvo, "[data-bolha-nonio]");
+  await expect(v(alvo, "[data-janela-nonio]")).toBeVisible();
+  await expect(v(alvo, "[data-janela-nonio] [data-acao=nonio]")).toBeVisible();
+  await expect(alvo.locator("[data-conversa=secao]")).toHaveCount(0);
+  await tocar(alvo, "[data-acao=fechar-janela]");
+  await expect(alvo.locator("[data-janela-nonio]")).toHaveCount(0);
   await tocar(alvo, "[data-acao=repartir]");
   await expect(v(alvo, "[data-bica='0']")).toHaveAttribute("data-quantidade", "1");
   await expect(v(alvo, "[data-gesto]")).toContainText("toque na peça que sobrou");
+  // O recado ao lado da bolinha: a primeira frase da fala, curta.
+  await expect(v(alvo, "[data-recado]")).toContainText("Sobrou uma broa.");
   await cortar(alvo, "1/1", 4);
   await tocar(alvo, "[data-acao=repartir]");
   await tocar(alvo, "[data-acao=fechar]");
@@ -152,6 +159,18 @@ for (const layout of LAYOUTS) {
   });
 }
 
+test.describe("degustação num aparelho escuro", () => {
+  test.use({ colorScheme: "dark" });
+
+  test("segue o aparelho, sem botão, e aceita ?tema= da recepção", async ({ page }) => {
+    await page.goto("/degustacao");
+    await expect(page.locator("html")).toHaveAttribute("data-tema", "escuro");
+    await expect(page.locator("[data-botao-tema]")).toHaveCount(0);
+    await page.goto("/degustacao?tema=claro");
+    await expect(page.locator("html")).toHaveAttribute("data-tema", "claro");
+  });
+});
+
 /* ---------- Embutida ---------- */
 
 declare global {
@@ -200,6 +219,8 @@ test.describe("degustação embutida", () => {
     await expect(ilhota.locator("[data-degustacao]")).toHaveAttribute("data-embutida", "sim");
     await expect(ilhota.locator("[data-degustacao]")).toHaveAttribute("data-recepcao", "sim");
     await expect(ilhota.locator("[data-acao=voltar]")).toHaveCount(0);
+    // Sem allow="fullscreen" no iframe, a tela cheia não existe: o botão não aparece.
+    await expect(ilhota.locator("[data-tela-cheia]")).toHaveCount(0);
 
     await jogar(ilhota);
     await expect.poll(async () => (await mensagens(page)).map((m) => m.tipo)).toContain("concluiu");

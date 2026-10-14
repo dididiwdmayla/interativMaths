@@ -1,0 +1,1243 @@
+{
+ "versao": 2,
+ "criadoEm": 1760200000000,
+ "atualizadoEm": 1760210014000,
+ "preferencias": {
+  "postura": "presente",
+  "cotas": "visiveis",
+  "animacoes": "completas",
+  "conversa": "desligada"
+ },
+ "aberturaVista": true,
+ "calibragem": {
+  "feitaEm": 1760200000000,
+  "pulada": true,
+  "respostas": [],
+  "maiorDegrau": 0,
+  "provaveis": [],
+  "recomendacao": "partilha.arco1.carga-igual"
+ },
+ "campanha": {
+  "atividades": {
+   "partilha.arco1.carga-igual": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760200000000,
+    "concluidaEm": 1760200058000,
+    "conclusoes": 1
+   },
+   "partilha.arco1.quantas-carrocas": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760200118000,
+    "concluidaEm": 1760200176000,
+    "conclusoes": 1
+   },
+   "partilha.arco1.sobrou": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760200236000,
+    "concluidaEm": 1760200306000,
+    "conclusoes": 1
+   },
+   "partilha.arco1.pao-nao-e-saca": {
+    "status": "em_andamento",
+    "via": null,
+    "iniciadaEm": 1760210000000,
+    "concluidaEm": null,
+    "conclusoes": 0
+   }
+  },
+  "execucoes": {
+   "partilha.arco1.pao-nao-e-saca": {
+    "versao": 2,
+    "assinatura": "pedido:narrativa|cinco-broas:operar|tres-broas:operar|comparar:aposta|duas-tres:prever|frase:frase|notacao:notacao|volta:operar|registro:registro",
+    "atividade": "partilha.arco1.pao-nao-e-saca",
+    "modo": "guiada",
+    "indice": 1,
+    "bancada": {
+     "atual": {
+      "config": {
+       "pele": "broas-mesas",
+       "pecas": {
+        "quantidade": 5
+       },
+       "bicas": {
+        "quantidade": 4,
+        "ajustavel": false
+       },
+       "fatiador": {
+        "partes": [
+         2,
+         3,
+         4,
+         6,
+         8
+        ],
+        "denominadorMaximo": 8
+       }
+      },
+      "esteira": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 4
+        },
+        "quantidade": 3
+       }
+      ],
+      "bicas": [
+       {
+        "aberta": true,
+        "pecas": [
+         {
+          "tamanho": {
+           "n": 1,
+           "d": 1
+          },
+          "quantidade": 1
+         },
+         {
+          "tamanho": {
+           "n": 1,
+           "d": 4
+          },
+          "quantidade": 1
+         }
+        ]
+       },
+       {
+        "aberta": true,
+        "pecas": [
+         {
+          "tamanho": {
+           "n": 1,
+           "d": 1
+          },
+          "quantidade": 1
+         }
+        ]
+       },
+       {
+        "aberta": true,
+        "pecas": [
+         {
+          "tamanho": {
+           "n": 1,
+           "d": 1
+          },
+          "quantidade": 1
+         }
+        ]
+       },
+       {
+        "aberta": true,
+        "pecas": [
+         {
+          "tamanho": {
+           "n": 1,
+           "d": 1
+          },
+          "quantidade": 1
+         }
+        ]
+       }
+      ],
+      "bandeja": [],
+      "lote": 1,
+      "pilha": "1/4",
+      "partes": 4,
+      "voltas": 0,
+      "cargaTravada": true,
+      "fechada": false,
+      "evento": {
+       "tipo": "colocou",
+       "tamanho": "1/4",
+       "bica": 0
+      },
+      "seq": 6
+     },
+     "passado": [
+      {
+       "config": {
+        "pele": "broas-mesas",
+        "pecas": {
+         "quantidade": 5
+        },
+        "bicas": {
+         "quantidade": 4,
+         "ajustavel": false
+        },
+        "fatiador": {
+         "partes": [
+          2,
+          3,
+          4,
+          6,
+          8
+         ],
+         "denominadorMaximo": 8
+        }
+       },
+       "esteira": [
+        {
+         "tamanho": {
+          "n": 1,
+          "d": 1
+         },
+         "quantidade": 5
+        }
+       ],
+       "bicas": [
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        }
+       ],
+       "bandeja": [],
+       "lote": 1,
+       "pilha": "1/1",
+       "partes": 2,
+       "voltas": 0,
+       "cargaTravada": false,
+       "fechada": false,
+       "evento": null,
+       "seq": 0
+      },
+      {
+       "config": {
+        "pele": "broas-mesas",
+        "pecas": {
+         "quantidade": 5
+        },
+        "bicas": {
+         "quantidade": 4,
+         "ajustavel": false
+        },
+        "fatiador": {
+         "partes": [
+          2,
+          3,
+          4,
+          6,
+          8
+         ],
+         "denominadorMaximo": 8
+        }
+       },
+       "esteira": [
+        {
+         "tamanho": {
+          "n": 1,
+          "d": 1
+         },
+         "quantidade": 4
+        }
+       ],
+       "bicas": [
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        }
+       ],
+       "bandeja": [],
+       "lote": 1,
+       "pilha": "1/1",
+       "partes": 2,
+       "voltas": 0,
+       "cargaTravada": true,
+       "fechada": false,
+       "evento": {
+        "tipo": "colocou",
+        "tamanho": "1/1",
+        "bica": 0
+       },
+       "seq": 1
+      },
+      {
+       "config": {
+        "pele": "broas-mesas",
+        "pecas": {
+         "quantidade": 5
+        },
+        "bicas": {
+         "quantidade": 4,
+         "ajustavel": false
+        },
+        "fatiador": {
+         "partes": [
+          2,
+          3,
+          4,
+          6,
+          8
+         ],
+         "denominadorMaximo": 8
+        }
+       },
+       "esteira": [
+        {
+         "tamanho": {
+          "n": 1,
+          "d": 1
+         },
+         "quantidade": 3
+        }
+       ],
+       "bicas": [
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        }
+       ],
+       "bandeja": [],
+       "lote": 1,
+       "pilha": "1/1",
+       "partes": 2,
+       "voltas": 0,
+       "cargaTravada": true,
+       "fechada": false,
+       "evento": {
+        "tipo": "colocou",
+        "tamanho": "1/1",
+        "bica": 1
+       },
+       "seq": 2
+      },
+      {
+       "config": {
+        "pele": "broas-mesas",
+        "pecas": {
+         "quantidade": 5
+        },
+        "bicas": {
+         "quantidade": 4,
+         "ajustavel": false
+        },
+        "fatiador": {
+         "partes": [
+          2,
+          3,
+          4,
+          6,
+          8
+         ],
+         "denominadorMaximo": 8
+        }
+       },
+       "esteira": [
+        {
+         "tamanho": {
+          "n": 1,
+          "d": 1
+         },
+         "quantidade": 2
+        }
+       ],
+       "bicas": [
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        }
+       ],
+       "bandeja": [],
+       "lote": 1,
+       "pilha": "1/1",
+       "partes": 2,
+       "voltas": 0,
+       "cargaTravada": true,
+       "fechada": false,
+       "evento": {
+        "tipo": "colocou",
+        "tamanho": "1/1",
+        "bica": 2
+       },
+       "seq": 3
+      },
+      {
+       "config": {
+        "pele": "broas-mesas",
+        "pecas": {
+         "quantidade": 5
+        },
+        "bicas": {
+         "quantidade": 4,
+         "ajustavel": false
+        },
+        "fatiador": {
+         "partes": [
+          2,
+          3,
+          4,
+          6,
+          8
+         ],
+         "denominadorMaximo": 8
+        }
+       },
+       "esteira": [
+        {
+         "tamanho": {
+          "n": 1,
+          "d": 1
+         },
+         "quantidade": 1
+        }
+       ],
+       "bicas": [
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        }
+       ],
+       "bandeja": [],
+       "lote": 1,
+       "pilha": "1/1",
+       "partes": 2,
+       "voltas": 0,
+       "cargaTravada": true,
+       "fechada": false,
+       "evento": {
+        "tipo": "colocou",
+        "tamanho": "1/1",
+        "bica": 3
+       },
+       "seq": 4
+      },
+      {
+       "config": {
+        "pele": "broas-mesas",
+        "pecas": {
+         "quantidade": 5
+        },
+        "bicas": {
+         "quantidade": 4,
+         "ajustavel": false
+        },
+        "fatiador": {
+         "partes": [
+          2,
+          3,
+          4,
+          6,
+          8
+         ],
+         "denominadorMaximo": 8
+        }
+       },
+       "esteira": [
+        {
+         "tamanho": {
+          "n": 1,
+          "d": 4
+         },
+         "quantidade": 4
+        }
+       ],
+       "bicas": [
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        },
+        {
+         "aberta": true,
+         "pecas": [
+          {
+           "tamanho": {
+            "n": 1,
+            "d": 1
+           },
+           "quantidade": 1
+          }
+         ]
+        }
+       ],
+       "bandeja": [],
+       "lote": 1,
+       "pilha": "1/4",
+       "partes": 4,
+       "voltas": 0,
+       "cargaTravada": true,
+       "fechada": false,
+       "evento": {
+        "tipo": "cortou",
+        "tamanho": "1/1",
+        "partes": 4,
+        "quantidade": 1,
+        "novo": "1/4"
+       },
+       "seq": 5
+      }
+     ]
+    },
+    "passo": {
+     "situacao": "ativo",
+     "ajuda": 0,
+     "tentativas": 0,
+     "junto": null,
+     "respostaCerta": null,
+     "lacunas": {},
+     "lacunasErradas": [],
+     "solucoes": [],
+     "ultimo": null,
+     "equivocosRegistrados": [],
+     "convite": null,
+     "inicio": {
+      "atual": {
+       "config": {
+        "pele": "broas-mesas",
+        "pecas": {
+         "quantidade": 5
+        },
+        "bicas": {
+         "quantidade": 4,
+         "ajustavel": false
+        },
+        "fatiador": {
+         "partes": [
+          2,
+          3,
+          4,
+          6,
+          8
+         ],
+         "denominadorMaximo": 8
+        }
+       },
+       "esteira": [
+        {
+         "tamanho": {
+          "n": 1,
+          "d": 1
+         },
+         "quantidade": 5
+        }
+       ],
+       "bicas": [
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        },
+        {
+         "aberta": true,
+         "pecas": []
+        }
+       ],
+       "bandeja": [],
+       "lote": 1,
+       "pilha": "1/1",
+       "partes": 2,
+       "voltas": 0,
+       "cargaTravada": false,
+       "fechada": false,
+       "evento": null,
+       "seq": 0
+      },
+      "passado": []
+     },
+     "retorno": null,
+     "respostas": 0,
+     "cumprido": false
+    },
+    "frases": {},
+    "palpites": {},
+    "concluida": false,
+    "equivocos": []
+   }
+  },
+  "desvio": null,
+  "concluidas": [
+   {
+    "atividade": "partilha.arco1.carga-igual",
+    "momento": 1760200058000
+   },
+   {
+    "atividade": "partilha.arco1.quantas-carrocas",
+    "momento": 1760200176000
+   },
+   {
+    "atividade": "partilha.arco1.sobrou",
+    "momento": 1760200306000
+   }
+  ],
+  "marcas": [],
+  "palpites": [
+   {
+    "atividade": "partilha.arco1.carga-igual",
+    "passo": "palpite",
+    "valor": "5",
+    "certo": "6",
+    "momento": 1760200004000
+   },
+   {
+    "atividade": "partilha.arco1.quantas-carrocas",
+    "passo": "palpite",
+    "valor": "4",
+    "certo": "5",
+    "momento": 1760200122000
+   },
+   {
+    "atividade": "partilha.arco1.sobrou",
+    "passo": "palpite",
+    "valor": "6",
+    "certo": "6",
+    "momento": 1760200240000
+   }
+  ]
+ },
+ "evidencias": [
+  {
+   "conceito": "div.partilha",
+   "tipo": "experimento",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.carga-igual",
+   "momento": 1760200026000
+  },
+  {
+   "conceito": "div.partilha",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.carga-igual",
+   "momento": 1760200030000
+  },
+  {
+   "conceito": "div.medida",
+   "tipo": "experimento",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.quantas-carrocas",
+   "momento": 1760200140000
+  },
+  {
+   "conceito": "div.medida",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.quantas-carrocas",
+   "momento": 1760200148000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "experimento",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760200246000
+  },
+  {
+   "conceito": "div.partilha",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760200246000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760200250000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760200258000
+  },
+  {
+   "conceito": "div.medida",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760200276000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760200276000
+  }
+ ],
+ "caderno": [
+  {
+   "id": "partilha.arco1.carga-igual",
+   "atividade": "partilha.arco1.carga-igual",
+   "titulo": "Repartir igualmente",
+   "frase": "24 sacas repartidas entre 4 carroças dão 6 em cada.",
+   "notacao": [
+    "24 ÷ 4 = 6",
+    "4 × 6 = 24"
+   ],
+   "volta": "18 ÷ 3 = 6",
+   "notas": [
+    "Então o número rasgado era 6. Trinta anos fazendo de cor.",
+    "Dividir reparte. Multiplicar junta de volta."
+   ],
+   "maquina": {
+    "config": {
+     "pele": "sacas-carrocas",
+     "pecas": {
+      "quantidade": 10
+     },
+     "carga": {
+      "minimo": 1,
+      "maximo": 40
+     },
+     "bicas": {
+      "quantidade": 4,
+      "ajustavel": true,
+      "vagas": 8
+     }
+    },
+    "esteira": [],
+    "bicas": [
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 6
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 6
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 6
+       }
+      ]
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     }
+    ],
+    "bandeja": [],
+    "lote": 6,
+    "pilha": null,
+    "partes": 2,
+    "voltas": 1,
+    "cargaTravada": true,
+    "fechada": true,
+    "evento": {
+     "tipo": "fechou",
+     "sobra": []
+    },
+    "seq": 5
+   },
+   "registradaEm": 1760200058000
+  },
+  {
+   "id": "partilha.arco1.quantas-carrocas",
+   "atividade": "partilha.arco1.quantas-carrocas",
+   "titulo": "Quantos cabem",
+   "frase": "30 sacas em grupos de 6 dão 5 carroças.",
+   "notacao": [
+    "30 ÷ 6 = 5",
+    "30 ÷ 5 = 6",
+    "5 × 6 = 30"
+   ],
+   "volta": "28 ÷ 7 = 4",
+   "notas": [
+    "A tabela que faltava era isto: três contas da mesma família.",
+    "Dividir também pergunta quantos grupos cabem."
+   ],
+   "maquina": {
+    "config": {
+     "pele": "sacas-carrocas",
+     "pecas": {
+      "quantidade": 10
+     },
+     "carga": {
+      "minimo": 1,
+      "maximo": 40
+     },
+     "bicas": {
+      "quantidade": 4,
+      "ajustavel": true,
+      "vagas": 8
+     }
+    },
+    "esteira": [],
+    "bicas": [
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     }
+    ],
+    "bandeja": [],
+    "lote": 4,
+    "pilha": null,
+    "partes": 2,
+    "voltas": 1,
+    "cargaTravada": true,
+    "fechada": true,
+    "evento": {
+     "tipo": "fechou",
+     "sobra": []
+    },
+    "seq": 5
+   },
+   "registradaEm": 1760200176000
+  },
+  {
+   "id": "partilha.arco1.sobrou",
+   "atividade": "partilha.arco1.sobrou",
+   "titulo": "O que sobra",
+   "frase": "26 sacas entre 4 carroças dão 6 em cada, e sobram 2.",
+   "notacao": [
+    "26 ÷ 4 = 6, resto 2",
+    "26 = 4 × 6 + 2"
+   ],
+   "volta": "23 ÷ 5 = 4, resto 3",
+   "notas": [
+    "O resto nunca vai para o rio. Às vezes vira mais uma carroça.",
+    "Resto menor que o divisor. Sempre."
+   ],
+   "maquina": {
+    "config": {
+     "pele": "sacas-carrocas",
+     "pecas": {
+      "quantidade": 10
+     },
+     "carga": {
+      "minimo": 1,
+      "maximo": 40
+     },
+     "bicas": {
+      "quantidade": 4,
+      "ajustavel": true,
+      "vagas": 8
+     }
+    },
+    "esteira": [],
+    "bicas": [
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     }
+    ],
+    "bandeja": [
+     {
+      "tamanho": {
+       "n": 1,
+       "d": 1
+      },
+      "quantidade": 3
+     }
+    ],
+    "lote": 4,
+    "pilha": null,
+    "partes": 2,
+    "voltas": 1,
+    "cargaTravada": true,
+    "fechada": true,
+    "evento": {
+     "tipo": "fechou",
+     "sobra": [
+      {
+       "tamanho": {
+        "n": 1,
+        "d": 1
+       },
+       "quantidade": 3
+      }
+     ]
+    },
+    "seq": 5
+   },
+   "registradaEm": 1760200306000
+  }
+ ],
+ "joias": {},
+ "museu": {},
+ "cenas": {},
+ "revisitas": {
+  "geradas": 0,
+  "atual": null
+ },
+ "relogio": {
+  "deslocamentoMs": 366000
+ },
+ "apresentacoes": {
+  "faixa": 1760200000000,
+  "mao-livre": 1760200000000
+ }
+}

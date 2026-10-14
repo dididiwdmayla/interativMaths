@@ -15,6 +15,8 @@ import { ATIVIDADES } from "@/conteudo/atividades";
 import { rotaDe, SONDAGEM_ATIVA } from "@/componentes/estado/catalogo";
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
+import { AREAS, nomeFormalDe } from "@/componentes/manual/dados";
+import { areaDoDistrito } from "@/nucleo/curriculo/formal";
 import { IconeVoltar } from "@/componentes/icones/IconeVoltar";
 import { CabecalhoJogo } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
@@ -68,7 +70,12 @@ export function Distrito() {
           </Link>
           <div className="min-w-0">
             <p className="m-0 truncate text-[13px] font-semibold text-tinta-suave">Arco 1 · O resto que ninguém repartia</p>
-            <h1 className="m-0 font-mao text-[38px] font-bold leading-none">A Partilha</h1>
+            <h1 className="m-0 flex flex-wrap items-baseline gap-x-2 font-mao text-[38px] font-bold leading-none">
+              A Partilha
+              <span className="font-sans text-[16px] font-bold text-tinta-suave" data-area="">
+                · {areaDoDistrito(AREAS, "partilha")?.area}
+              </span>
+            </h1>
           </div>
         </header>
 
@@ -78,7 +85,7 @@ export function Distrito() {
               <li key={c.id} className="list-none">
                 <Link
                   href={c.href}
-                  className="block max-w-[230px] rounded-md border-2 border-tinta bg-marca-texto px-3 py-2 anima-subir"
+                  className="block max-w-[230px] rounded-md border-2 border-contorno bg-marca-texto text-sobre-marca px-3 py-2 anima-subir"
                   style={{ transform: `rotate(${i % 2 === 0 ? -2 : 1.5}deg)` }}
                   data-chamado={c.id}
                 >
@@ -162,7 +169,7 @@ function Parada({ s, lado, atual }: { s: SituacaoMissao; lado: "esquerda" | "dir
   return (
     <li className={`flex w-full list-none items-center gap-3 lg:w-[640px] ${lado === "direita" ? "flex-row-reverse lg:self-end" : "lg:self-start"}`} data-estacao={m.id} data-status={s.status}>
       <div className="relative shrink-0" data-no="">
-        <div className={`relative z-[1] flex h-[72px] w-[72px] items-center justify-center rounded-2xl border-2 bg-folha ${porVir ? "border-dashed border-grafite" : "border-tinta bg-marca-texto-palido"}`}>
+        <div className={`relative z-[1] flex h-[72px] w-[72px] items-center justify-center rounded-2xl border-2 bg-folha ${porVir ? "border-dashed border-grafite" : "border-contorno bg-marca-texto-palido"}`}>
           <MiniaturaMissao numero={m.numero ?? 1} tamanho={46} lapis={porVir} />
         </div>
         {atual && (
@@ -176,6 +183,9 @@ function Parada({ s, lado, atual }: { s: SituacaoMissao; lado: "esquerda" | "dir
           Missão {m.numero} · {m.ideia}
         </p>
         <h2 className={`m-0 text-[17px] font-extrabold leading-tight ${porVir ? "text-tinta-suave" : ""}`}>{m.titulo}</h2>
+        <p className="m-0 text-[12px] font-semibold text-tinta-suave" data-conteudo-formal="">
+          {nomeFormalDe(m).conteudo}
+        </p>
         <p className="m-0 mt-0.5 text-[14px] font-medium text-tinta-suave">{estado}</p>
         {feita && (
           <span className="absolute bottom-3 right-4 rotate-[-6deg] font-mao text-[26px] font-bold leading-none text-verde-escuro" aria-hidden="true">

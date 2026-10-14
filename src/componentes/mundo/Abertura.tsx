@@ -68,7 +68,7 @@ export function Abertura() {
         )}
         {cena === 3 && (
           <Cena key="caderno">
-            <FolhaPautada titulo="Caderno" className="w-full max-w-[360px] rotate-[-1.5deg] rounded-[16px] text-left shadow-[0_4px_0_var(--tinta)]">
+            <FolhaPautada titulo="Caderno" className="w-full max-w-[360px] rotate-[-1.5deg] rounded-[16px] text-left shadow-[0_4px_0_var(--sombra)]">
               <div className="pt-[14px]">
                 <NotaDalia>Sigo o manual há trinta anos e nunca entendi metade.</NotaDalia>
                 <NotaDalia>Fica com o Caderno. Escreve o porquê.</NotaDalia>

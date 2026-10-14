@@ -34,7 +34,7 @@ export const AREAS: Record<IdDistrito, [number, number, number, number]> = {
   rua: [632, 440, 120, 160],
 };
 
-const tinta = { stroke: "var(--tinta)", strokeWidth: TRACO, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
+const tinta = { stroke: "var(--contorno)", strokeWidth: TRACO, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
 function Lapis({ lapis, children }: { lapis: boolean; children: ReactNode }) {
   return <g className={lapis ? "a-lapis" : undefined}>{children}</g>;
@@ -60,9 +60,9 @@ export function DesenhoPartilha({ girando = true, comNonio = true }: { girando?:
         <path d="M142 488 a10 9 0 0 1 20 0 Z" fill="var(--pao)" strokeWidth={2.2} />
         <path d="M168 488 a10 9 0 0 1 20 0 Z" fill="var(--pao)" strokeWidth={2.2} />
         <rect x={102} y={488} width={128} height={12} rx={6} fill="var(--folha)" />
-        <circle cx={112} cy={494} r={1.6} fill="var(--tinta)" />
-        <circle cx={166} cy={494} r={1.6} fill="var(--tinta)" />
-        <circle cx={220} cy={494} r={1.6} fill="var(--tinta)" />
+        <circle cx={112} cy={494} r={1.6} fill="var(--contorno)" />
+        <circle cx={166} cy={494} r={1.6} fill="var(--contorno)" />
+        <circle cx={220} cy={494} r={1.6} fill="var(--contorno)" />
       </g>
       {comNonio && <NonioNoMapa x={270} y={500} />}
     </g>
@@ -72,17 +72,17 @@ export function DesenhoPartilha({ girando = true, comNonio = true }: { girando?:
 /** O Nônio de pé, ao lado da esteira (desenho fixo, sem expressão). */
 function NonioNoMapa({ x, y }: { x: number; y: number }) {
   return (
-    <g transform={`translate(${x} ${y})`} stroke="var(--tinta)" strokeWidth={2.4} strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
+    <g transform={`translate(${x} ${y})`} stroke="var(--nonio-traco)" strokeWidth={2.4} strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
       <line x1={28} y1={-28} x2={34} y2={-37} />
       <circle cx={35} cy={-39} r={4} fill="var(--marca-texto)" />
-      <rect x={15} y={6} width={5} height={9} rx={2.5} fill="var(--caneta-clara)" />
-      <rect x={36} y={6} width={5} height={9} rx={2.5} fill="var(--caneta-clara)" />
-      <path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--caneta)" />
-      <path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--folha)" />
-      <rect x={-3} y={0} width={62} height={8} rx={4} fill="var(--caneta-clara)" />
-      <circle cx={22} cy={-8} r={1.5} fill="var(--tinta)" stroke="none" />
-      <circle cx={34} cy={-8} r={1.5} fill="var(--tinta)" stroke="none" />
-      <path d="M25 -4.5 Q28 -2 31 -4.5" fill="none" strokeWidth={1.8} />
+      <rect x={15} y={6} width={5} height={9} rx={2.5} fill="var(--nonio-aba)" />
+      <rect x={36} y={6} width={5} height={9} rx={2.5} fill="var(--nonio-aba)" />
+      <path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--nonio-cupula)" />
+      <path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--nonio-rosto)" />
+      <rect x={-3} y={0} width={62} height={8} rx={4} fill="var(--nonio-aba)" />
+      <circle cx={22} cy={-8} r={1.5} fill="var(--nonio-olho)" stroke="none" />
+      <circle cx={34} cy={-8} r={1.5} fill="var(--nonio-olho)" stroke="none" />
+      <path d="M25 -4.5 Q28 -2 31 -4.5" fill="none" stroke="var(--nonio-olho)" strokeWidth={1.8} />
     </g>
   );
 }
@@ -163,9 +163,9 @@ export function DesenhoFeira({ lapis }: { lapis: boolean }) {
         <path d="M672 238 V282 M688 238 V282 M704 238 V282" fill="none" strokeWidth={1.8} />
         <path d="M688 212 V200 l10 4 l-10 4" fill="var(--marca-texto)" />
         <rect x={724} y={258} width={22} height={22} rx={4} fill="var(--folha)" />
-        <circle cx={730} cy={264} r={1.8} fill="var(--tinta)" stroke="none" />
-        <circle cx={735} cy={269} r={1.8} fill="var(--tinta)" stroke="none" />
-        <circle cx={740} cy={274} r={1.8} fill="var(--tinta)" stroke="none" />
+        <circle cx={730} cy={264} r={1.8} fill="var(--contorno)" stroke="none" />
+        <circle cx={735} cy={269} r={1.8} fill="var(--contorno)" stroke="none" />
+        <circle cx={740} cy={274} r={1.8} fill="var(--contorno)" stroke="none" />
       </g>
     </Lapis>
   );

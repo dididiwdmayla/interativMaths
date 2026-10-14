@@ -25,31 +25,31 @@ function Rosto({ expressao, traco }: { expressao: ExpressaoNonio; traco: number 
     case "neutro":
       return (
         <>
-          <circle cx={22} cy={-8} r={1.6} fill="var(--tinta)" stroke="none" />
-          <circle cx={34} cy={-8} r={1.6} fill="var(--tinta)" stroke="none" />
+          <circle cx={22} cy={-8} r={1.6} fill="var(--nonio-olho)" stroke="none" />
+          <circle cx={34} cy={-8} r={1.6} fill="var(--nonio-olho)" stroke="none" />
           <path d="M25 -4.5 Q28 -2 31 -4.5" fill="none" strokeWidth={traco * 0.75} />
         </>
       );
     case "atento":
       return (
         <>
-          <circle cx={22} cy={-8.5} r={2.3} fill="var(--tinta)" stroke="none" />
-          <circle cx={34} cy={-8.5} r={2.3} fill="var(--tinta)" stroke="none" />
+          <circle cx={22} cy={-8.5} r={2.3} fill="var(--nonio-olho)" stroke="none" />
+          <circle cx={34} cy={-8.5} r={2.3} fill="var(--nonio-olho)" stroke="none" />
         </>
       );
     case "medindo":
       return (
         <>
-          <circle cx={19.5} cy={-8} r={1.6} fill="var(--tinta)" stroke="none" />
-          <circle cx={31.5} cy={-8} r={1.6} fill="var(--tinta)" stroke="none" />
-          <circle cx={25.5} cy={-4} r={1.3} fill="var(--tinta)" stroke="none" />
+          <circle cx={19.5} cy={-8} r={1.6} fill="var(--nonio-olho)" stroke="none" />
+          <circle cx={31.5} cy={-8} r={1.6} fill="var(--nonio-olho)" stroke="none" />
+          <circle cx={25.5} cy={-4} r={1.3} fill="var(--nonio-olho)" stroke="none" />
         </>
       );
     case "duvida":
       return (
         <>
-          <circle cx={24} cy={-10.5} r={1.6} fill="var(--tinta)" stroke="none" />
-          <circle cx={36} cy={-10.5} r={1.6} fill="var(--tinta)" stroke="none" />
+          <circle cx={24} cy={-10.5} r={1.6} fill="var(--nonio-olho)" stroke="none" />
+          <circle cx={36} cy={-10.5} r={1.6} fill="var(--nonio-olho)" stroke="none" />
           <path d="M26.5 -4.5 H32.5" fill="none" strokeWidth={traco * 0.8} />
         </>
       );
@@ -58,7 +58,7 @@ function Rosto({ expressao, traco }: { expressao: ExpressaoNonio; traco: number 
         <>
           <path d="M19 -8 q2.5 -3.2 5 0" fill="none" strokeWidth={traco * 0.7} />
           <path d="M32 -8 q2.5 -3.2 5 0" fill="none" strokeWidth={traco * 0.7} />
-          <path d="M24.5 -5.5 Q28 -1 31.5 -5.5 Z" fill="var(--tinta)" strokeWidth={traco * 0.5} />
+          <path d="M24.5 -5.5 Q28 -1 31.5 -5.5 Z" fill="var(--nonio-olho)" strokeWidth={traco * 0.5} />
         </>
       );
     case "quieto":
@@ -76,6 +76,7 @@ export function Nonio({
   tamanho = 64,
   rotulo = "Nônio",
   pes = true,
+  vivo = false,
 }: {
   expressao?: ExpressaoNonio;
   /** Largura em px. */
@@ -83,6 +84,8 @@ export function Nonio({
   rotulo?: string;
   /** Sem os pezinhos (o Nônio do cabeçalho). */
   pes?: boolean;
+  /** A antena balança devagar de vez em quando (a bolinha). Com movimento reduzido, fica parada. */
+  vivo?: boolean;
 }) {
   // Desenho pequeno pede traço mais grosso para continuar legível.
   const traco = tamanho <= 40 ? 2.8 : tamanho <= 80 ? 2.4 : 2.1;
@@ -97,7 +100,7 @@ export function Nonio({
       aria-label={rotulo || undefined}
       aria-hidden={rotulo ? undefined : true}
       data-expressao={expressao}
-      stroke="var(--tinta)"
+      stroke="var(--nonio-traco)"
       strokeWidth={traco}
       strokeLinejoin="round"
       strokeLinecap="round"
@@ -110,22 +113,24 @@ export function Nonio({
       </g>
       <g style={{ transform: `rotate(${expressao === "duvida" ? -6 : 0}deg)`, transformOrigin: "28px 8px", transition: transicao }}>
         {/* Antena com a bolinha-ponteiro */}
-        <g style={{ transform: `rotate(${ANTENA[expressao]}deg)`, transformOrigin: "28px -28px", transition: transicao }}>
-          <line x1={28} y1={-28} x2={28} y2={-38.5} />
-          <circle cx={28} cy={-41} r={4} fill="var(--marca-texto)" />
-          <circle cx={28} cy={-41} r={4} fill="var(--folha)" className="camada" style={{ opacity: expressao === "quieto" ? 1 : 0 }} />
+        <g className={vivo ? "nonio-antena-viva" : undefined}>
+          <g style={{ transform: `rotate(${ANTENA[expressao]}deg)`, transformOrigin: "28px -28px", transition: transicao }}>
+            <line x1={28} y1={-28} x2={28} y2={-38.5} />
+            <circle cx={28} cy={-41} r={4} fill="var(--marca-texto)" />
+            <circle cx={28} cy={-41} r={4} fill="var(--nonio-rosto)" className="camada" style={{ opacity: expressao === "quieto" ? 1 : 0 }} />
+          </g>
         </g>
         {pes && (
           <>
-            <rect x={15} y={6} width={5} height={9} rx={2.5} fill="var(--caneta-clara)" />
-            <rect x={36} y={6} width={5} height={9} rx={2.5} fill="var(--caneta-clara)" />
+            <rect x={15} y={6} width={5} height={9} rx={2.5} fill="var(--nonio-aba)" />
+            <rect x={36} y={6} width={5} height={9} rx={2.5} fill="var(--nonio-aba)" />
           </>
         )}
-        <path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--caneta)" />
-        <path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--folha)" />
-        <rect x={-3} y={0} width={62} height={8} rx={4} fill="var(--caneta-clara)" />
+        <path d="M0 0 A28 28 0 0 1 56 0 Z" fill="var(--nonio-cupula)" />
+        <path d="M10 0 A18 18 0 0 1 46 0 Z" fill="var(--nonio-rosto)" />
+        <rect x={-3} y={0} width={62} height={8} rx={4} fill="var(--nonio-aba)" />
         {EXPRESSOES.map((e) => (
-          <g key={e} className="camada" style={{ opacity: e === expressao ? 1 : 0 }} data-rosto={e === expressao ? e : undefined}>
+          <g key={e} className="camada" stroke="var(--nonio-olho)" style={{ opacity: e === expressao ? 1 : 0 }} data-rosto={e === expressao ? e : undefined}>
             <Rosto expressao={e} traco={traco} />
           </g>
         ))}

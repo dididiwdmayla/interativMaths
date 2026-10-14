@@ -45,6 +45,7 @@ export const ECO_ARCO_1: Atividade = {
       aceitaEquivalente: true,
       demonstracao: [{ tipo: "partes", valor: 5 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 3 }, { tipo: "repartir" }],
       explicacao: "Cada tonel em cinco partes: quinze partes, três para cada casa. 3 ÷ 5 = 3/5, como as broas.",
+      recados: { acerto: "Três quintos de tonel para cada casa." },
       dicas: [
         { texto: "É a mesma conta das broas da padaria, com água.", alvo: "fatiador" },
         { texto: "Em cima, o que se reparte; embaixo, entre quantos." },

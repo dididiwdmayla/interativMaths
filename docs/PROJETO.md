@@ -18,8 +18,13 @@ Jovens e adultos recuperando base, gente que acredita "não ter base".
 - Erro é um evento da máquina (ela engasga, a bandeja apara) e tudo pode ser desfeito.
 - Acertar fica verde e diz o que ficou certo. Não acertar ainda fica vermelho por um instante, com
   o porquê e o próximo passo, e some no primeiro gesto. Nunca "errado", nunca X, nunca risco.
-- Toda tela diz, com verbo, o que fazer agora; o Nônio está sempre na missão, sem precisar abrir
-  nada.
+- Toda tela diz, com verbo, o que fazer agora; o Nônio está sempre na missão, uma bolinha no
+  canto da máquina que avisa por recados curtos e abre a janelinha quando tocada.
+- O nome formal está à vista sem assustar: cada missão diz a área e o conteúdo ("Missão 4 ·
+  Aritmética · Frações"), como na escola, e nunca o ano escolar, a série ou o código da BNCC (os
+  códigos carregam o ano, e o público carrega vergonha da escola).
+- A conta aparece depois da descoberta: o rascunho a lápis anota cada gesto na máquina; no
+  acerto, a conta passada a caneta, com o nome de cada termo.
 - "Não sei ainda" é resposta legítima em qualquer pergunta.
 - Texto adulto, seco e caloroso, em frases curtas. Nada infantilizado, nada de exclamação.
 
@@ -65,7 +70,17 @@ do Caderno é o passado a limpo, onde a matemática formal fica registrada.
 
 **Lugares nesta versão:** A Partilha (Arco 1 jogável); O Contrapeso, Pátio dos Sinais,
 Observatório, Estaleiro das Formas e Feira do Acaso (em projeto); a Planta; o Caderno; o Relicário
-(vitrine); o Museu das Descobertas (uma exposição); a Rua (uma cena).
+(vitrine); o Museu das Descobertas (uma exposição); a Rua (uma cena); o Manual.
+
+## O Manual
+
+O manual do Engenho, de que a Dália só conhece as páginas rasgadas, volta a ficar inteiro aos
+poucos: cada página é um conceito, impressa (não à mão, como o Caderno), com o nome de escola, a
+frase, como se escreve, a máquina parada, o que vale sempre, os cuidados e os nomes dos termos.
+A página volta quando o jogador descobre o porquê na máquina (página no Caderno ou conceito
+dominado), e a missão avisa: "Uma página do Manual voltou". Antes disso, só os nomes ficam à mão,
+para quem quiser consultar: a descoberta continua sendo do jogador. Dentro da missão, o livro no
+cabeçalho abre a referência dela, com os nomes e as páginas que ajudam ali.
 
 ## Arco 1 de A Partilha: "O resto que ninguém repartia"
 

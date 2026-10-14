@@ -1,16 +1,17 @@
 "use client";
 
 /**
- * A parte da vitrine que é da v0.3: a faixa do Nônio em todos os estados, os selos, a faixa do
- * objetivo, o bilhete da aposta, o menu de corte e as folhas (etapas, conversa, apresentação).
+ * A parte da vitrine que é do guia: o Nônio flutuante (a bolinha nos estados, o recado, a
+ * janelinha), os selos, a faixa do objetivo, o bilhete da aposta, o menu de corte e as folhas.
  * Tudo com dados de exemplo, sem missão aberta.
  */
 import { useState, type ReactNode } from "react";
 import { MISSAO_4 } from "@/conteudo/missoes/m4-pao-nao-e-saca";
 import { PERGUNTAS_PADRAO } from "@/conteudo/tutor";
 import { MenuCorte } from "@/componentes/maquinas/MenuCorte";
-import { FaixaNonio } from "@/componentes/nonio/FaixaNonio";
-import { ConversaNonio } from "@/componentes/nonio/ConversaNonio";
+import { BolhaNonio } from "@/componentes/nonio/BolhaNonio";
+import { RecadoNonio } from "@/componentes/nonio/RecadoNonio";
+import { JanelaNonio } from "@/componentes/nonio/JanelaNonio";
 import { Apresentacao } from "@/componentes/nonio/Apresentacao";
 import type { MensagemTela } from "@/componentes/nonio/useConversa";
 import { Bilhete } from "@/componentes/missao/Aposta";
@@ -40,53 +41,34 @@ export function VitrineGuia({ Secao }: { Secao: (p: { titulo: string; children: 
   const [folha, setFolha] = useState<"etapas" | "conversa" | "apresentacao" | null>(null);
   return (
     <>
-      <Secao titulo="Faixa do Nônio">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2" data-vitrine="faixa">
-          <Caso rotulo="Neutra: lê a máquina">
-            <FaixaNonio
-              fala={{ id: "v-neutra", texto: "Cinco broas, quatro mesas. A quinta não cabe numa volta de inteiras.", categoria: "passo" }}
-              selo={null}
-              retorno="neutro"
-              expressao="atento"
-              ajuda={{ rotulo: "Me ajuda", onPedir: nada, oferta: false }}
-              onPerguntar={nada}
-            />
-          </Caso>
-          <Caso rotulo="Acertou: verde, com o que ficou certo">
-            <FaixaNonio
-              fala={{ id: "v-acertou", texto: "Uma broa e um quarto em cada mesa, e nada sobrou.", categoria: "retorno" }}
-              selo="acertou"
-              retorno="acertou"
-              expressao="satisfeito"
-            />
-          </Caso>
-          <Caso rotulo="Ainda não: passageiro, com o porquê e o que tentar">
-            <FaixaNonio
-              fala={{ id: "v-ainda", texto: "Assim cada mesa ganharia mais de uma broa, e só há duas para três. Quem vai em cima?", categoria: "retorno" }}
-              selo="ainda-nao"
-              retorno="ainda-nao"
-              expressao="medindo"
-              ajuda={{ rotulo: "Me ajuda", onPedir: nada, oferta: false }}
-            />
-          </Caso>
-          <Caso rotulo="Pedindo ajuda: a oferta acende a bolinha">
-            <FaixaNonio
-              fala={{ id: "v-oferta", texto: "Quer uma medida? Eu aponto onde olhar.", categoria: "oferta" }}
-              selo={null}
-              retorno="neutro"
-              expressao="atento"
-              ajuda={{ rotulo: "Mais ajuda", onPedir: nada, oferta: true }}
-              apontando
-            />
-          </Caso>
-          <Caso rotulo="Aposta: o bilhete e a faixa">
-            <div className="flex flex-col gap-3">
-              <Bilhete texto="Aposto que 2/8 é mais que 1/4. Afinal, dois é mais que um." />
-              <FaixaNonio fala={{ id: "v-aposta", texto: "Fiz uma aposta. Mostre na máquina se eu tenho razão.", categoria: "passo" }} selo={null} retorno="neutro" expressao="atento" />
+      <Secao titulo="O Nônio flutuante">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2" data-vitrine="bolha">
+          <Caso rotulo="A bolinha: neutra, com fala nova, satisfeita, quieta">
+            <div className="flex flex-wrap items-center gap-4 rounded-xl border-2 border-dashed border-grafite bg-folha p-4">
+              <BolhaNonio expressao="atento" novidade={false} onAbrir={nada} />
+              <BolhaNonio expressao="neutro" novidade onAbrir={nada} />
+              <BolhaNonio expressao="satisfeito" novidade={false} onAbrir={nada} />
+              <BolhaNonio expressao="quieto" novidade onAbrir={nada} />
             </div>
           </Caso>
-          <Caso rotulo="Compacta, sobre a folha que sobe">
-            <FaixaNonio fala={{ id: "v-compacta", texto: "Toque numa cota e depois numa lacuna.", categoria: "passo" }} selo={null} retorno="neutro" expressao="neutro" compacta />
+          <Caso rotulo="O recado: some no primeiro gesto ou depois de uns segundos">
+            <div className="flex flex-col items-end gap-3 rounded-xl border-2 border-dashed border-grafite bg-folha p-4" data-vitrine="recado">
+              <div className="nonio-canto nonio-canto-vitrine">
+                <RecadoNonio texto="Sobrou uma broa." selo={null} onTocar={nada} />
+                <BolhaNonio expressao="atento" novidade={false} onAbrir={nada} />
+              </div>
+              <div className="nonio-canto nonio-canto-vitrine">
+                <RecadoNonio texto="Fechou, sem sobra." selo="acertou" onTocar={nada} />
+                <BolhaNonio expressao="satisfeito" novidade={false} onAbrir={nada} />
+              </div>
+              <div className="nonio-canto nonio-canto-vitrine">
+                <RecadoNonio texto="Assim cada mesa ganharia mais de uma broa." selo="ainda-nao" onTocar={nada} />
+                <BolhaNonio expressao="medindo" novidade={false} onAbrir={nada} />
+              </div>
+            </div>
+          </Caso>
+          <Caso rotulo="Aposta: o bilhete">
+            <Bilhete texto="Aposto que 2/8 é mais que 1/4. Afinal, dois é mais que um." />
           </Caso>
         </div>
       </Secao>
@@ -96,7 +78,7 @@ export function VitrineGuia({ Secao }: { Secao: (p: { titulo: string; children: 
           <Selo tipo="acertou" />
           <Selo tipo="ainda-nao" />
         </div>
-        <div className="flex flex-col gap-3 rounded-xl border-2 border-tinta bg-folha" data-vitrine="objetivo">
+        <div className="flex flex-col gap-3 rounded-xl border-2 border-contorno bg-folha" data-vitrine="objetivo">
           <Objetivo etiqueta="Objetivo" instrucao="Reparta as 5 broas entre as 4 mesas, sem sobrar nada." gesto={{ texto: "Agora: ponha uma broa em cada mesa, ou use Repartir.", tom: "gesto" }} />
           <Objetivo etiqueta="Pergunta" instrucao="Monte com as fichas o pedaço que cada mesa recebe: 2 broas, 3 mesas." gesto={{ texto: "Agora: troque as fichas e confira de novo.", tom: "tentar" }} />
           <Objetivo etiqueta="Aposta do Nônio" instrucao="Mostre na máquina se ele tem razão." gesto={null} />
@@ -119,8 +101,8 @@ export function VitrineGuia({ Secao }: { Secao: (p: { titulo: string; children: 
           <button type="button" className="botao-secundario" onClick={() => setFolha("etapas")} data-acao="vitrine-etapas">
             Abrir a folha de etapas
           </button>
-          <button type="button" className="botao-secundario" onClick={() => setFolha("conversa")} data-acao="vitrine-conversa">
-            Abrir a conversa
+          <button type="button" className="botao-secundario" onClick={() => setFolha("conversa")} data-acao="vitrine-janela">
+            Abrir a janelinha
           </button>
           <button type="button" className="botao-secundario" onClick={() => setFolha("apresentacao")} data-acao="vitrine-apresentacao">
             Ver uma apresentação
@@ -130,18 +112,19 @@ export function VitrineGuia({ Secao }: { Secao: (p: { titulo: string; children: 
 
       {folha === "etapas" && <FolhaEtapas passos={MISSAO_4.passos} atual={3} onFechar={() => setFolha(null)} />}
       {folha === "conversa" && (
-        <ConversaNonio
-          mensagens={CONVERSA_EXEMPLO}
-          esperando={false}
-          sugestoes={PERGUNTAS_PADRAO.operar}
-          fechada={false}
-          aviso={false}
-          onEntendi={nada}
-          onEnviar={nada}
+        <JanelaNonio
+          fala={{ id: "v-janela", texto: "Sobrou uma broa. Pão a gente corta: em quantas partes, para as quatro mesas ficarem iguais?" }}
+          selo={null}
+          expressao="atento"
+          apontando="Apontando a pilha na esteira"
+          antes={[{ id: "v-antes", texto: "Pão não é saca: o que sobra dá para cortar. Comece como com as sacas." }]}
+          ajuda={{ rotulo: "Me ajuda", onPedir: nada, nivel: 1, oferta: false }}
+          caso={null}
+          conversa={{ mensagens: CONVERSA_EXEMPLO, esperando: false, sugestoes: PERGUNTAS_PADRAO.operar, fechada: false, aviso: false, onEntendi: nada, onEnviar: nada }}
           onFechar={() => setFolha(null)}
         />
       )}
-      {folha === "apresentacao" && <Apresentacao id="faixa" onEntendi={() => setFolha(null)} />}
+      {folha === "apresentacao" && <Apresentacao id="bolha" onEntendi={() => setFolha(null)} />}
     </>
   );
 }

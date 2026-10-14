@@ -10,7 +10,7 @@ export const ALTURA_RECEPTOR = 22;
 export function Receptor({ forma, cx, y, largura }: { forma: FormaReceptor; cx: number; y: number; largura: number }) {
   const w = Math.max(24, Math.min(largura - 12, 72));
   const x0 = cx - w / 2;
-  const traco = { stroke: "var(--tinta)", strokeWidth: TRACO, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
+  const traco = { stroke: "var(--contorno)", strokeWidth: TRACO, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
   switch (forma) {
     case "carroca":
       return (
@@ -20,7 +20,7 @@ export function Receptor({ forma, cx, y, largura }: { forma: FormaReceptor; cx: 
           {[x0 + w * 0.24, x0 + w * 0.76].map((rx) => (
             <g key={rx}>
               <circle cx={rx} cy={y + 15} r={5.5} fill="var(--folha)" />
-              <circle cx={rx} cy={y + 15} r={1.4} fill="var(--tinta)" stroke="none" />
+              <circle cx={rx} cy={y + 15} r={1.4} fill="var(--contorno)" stroke="none" />
             </g>
           ))}
         </g>

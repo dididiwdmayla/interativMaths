@@ -4,6 +4,8 @@ import { ancestrais, dependentesDe, indexarConceitos, ordemTopologica, type Conc
 const c = (id: string, dependeDe: string[] = []): Conceito => ({
   id,
   nome: id,
+  formal: id,
+  formalCurto: id,
   linha: "",
   dependeDe,
   situacao: "ativo",

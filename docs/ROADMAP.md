@@ -84,10 +84,34 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
     ferramenta em destaque e a máquina cobria o "Entendi") e vai para o lado da ferramenta quando há
     espaço. Gesto antes de qualquer volta, quando as inteiras não dão uma para cada: "toque numa
     peça e escolha em quantas partes cortar" (não fala em sobra).
+- v0.4 — **Nônio flutuante, contas visíveis, o Manual e o modo escuro** (referência nova em
+  `docs/referencia-visual/v04.html`):
+  - Base: papéis da tinta separados (`--contorno`, `--sombra`, `sobre-*`, tokens do Nônio) sem
+    mudar o claro (capturas iguais pixel a pixel); `--tinta` proibida em borda, traço e sombra
+    (higiene); progresso v3 (preferência `aparencia`) com migração testada contra um progresso v2.
+  - Nônio flutuante: a faixa saiu; bolinha de 58 px no canto da máquina, recado de até 60
+    caracteres que some no gesto seguinte ou em 6 s, ponto de fala nova, janelinha com a fala,
+    "Antes, neste passo", Me ajuda em quatro degraus com o caso parecido dentro e "Pergunte por
+    escrito"; a máquina ficou maior e o canto dela livre; apresentação `bolha`.
+  - Rascunho a lápis (uma linha por gesto que mexe na carga) e conta passada a caneta no acerto,
+    com o nome dos termos, em todas as formas (partilha, medida, resto, fração, transporte,
+    comparação, parte); conta armada na Missão 3 e no Caderno; tudo verdadeiro com `Racional`.
+  - Nome formal (área e conteúdo, nunca ano escolar) no cabeçalho da missão, no distrito, no fim
+    da missão, no Caderno e na Planta. O Manual: `/manual` e `/manual/[pagina]`, cinco páginas que
+    se restauram com a descoberta, as outras a lápis; "Uma página do Manual voltou" no fim da
+    missão; o livro no cabeçalho abre a referência da missão.
+  - Modo escuro: a mesma tabela com a luz apagada (objetos não invertem), sem piscar ao abrir, lua
+    ou sol no topo, Aparência no Menu; a degustação segue o aparelho e aceita `?tema=`.
+  - Tela cheia (topo, Menu e degustação, onde o navegador deixa) e app instalável (manifesto,
+    ícones de 192, 512 e mascarável, ícone da tela de início do iPhone); no iPhone, o Menu ensina
+    a instalar.
+  - Fecho: contador de joias só depois da primeira; o gesto da notação diz "toque em Continuar"
+    depois de comprimir; `/lab/vitrine` com a bolinha, o recado, a janelinha, o rascunho, as duas
+    contas, uma página do Manual e tudo no escuro; documentos; capturas em `docs/capturas/v0.4/`.
 
 ## Parcialmente implementado
-- Pergunte ao Nônio: verificado com simulação e testes da rota; **não exercitado contra a API real
-  nesta sessão** (sem chave no ambiente). A primeira prévia com `ANTHROPIC_API_KEY` na Vercel é o
+- Pergunte por escrito (a conversa com o Nônio): verificado com simulação e testes da rota; **não
+  exercitado contra a API real nesta sessão** (sem chave no ambiente). A primeira prévia com `ANTHROPIC_API_KEY` na Vercel é o
   teste de verdade (latência, tom, guardas com respostas reais).
 - Revisitas (atividades geradas) ficam sem a conversa: o servidor só monta contexto de atividades
   do catálogo.
@@ -124,6 +148,12 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   livre.
 
 ## Pendências
+- Tela cheia no celular de verdade: verificada no Chromium do computador (botão, troca de estado,
+  some no iframe sem `allow`); falta conferir no Android e o app instalado no iPhone.
+- Degustação no celular em pé: com livro, tela cheia e etapas no cabeçalho, o título encurta
+  ("Três broas, qu..."). Se incomodar, a tela cheia pode ir para o fim da degustação.
+- Planta: o nome formal embaixo de cada etiqueta fica apertado no celular ("Divisão: quantos
+  cabem" encosta na vizinha); legível, mas um respiro maior entre colunas ajudaria.
 - Previsão: o resultado ("Você disse... A máquina deu") aparece antes de a demonstração terminar,
   porque o painel começa pronto (já era assim na Missão 4). Na degustação, esperar a máquina
   deixaria a descoberta mais forte; é mudança de comportamento das missões, então ficou anotada.

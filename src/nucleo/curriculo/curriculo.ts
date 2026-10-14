@@ -17,6 +17,15 @@ export type SituacaoNoJogo =
 export interface Conceito {
   readonly id: IdConceito;
   readonly nome: string;
+  /** O nome de escola, para o Manual e o cabeçalho: "Divisão exata: repartir em partes iguais". */
+  readonly formal: string;
+  /** O mesmo, curto, para caber numa linha: "Divisão exata". */
+  readonly formalCurto: string;
+  /**
+   * Quando dois conceitos de uma atividade têm o mesmo curto, o aspecto os separa na etiqueta:
+   * "Frações: parte e divisão".
+   */
+  readonly aspecto?: string;
   /** O que ele é, em uma linha. */
   readonly linha: string;
   readonly dependeDe: readonly IdConceito[];

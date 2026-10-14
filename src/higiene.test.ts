@@ -29,6 +29,25 @@ describe("higiene", () => {
     expect(infratores).toEqual([]);
   });
 
+  it("borda, traço e sombra não usam --tinta: são --contorno e --sombra (a tinta é só texto)", () => {
+    const papelErrado = [
+      /box-shadow:[^;]*var\(--tinta\)/,
+      /^\s*border(-[a-z]+)*:[^;]*var\(--tinta\)/m,
+      /\bstroke(=|:\s*|=\{)["'`]?var\(--tinta\)/,
+      /\bborder-tinta\b/,
+      /shadow-\[[^\]]*--tinta[^\]]*\]/,
+      /\boutline:[^;]*var\(--tinta\)/,
+    ];
+    const infratores = todos
+      .filter((f) => /\.(ts|tsx|css)$/.test(f))
+      .filter((f) => {
+        const texto = readFileSync(f, "utf8");
+        return papelErrado.some((r) => r.test(texto));
+      })
+      .map((f) => relative(RAIZ, f));
+    expect(infratores).toEqual([]);
+  });
+
   it("nenhum emoji no código, no conteúdo ou na interface", () => {
     const emoji = /\p{Extended_Pictographic}/u;
     const infratores = todos

@@ -1,5 +1,5 @@
 /**
- * O progresso salvo pela v0.2 (versão 1) abre na v0.3. A amostra foi gravada pelo código da v0.2:
+ * O progresso salvo pela v0.2 (versão 1) abre na v0.3 (e na v0.4). A amostra foi gravada pelo código da v0.2:
  * missão 1 concluída com página no Caderno, missão 4 parada no meio e o eco começado.
  */
 import { readFileSync } from "node:fs";
@@ -26,7 +26,7 @@ describe("progresso v1 (v0.2) na v0.3", () => {
     const { progresso, aviso } = abrir();
     expect(aviso).toBeNull();
     expect(progresso.versao).toBe(VERSAO_PROGRESSO);
-    expect(progresso.preferencias).toEqual({ ...original.preferencias, conversa: "ligada" });
+    expect(progresso.preferencias).toEqual({ ...original.preferencias, conversa: "ligada", aparencia: "automatico" });
     expect(progresso.apresentacoes).toEqual({});
     expect(progresso.evidencias).toEqual(original.evidencias);
     expect(progresso.caderno).toEqual(original.caderno);

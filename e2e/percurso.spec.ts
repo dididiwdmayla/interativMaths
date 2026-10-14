@@ -54,9 +54,16 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await expect(v(page, "[data-estacao='partilha.arco1.carga-igual']")).toHaveAttribute("data-status", "disponivel");
   await tocar(page, "[data-estacao='partilha.arco1.carga-igual'] [data-acao=entrar]");
 
-  // Missão 1. A faixa do Nônio se apresenta na primeira vez.
+  // Missão 1. A bolinha do Nônio se apresenta na primeira vez.
   await passo(page, "pedido");
-  await entender(page, "faixa");
+  await entender(page, "bolha");
+  // O nome formal no cabeçalho, e o livro abre a referência da missão.
+  await expect(v(page, "[data-lugar]")).toContainText("Missão 1");
+  await expect(v(page, "[data-lugar]")).toContainText("Divisão exata");
+  await tocar(page, "[data-referencia-missao=botao]");
+  await expect(v(page, "[data-referencia-missao=folha]")).toContainText("Dividendo");
+  await expect(v(page, "[data-referencia-missao=folha] [data-pagina-manual='div.partilha']")).toHaveAttribute("data-restaurada", "nao");
+  await tocar(page, "[data-referencia-missao=folha] button[aria-label='Fechar a referência']");
   await tocar(page, "[data-acao=seguir]");
   await passo(page, "palpite");
   await mais(page, "resposta", 4);
@@ -71,12 +78,19 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   }
   await expect(v(page, "[data-tela=missao][data-situacao=vencido]")).toBeVisible();
   await expect(v(page, "[data-tela=missao]")).toHaveAttribute("data-retorno", "acertou");
+  // O rascunho a lápis: a rodada feita à mão vira uma linha só. O passo da mão não tem conta.
+  await expect(v(page, "[data-rascunho]")).toContainText("À mão: 1 saca em cada carroça · 4 × 1 = 4");
+  await expect(page.locator("[data-conta]")).toHaveCount(0);
   await tocar(page, "[data-acao=seguir]");
 
   await passo(page, "repartir");
-  // Sem chave no servidor, a conversa não aparece: a faixa tem só o Me ajuda.
-  await expect(v(page, "[data-acao=nonio]")).toBeVisible();
-  await expect(page.locator("[data-acao=perguntar]")).toHaveCount(0);
+  // A bolinha no lugar da faixa. Sem chave no servidor, a janelinha abre sem o Pergunte por escrito.
+  await expect(page.locator("[data-faixa-nonio]")).toHaveCount(0);
+  await tocar(page, "[data-bolha-nonio]");
+  await expect(v(page, "[data-janela-nonio] [data-acao=nonio]")).toBeVisible();
+  await expect(page.locator("[data-conversa=secao]")).toHaveCount(0);
+  await tocar(page, "[data-acao=fechar-janela]");
+  await expect(page.locator("[data-janela-nonio]")).toHaveCount(0);
 
   // Um fechamento desigual: "ainda não", passageiro; o gesto seguinte volta a neutro.
   const tela = v(page, "[data-tela=missao]");
@@ -91,10 +105,12 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
 
   await mais(page, "lote", 7);
   await tocar(page, "[data-acao=repartir]");
-  await expect(v(page, "[data-visor]")).toContainText("Uma volta de 8 em 4 bicas pede 32");
+  await expect(v(page, "[data-visor]")).toContainText("uma volta de 8 em 4 bicas pede 32");
   for (let i = 0; i < 3; i++) await tocar(page, '[data-seletor=lote] button[aria-label$="menos um"]');
   await tocar(page, "[data-acao=repartir]");
   await expect(v(page, "[data-bica='0']")).toHaveAttribute("data-quantidade", "6");
+  // Depois de Repartir, a linha da volta no rascunho (a última linha é a leitura da máquina).
+  await expect(v(page, "[data-visor]")).toContainText("Volta 1: 5 em cada · 4 × 5 = 20");
 
   // Fechar e reabrir no meio da missão: mesmo passo, máquina no mesmo estado.
   await page.reload();
@@ -104,6 +120,9 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await tocar(page, "[data-acao=fechar]");
   await expect(v(page, "[data-tela=missao][data-situacao=vencido]")).toBeVisible();
   await expect(v(page, "[data-tela=missao]")).toHaveAttribute("data-retorno", "acertou");
+  // No acerto, a conta passada a caneta, com o nome dos termos.
+  await expect(v(page, "[data-conta]")).toHaveAttribute("data-conta", "24 ÷ 4 = 6");
+  await expect(v(page, "[data-conta]")).toContainText("dividendo");
   await tocar(page, "[data-acao=seguir]");
 
   await passo(page, "trinta");
@@ -142,10 +161,27 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await tocar(page, "[data-acao=guardar-pagina]");
   await expect(v(page, "[data-tela=fim]")).toBeVisible();
 
+  // Uma página do Manual voltou: a da divisão exata. No Manual, ela está restaurada.
+  await expect(v(page, "[data-manual-voltou]")).toHaveAttribute("data-manual-voltou", "div.partilha");
+  await page.goto("/manual");
+  await expect(v(page, "[data-manual] [data-pagina-manual='div.partilha']")).toHaveAttribute("data-restaurada", "sim");
+  await expect(v(page, "[data-manual] [data-pagina-manual='div.resto']")).toHaveAttribute("data-restaurada", "nao");
+
   // O Caderno guarda a página, e ela volta depois de recarregar.
   await page.goto("/caderno");
   await expect(v(page, "[data-pagina='partilha.arco1.carga-igual']")).toBeVisible();
   await page.reload();
   await expect(v(page, "[data-pagina='partilha.arco1.carga-igual']")).toBeVisible();
   await expect(v(page, "[data-pagina='partilha.arco1.carga-igual']")).toContainText("24 sacas repartidas entre 4 carroças dão 6 em cada.");
+
+  // A tela cheia mora no topo, onde o navegador deixa.
+  await expect(v(page, "[data-tela-cheia]")).toHaveAttribute("data-tela-cheia", "inativa");
+
+  // A luz do caderno: a lua do topo apaga, e o escuro continua depois de recarregar.
+  await expect(page.locator("html")).toHaveAttribute("data-tema", "claro");
+  await tocar(page, "[data-botao-tema]");
+  await expect(page.locator("html")).toHaveAttribute("data-tema", "escuro");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-tema", "escuro");
+  await expect(v(page, "[data-botao-tema]")).toHaveAttribute("data-botao-tema", "escuro");
 });

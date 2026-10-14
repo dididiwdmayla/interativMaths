@@ -20,6 +20,8 @@ import { IconeChave } from "@/componentes/icones/IconeChave";
 import { IconeVisto } from "@/componentes/icones/IconeVisto";
 import { CabecalhoJogo } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
+import { AREAS } from "@/conteudo/areas";
+import { areaDoDistrito } from "@/nucleo/curriculo/formal";
 
 const W = 400;
 const X = (x: number) => 52 + x * 59;
@@ -101,7 +103,7 @@ export function Planta() {
                   key={l.chave}
                   d={l.d}
                   fill="none"
-                  stroke={l.tinta ? "var(--tinta)" : "var(--grafite)"}
+                  stroke={l.tinta ? "var(--contorno)" : "var(--grafite)"}
                   strokeWidth={l.tinta ? 2.4 : 2.2}
                   strokeDasharray={l.tinta ? undefined : "6 6"}
                   strokeLinecap="round"
@@ -136,22 +138,26 @@ function Componente({ c, s, estado, selecionado, onAbrir }: { c: Conceito; s: Si
         data-conceito={c.id}
         data-estado={estado}
       >
-        {s.provavel && estado === "nao_avaliado" && <span className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-tinta bg-caneta" aria-hidden="true" />}
+        {s.provavel && estado === "nao_avaliado" && <span className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-contorno bg-caneta" aria-hidden="true" />}
         {(estado === "dominado" || estado === "consolidado") && (
-          <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-tinta bg-verde-palido text-verde-escuro" aria-hidden="true">
+          <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-contorno bg-verde-palido text-verde-escuro" aria-hidden="true">
             <IconeVisto />
           </span>
         )}
         {estado === "pede_ajuste" && (
-          <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-tinta bg-marca-texto-palido" aria-hidden="true">
+          <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-contorno bg-marca-texto-palido" aria-hidden="true">
             <IconeChave />
           </span>
         )}
         <span className={estado === "consolidado" ? "grifo" : undefined}>{c.nome}</span>
       </button>
-      {estado === "em_projeto" && (
+      {estado === "em_projeto" ? (
         <span className="pointer-events-none mt-1 whitespace-nowrap rounded bg-papel px-1 font-mao text-[19px] font-bold leading-none text-tinta-suave" aria-hidden="true">
           ainda a lápis
+        </span>
+      ) : (
+        <span className="pointer-events-none mt-1 whitespace-nowrap rounded bg-papel px-1 text-[10.5px] font-semibold leading-none text-tinta-suave" aria-hidden="true" data-conteudo-formal="">
+          {c.formalCurto}
         </span>
       )}
     </div>
@@ -178,7 +184,7 @@ function Legenda() {
           </li>
         ))}
         <li className="flex list-none items-center gap-2.5 text-[14px] font-medium text-tinta-suave">
-          <span className="ml-1 h-3 w-3 shrink-0 rounded-full border-2 border-tinta bg-caneta" aria-hidden="true" />
+          <span className="ml-1 h-3 w-3 shrink-0 rounded-full border-2 border-contorno bg-caneta" aria-hidden="true" />
           ponto azul: a calibragem acha provável
         </li>
       </ul>
@@ -224,6 +230,9 @@ function Detalhe({ c, s, estado, progresso, onFechar }: { c: Conceito; s: Situac
       <section className="painel-sobe relative max-h-[80dvh] w-full overflow-y-auto px-5 pb-6 pt-5 area-segura-base anima-subir lg:max-w-[520px]" data-detalhe={c.id}>
         <EtiquetaEstado estado={estado} />
         <h2 className="m-0 mt-2.5 text-[22px] font-extrabold leading-tight">{c.nome}</h2>
+        <p className="m-0 mt-0.5 text-[13px] font-semibold text-tinta-suave" data-nome-formal="">
+          {areaDoDistrito(AREAS, c.distrito)?.area} · {c.formal}
+        </p>
         <p className="m-0 mt-1 text-[16px] font-medium">{c.linha}</p>
         {c.situacao !== "em_projeto" && (
           <>

@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { comoRacional, igual } from "@/nucleo/racional/racional";
 import type { Execucao } from "@/nucleo/missoes/motor";
 import { preencher, valoresDasFichas } from "@/nucleo/missoes/motor";
-import type { Fala, PassoFrase, PassoNotacao, PassoPalpite, PassoPrever, PassoRegistro } from "@/nucleo/missoes/tipos";
+import type { PassoFrase, PassoNotacao, PassoPalpite, PassoPrever, PassoRegistro } from "@/nucleo/missoes/tipos";
 import { Numero } from "@/componentes/notacao/Numero";
 import { LinhaNotacao } from "@/componentes/notacao/Notacao";
 import { Compressao } from "@/componentes/notacao/Compressao";
@@ -44,6 +44,8 @@ export function PainelPrever({
   onResponder,
   onSeguir,
   marca,
+  rascunho,
+  conta,
 }: {
   passo: PassoPrever;
   exec: Execucao;
@@ -51,6 +53,10 @@ export function PainelPrever({
   onResponder: (v: string | null) => void;
   onSeguir: () => void;
   marca?: MarcaResposta;
+  /** O rascunho a lápis da máquina (o que a demonstração fez). */
+  rascunho?: ReactNode;
+  /** A conta passada a caneta, quando a previsão bateu. */
+  conta?: ReactNode;
 }) {
   const conferindo = exec.passo.situacao === "conferindo";
   const resposta = exec.passo.resposta;
@@ -59,6 +65,7 @@ export function PainelPrever({
   const dalia = passo.falas?.filter((f) => f.quem === "dalia") ?? [];
   return (
     <div className="flex flex-col gap-3" data-painel="prever" data-situacao={exec.passo.situacao}>
+      {conferindo && !demonstrando && rascunho}
       {dalia.length > 0 && !conferindo && exec.passo.respostas === 0 && <Falas falas={dalia} compacta />}
       <p className="m-0 text-[17px] font-bold leading-snug">{passo.pergunta}</p>
       {!conferindo && <EntradaResposta tipo={passo.resposta} onResponder={onResponder} rotuloConferir={exec.passo.respostas > 0 ? "Conferir de novo" : "Conferir"} marca={marca} />}
@@ -79,6 +86,7 @@ export function PainelPrever({
                   </span>
                 )}
               </p>
+              {conta}
               <Seguir rotulo="Continuar" onClick={onSeguir} />
             </>
           )}
@@ -88,26 +96,32 @@ export function PainelPrever({
   );
 }
 
+/**
+ * O passo vencido (referência 3): o rascunho a lápis em cima, a conta passada a caneta embaixo,
+ * e então Continuar e o desafio. A fala da Dália sobre o acerto mora acima da máquina.
+ */
 export function PainelVencido({
-  falas,
+  rascunho,
+  conta,
   palpite,
   convite,
   onConvite,
   onSeguir,
   extra,
 }: {
-  falas?: readonly Fala[];
+  rascunho?: ReactNode;
+  conta?: ReactNode;
   palpite?: { valor: string | null; certo: string } | null;
   convite?: string | null;
   onConvite?: (aceitar: boolean) => void;
   onSeguir: () => void;
   extra?: ReactNode;
 }) {
-  const dalia = falas?.filter((f) => f.quem === "dalia") ?? [];
   const mosca = palpite && palpite.valor !== null && mesmoValor(palpite.valor, palpite.certo);
   return (
-    <div className="flex flex-col gap-3" data-painel="vencido">
-      {dalia.length > 0 && <Falas falas={dalia} compacta />}
+    <div className="flex flex-col gap-2.5" data-painel="vencido">
+      {rascunho}
+      {conta}
       {palpite && (
         <p className="m-0 flex flex-wrap items-center gap-2 text-[15px] font-medium" data-palpite={mosca ? "na-mosca" : "outro"}>
           {mosca ? (
@@ -128,13 +142,17 @@ export function PainelVencido({
         </p>
       )}
       {extra}
-      <Seguir rotulo="Continuar" onClick={onSeguir} />
-      {convite && onConvite && (
-        <button type="button" className="botao-secundario w-full" onClick={() => onConvite(true)} data-acao="aceitar-convite">
-          <IconeEstrela />
-          Desafio: {convite}
+      <div className="flex items-stretch gap-2.5">
+        <button type="button" className="botao-principal min-w-0 flex-1" onClick={onSeguir} data-acao="seguir">
+          Continuar
         </button>
-      )}
+        {convite && onConvite && (
+          <button type="button" className="botao-secundario shrink-0" onClick={() => onConvite(true)} aria-label={`Desafio: ${convite}`} data-acao="aceitar-convite">
+            <IconeEstrela />
+            Desafio
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -149,13 +167,8 @@ function mesmoValor(a: string, b: string): boolean {
 
 /* ---------- Formalização: a folha pautada ---------- */
 
-/** A folha sobe com a faixa do Nônio colada em cima: os cantos de cima ficam com a faixa. */
-const CANTOS = "rounded-none border-t-0 lg:rounded-b-[18px]";
-
-/** A faixa do Nônio, compacta, no topo da folha que sobe. */
-export function FaixaNaFolha({ children }: { children: ReactNode }) {
-  return <div className="faixa-na-folha">{children}</div>;
-}
+/** A folha sobe da borda de baixo: cantos de cima redondos (no computador, todos). */
+const CANTOS = "rounded-t-[18px] lg:rounded-b-[18px]";
 
 export function FolhaFrase({
   passo,

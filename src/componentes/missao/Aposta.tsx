@@ -30,7 +30,13 @@ export function PainelAposta({
   onResponder,
   onDesfazer,
   onSeguir,
+  rascunho,
+  conta,
 }: {
+  /** O rascunho a lápis da máquina, em cima. */
+  rascunho?: ReactNode;
+  /** A conta passada a caneta, depois do acerto. */
+  conta?: ReactNode;
   passo: PassoAposta;
   exec: Execucao;
   /** O lote e Repartir, quando a prova pede a alavanca. */
@@ -49,6 +55,7 @@ export function PainelAposta({
   const opcoes = passo.resposta.tipo === "opcoes" ? passo.resposta.opcoes : [];
   return (
     <div className="flex flex-col gap-3" data-painel="aposta" data-aposta="painel" data-cumprido={cumprido ? "sim" : "nao"}>
+      {rascunho}
       {junto}
       {!vencido && alavanca}
       <p className="m-0 text-[14px] font-semibold text-tinta-suave">{passo.pergunta}</p>
@@ -76,9 +83,12 @@ export function PainelAposta({
         })}
       </div>
       {vencido ? (
-        <button type="button" className="botao-principal w-full" onClick={onSeguir} data-acao="seguir">
-          Continuar
-        </button>
+        <>
+          {conta}
+          <button type="button" className="botao-principal w-full" onClick={onSeguir} data-acao="seguir">
+            Continuar
+          </button>
+        </>
       ) : (
         <>
         <div className="flex items-center gap-2">

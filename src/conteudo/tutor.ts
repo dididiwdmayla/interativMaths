@@ -39,8 +39,31 @@ export const PERGUNTAS_PADRAO = {
   narrativa: ["O que eu faço aqui?", "Quem é a Dália?", "O que vem depois?"],
 } as const;
 
+/** A bolinha e a janelinha do Nônio. */
+export const TEXTOS_JANELA = {
+  nome: "Nônio",
+  abrir: "Nônio: abrir a janelinha",
+  abrirNovidade: "Nônio: abrir a janelinha, há uma fala nova",
+  fechar: "Fechar a janelinha",
+  antes: "Antes, neste passo:",
+  /** O subtítulo quando ele não está apontando nada. */
+  semAlvo: "Lê a máquina e ajuda um degrau por vez",
+  /** Os degraus da escada, na legenda da barrinha. */
+  degraus: "Olhar, medir, caso parecido, fazer junto",
+  voltarDoCaso: "Voltar",
+  /** O subtítulo quando ele aponta uma parte da máquina (receptores com os nomes da pele). */
+  apontandoA: {
+    prefixo: "Apontando",
+    naEsteira: "na esteira",
+    esteira: "Apontando a esteira",
+    pilha: "Apontando a pilha na esteira",
+    bandeja: "Apontando a bandeja da sobra",
+    fatiador: "Apontando o fatiador",
+  },
+} as const;
+
 export const TEXTOS_CONVERSA = {
-  titulo: "Pergunte ao Nônio",
+  titulo: "Pergunte por escrito",
   subtitulo: "Sobre esta missão",
   botao: "Perguntar",
   sugestoes: "Pergunte também",
