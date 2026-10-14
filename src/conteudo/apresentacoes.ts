@@ -3,9 +3,9 @@
  * SÓ DADOS. Até 160 caracteres, sem exclamação. O "Perguntar" se apresenta dentro da conversa.
  */
 export const APRESENTACOES = {
-  faixa: {
-    texto: "Eu fico aqui, entre a máquina e os controles. Digo o que a máquina mostra e, se você pedir, ajudo um degrau por vez.",
-    alvo: "[data-faixa-nonio]",
+  bolha: {
+    texto: "Eu fico aqui no canto. Toque em mim para ajuda ou perguntas.",
+    alvo: "[data-bolha-nonio]",
   },
   "mao-livre": {
     texto: "A máquina responde ao toque: toque numa peça e depois num lugar. Tocar numa peça já posta devolve ela à esteira.",

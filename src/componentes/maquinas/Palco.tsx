@@ -2,9 +2,9 @@
 
 /**
  * O palco de uma máquina. Celular em pé: a linha do objetivo, a máquina numa ficha
- * quadriculada, a faixa do Nônio e a bancada de controles embaixo, na zona do polegar.
- * No computador: a máquina numa ficha à esquerda; à direita, o objetivo, o Nônio e a bancada.
- * Girar o aparelho só muda o CSS: o estado não se perde.
+ * quadriculada (a protagonista, com o Nônio em bolinha no canto de baixo à direita) e a bancada
+ * de controles embaixo, na zona do polegar. No computador: a máquina numa ficha à esquerda; à
+ * direita, o objetivo, a nota e a bancada. Girar o aparelho só muda o CSS: o estado não se perde.
  */
 import type { ReactNode } from "react";
 import { useAmbiente } from "@/componentes/ui/useAmbiente";
@@ -14,18 +14,18 @@ export function Palco({
   pedido,
   nota,
   maquina,
-  faixa,
+  nonio,
   controles,
   sobreposicao,
   atributos,
 }: {
   cabecalho?: ReactNode;
   pedido?: ReactNode;
-  /** Acima da máquina: o bilhete da aposta, a fala da Dália quando a máquina muda. */
+  /** Acima da máquina: o bilhete da aposta, a fala da Dália quando a máquina muda, o desvio. */
   nota?: ReactNode;
   maquina: ReactNode;
-  /** A faixa do Nônio (e o que mora com ela: desvio, categoria da Rua). */
-  faixa?: ReactNode;
+  /** O Nônio flutuante (bolinha e recado), por cima do canto inferior direito da máquina. */
+  nonio?: ReactNode;
   controles?: ReactNode;
   /** Algo que ocupa o lugar dos controles (a folha pautada do Caderno, que sobe). */
   sobreposicao?: ReactNode;
@@ -40,8 +40,8 @@ export function Palco({
         {nota && !sobreposicao && <div className="palco-nota">{nota}</div>}
         <section className="palco-maquina ficha-quadriculada" aria-label="Máquina">
           {maquina}
+          {nonio}
         </section>
-        {faixa && !sobreposicao && <div className="palco-faixa">{faixa}</div>}
         {sobreposicao ? (
           <div className="palco-folha">{sobreposicao}</div>
         ) : (

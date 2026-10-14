@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * A escada de ajuda dentro da faixa: os degraus 1 e 2 aparecem no balão (apontando e mostrando a
- * cota na máquina); o degrau 3 abre esta folha com a máquina pequena, com OUTROS números; o 4 é a
- * barra de fazer junto. Nunca a resposta do caso atual.
+ * A escada de ajuda, dentro da janelinha do Nônio: os degraus 1 e 2 aparecem na fala (apontando e
+ * mostrando a cota na máquina); o degrau 3 abre o caso parecido, com a máquina pequena e OUTROS
+ * números; o 4 é a barra de fazer junto, embaixo da máquina. Nunca a resposta do caso atual.
  */
 import { useEffect, useState } from "react";
 import { criarBancada, operar } from "@/nucleo/maquinas/bancada/bancada";
@@ -13,52 +13,34 @@ import { preencher } from "@/nucleo/missoes/motor";
 import { PELES } from "@/conteudo/peles";
 import { AJUDA, DEGRAUS } from "@/conteudo/reacoes";
 import { Bancada } from "@/componentes/maquinas/Bancada";
-import { IconeFechar } from "@/componentes/icones/IconeFechar";
-import { Nonio } from "./Nonio";
 
-export function FolhaCasoParecido({
+/** O degrau 3 dentro da janelinha: o texto do caso e a máquina pequena; dali, fazer junto. */
+export function CasoNaJanela({
   dica,
   medidas,
   podeJunto,
   onJunto,
-  onFechar,
 }: {
   dica: Dica;
   medidas: Readonly<Record<string, string>>;
   podeJunto: boolean;
   onJunto: () => void;
-  onFechar: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-40 flex flex-col justify-end lg:items-center lg:justify-center" role="dialog" aria-modal="true" aria-label="Caso parecido">
-      <button type="button" className="absolute inset-0 bg-veu" aria-label="Voltar à máquina" onClick={onFechar} />
-      <div className="painel-sobe relative max-h-[86dvh] w-full overflow-y-auto px-4 pb-5 pt-3 area-segura-base anima-subir lg:max-w-[520px]" data-painel="ajuda">
-        <div className="alca-folha" aria-hidden="true" />
-        <div className="flex items-center gap-2.5">
-          <Nonio expressao="medindo" tamanho={50} rotulo="" />
-          <div className="flex min-w-0 flex-1 flex-col">
-            <p className="m-0 text-[18px] font-extrabold">{DEGRAUS[2]}</p>
-            <p className="m-0 text-[12.5px] font-semibold text-tinta-suave">{AJUDA.caso}</p>
-          </div>
-          <button type="button" className="botao-icone" aria-label="Fechar o caso parecido" onClick={onFechar}>
-            <IconeFechar />
-          </button>
-        </div>
-        <p className="m-0 mt-3 text-[16px] font-medium leading-[1.4]" data-degrau={3}>
+    <div className="flex flex-col gap-3" data-painel="ajuda">
+      <div>
+        <p className="m-0 text-[12.5px] font-bold text-tinta-suave">{DEGRAUS[2]}</p>
+        <p className="m-0 mt-1 text-[16px] font-medium leading-[1.4]" data-degrau={3}>
+          <span className="so-leitor">{AJUDA.caso} </span>
           {preencher(dica.texto, medidas)}
         </p>
-        {dica.caso && <CasoParecido dica={dica} />}
-        <div className="mt-4 flex flex-col gap-2">
-          <button type="button" className="botao-principal w-full" onClick={onFechar} data-acao="voltar-maquina">
-            Voltar à máquina
-          </button>
-          {podeJunto && (
-            <button type="button" className="botao-secundario w-full" onClick={onJunto} data-acao="junto">
-              {DEGRAUS[3]}
-            </button>
-          )}
-        </div>
       </div>
+      {dica.caso && <CasoParecido dica={dica} />}
+      {podeJunto && (
+        <button type="button" className="botao-secundario w-full" onClick={onJunto} data-acao="junto">
+          {DEGRAUS[3]}
+        </button>
+      )}
     </div>
   );
 }

@@ -149,13 +149,8 @@ function mesmoValor(a: string, b: string): boolean {
 
 /* ---------- Formalização: a folha pautada ---------- */
 
-/** A folha sobe com a faixa do Nônio colada em cima: os cantos de cima ficam com a faixa. */
-const CANTOS = "rounded-none border-t-0 lg:rounded-b-[18px]";
-
-/** A faixa do Nônio, compacta, no topo da folha que sobe. */
-export function FaixaNaFolha({ children }: { children: ReactNode }) {
-  return <div className="faixa-na-folha">{children}</div>;
-}
+/** A folha sobe da borda de baixo: cantos de cima redondos (no computador, todos). */
+const CANTOS = "rounded-t-[18px] lg:rounded-b-[18px]";
 
 export function FolhaFrase({
   passo,

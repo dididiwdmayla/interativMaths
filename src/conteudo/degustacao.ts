@@ -131,6 +131,7 @@ export const DEGUSTACAO: Atividade = {
       ],
       equivocos: ["corte-que-nao-fecha", "resto-jogado-fora", "parou-cedo"],
       aoConcluir: [{ quem: "nonio", texto: "Nenhuma mesa ganhou broa inteira, e todas ganharam igual: três pedaços de um quarto. Três quartos de broa." }],
+      recados: { acerto: "Todas iguais: três quartos de broa em cada mesa." },
     },
     {
       id: "duas-tres",
@@ -206,6 +207,7 @@ export const DEGUSTACAO: Atividade = {
       demonstracao: [{ tipo: "partes", valor: 8 }, { tipo: "fatiar", quantidade: "todas" }, { tipo: "lote", valor: 5 }, { tipo: "repartir" }],
       respostasEquivoco: [{ resposta: "5", equivoco: "conta-pedacos" }],
       explicacao: "Cada broa em 8 partes: quarenta oitavos, cinco para cada mesa. 5 ÷ 8 = 5/8.",
+      recados: { acerto: "Cinco oitavos de broa para cada mesa." },
       dicas: [
         { texto: "O traço da fração é uma divisão.", alvo: "fatiador" },
         { texto: "Em cima, o que se reparte; embaixo, entre quantos." },

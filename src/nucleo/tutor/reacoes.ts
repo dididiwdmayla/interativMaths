@@ -34,6 +34,8 @@ export interface NomesPele {
 export interface TextoRetorno {
   readonly consequencia: string;
   readonly pergunta: string;
+  /** O recado da bolinha, quando a primeira frase da consequência passa de 60 caracteres. */
+  readonly recado?: string;
 }
 
 export interface TextosReacao {
@@ -254,6 +256,24 @@ export function textoDoMotivo(motivo: string, valores: Record<string, string>, t
   return textoRetorno(textos.motivos[motivo], valores, aplicacao);
 }
 
+/** O recado próprio de um equívoco (quando o dado traz), preenchido. */
+export function recadoDoEquivoco(id: string, valores: Record<string, string>, textos: TextosReacao, opcoes: { previsao?: boolean } = {}): string | undefined {
+  const e = textos.equivocos.find((x) => x.id === id);
+  const t = e && opcoes.previsao && e.previsao ? e.previsao : e;
+  return t?.recado ? maiuscula(preencherFala(t.recado, valores)) : undefined;
+}
+
+export function recadoDoMotivo(motivo: string, valores: Record<string, string>, textos: TextosReacao): string | undefined {
+  const t = textos.motivos[motivo];
+  return t?.recado ? maiuscula(preencherFala(t.recado, valores)) : undefined;
+}
+
+/** O recado de um passo (abertura ou acerto), preenchido com as medidas. */
+function recadoDoPasso(passo: Passo, qual: "abertura" | "acerto", m: Record<string, string>): string | undefined {
+  const r = passo.recados?.[qual];
+  return r ? maiuscula(preencherFala(r, m)) : undefined;
+}
+
 /* ---------- Leituras da máquina ---------- */
 
 /** O que a máquina fez, em voz de instrumento (a antiga tira de mensagem). */
@@ -262,7 +282,7 @@ export function leituraDoEvento(
   pele: NomesPele,
   textos: TextosReacao,
   opcoes: { postura?: Postura; aplicacao?: boolean; antes?: EstadoBancada | null } = {},
-): { texto: string; atencao: boolean } | null {
+): { texto: string; atencao: boolean; guia?: AlvoMaquina } | null {
   const ev: Evento | null = e.evento;
   if (!ev) return null;
   const m = medidasComNomes(e, pele);
@@ -273,7 +293,8 @@ export function leituraDoEvento(
       const B = bicasAbertas(e).length;
       const naoDaVolta = !ehZero(sobra) && B > 0 && e.esteira.every((p) => p.quantidade < B);
       if (naoDaVolta && e.config.fatiador && !opcoes.aplicacao) {
-        return { texto: preencherFala(textos.eventos.voltaCortavel, { ...m, sobraNome: quantidadeComNome(sobra, pele) }), atencao: false };
+        // Não é só leitura: é o próximo passo da partilha (o corte), e ele aponta a peça que sobrou.
+        return { texto: preencherFala(textos.eventos.voltaCortavel, { ...m, sobraNome: quantidadeComNome(sobra, pele) }), atencao: false, guia: "pilha" };
       }
       return { texto: preencherFala(textos.eventos.volta, { ...m, lotePecas: pecasDeTamanho(ev.tamanho, ev.lote, pele) }), atencao: false };
     }
@@ -292,7 +313,7 @@ export function leituraDoEvento(
       const b = e.bicas[ev.bica];
       const antes = opcoes.antes;
       if (antes && opcoes.postura !== "quieto" && primeiraVoltaAMao(antes, e)) {
-        return { texto: preencherFala(textos.eventos.primeiraVoltaAMao, m), atencao: false };
+        return { texto: preencherFala(textos.eventos.primeiraVoltaAMao, m), atencao: false, guia: "bicas" };
       }
       const texto = preencherFala(textos.eventos.colocou, {
         ...m,
@@ -368,6 +389,11 @@ export function falaDeAcerto(ctx: Pick<ContextoReacao, "passo" | "depois" | "tex
   return com.length <= LIMITE_FALA ? com : base;
 }
 
+/** O recado do acerto de um passo de máquina: o do passo, se a fala é a dele. */
+function recadoDeAcerto(passo: Passo, m: Record<string, string>): string | undefined {
+  return passo.acerto || falaNonioDe(passo.aoConcluir) ? recadoDoPasso(passo, "acerto", m) : undefined;
+}
+
 /** Reação a uma entrada. null: a faixa continua com o que tinha. */
 export function reagir(ctx: ContextoReacao): FalaFaixa | null {
   const { passo, antes, depois, entrada, efeitos, textos, pele } = ctx;
@@ -388,17 +414,24 @@ export function reagir(ctx: ContextoReacao): FalaFaixa | null {
     const vm = { ...m, ...resultado.medidas };
     if (resultado.ok) {
       const validador = passo.tipo === "operar" ? (depois.passo.convite === "feito" && passo.convite ? passo.convite.objetivo.validador : passo.objetivo.validador) : "partilha.fechada";
-      return fala(passo, `acertou:${passo.id}:${depois.passo.convite ?? ""}`, falaDeAcerto(ctx, validador), { categoria: "retorno", selo: "acertou", expressao: "satisfeito" });
+      return fala(passo, `acertou:${passo.id}:${depois.passo.convite ?? ""}`, falaDeAcerto(ctx, validador), {
+        categoria: "retorno",
+        selo: "acertou",
+        expressao: "satisfeito",
+        recado: recadoDeAcerto(passo, m),
+      });
     }
     if (resultado.parcial) {
       return fala(passo, `parcial:${resultado.medidas.feitas}`, textoDoMotivo(resultado.motivo, vm, textos), { categoria: "retorno", selo: "acertou", expressao: "satisfeito" });
     }
     const texto = equivoco ? textoDoEquivoco(equivoco.id, { ...vm, ...equivoco.medidas }, textos, { aplicacao }) : textoDoMotivo(resultado.motivo, vm, textos, aplicacao);
+    const recado = equivoco ? recadoDoEquivoco(equivoco.id, { ...vm, ...equivoco.medidas }, textos) : recadoDoMotivo(resultado.motivo, vm, textos);
     return fala(passo, `ainda-nao:${resultado.motivo}:${equivoco?.id ?? ""}:${texto}`, texto, {
       categoria: "retorno",
       selo: "ainda-nao",
       expressao: "medindo",
       alvo: alvoDoMotivo(resultado),
+      recado,
     });
   }
 
@@ -427,10 +460,16 @@ export function reagir(ctx: ContextoReacao): FalaFaixa | null {
     // Um corte que não fecha é um equívoco da máquina: informação, com ponto vermelho.
     if (equivoco?.id === "corte-que-nao-fecha") {
       const texto = textoDoEquivoco(equivoco.id, { ...m, ...equivoco.medidas }, textos, { aplicacao });
-      return fala(passo, `evento:${estado.seq}`, texto, { categoria: "evento", expressao: "medindo", atencao: true, alvo: "fatiador" });
+      const recado = recadoDoEquivoco(equivoco.id, { ...m, ...equivoco.medidas }, textos);
+      return fala(passo, `evento:${estado.seq}`, texto, { categoria: "evento", expressao: "medindo", atencao: true, alvo: "fatiador", recado });
     }
     const leitura = leituraDoEvento(estado, pele, textos, { postura: ctx.postura, aplicacao, antes: antes.bancada?.atual ?? null });
     if (!leitura) return null;
+    // A leitura que encaminha o próximo passo (o corte da sobra, a volta feita à mão) conta como
+    // fala de passo: vira recado também na postura disponível, como a abertura.
+    if (leitura.guia) {
+      return fala(passo, `evento:${estado.seq}`, leitura.texto, { categoria: "passo", expressao: "atento", alvo: leitura.guia });
+    }
     return fala(passo, `evento:${estado.seq}`, leitura.texto, { categoria: "evento", expressao: leitura.atencao ? "medindo" : "atento", atencao: leitura.atencao });
   }
   return null;
@@ -443,7 +482,12 @@ function reagirResposta(ctx: ContextoReacao, m: Record<string, string>, equivoco
   const ep = depois.passo;
   const explicacao = passo.explicacao ?? "";
   if (ep.retorno === "acertou") {
-    return fala(passo, `acertou:${passo.id}`, preencherFala(explicacao || textos.respostas.conferiu, m), { categoria: "retorno", selo: "acertou", expressao: "satisfeito" });
+    return fala(passo, `acertou:${passo.id}`, preencherFala(explicacao || textos.respostas.conferiu, m), {
+      categoria: "retorno",
+      selo: "acertou",
+      expressao: "satisfeito",
+      recado: recadoDoPasso(passo, "acerto", m),
+    });
   }
   if (ep.resposta === null) {
     return fala(passo, `nao-sei:${passo.id}`, juntar(textos.respostas.naoSei, preencherFala(explicacao, m)).slice(0, LIMITE_FALA), { categoria: "retorno", expressao: "atento" });
@@ -453,6 +497,7 @@ function reagirResposta(ctx: ContextoReacao, m: Record<string, string>, equivoco
     return fala(passo, `ainda-nao:final:${passo.id}`, preencherFala(textos.respostas.conferiu, { ...m, explicacao }), { categoria: "retorno", selo: "ainda-nao", expressao: "medindo" });
   }
   const valores = { ...m, resposta: ep.resposta ?? "" };
+  const recado = equivoco ? recadoDoEquivoco(equivoco, valores, textos, { previsao: true }) : undefined;
   let texto = "";
   if (equivoco) {
     texto = textoDoEquivoco(equivoco, valores, textos, { aplicacao, previsao: true });
@@ -462,7 +507,7 @@ function reagirResposta(ctx: ContextoReacao, m: Record<string, string>, equivoco
     texto = juntar(textos.respostas.aindaNao, aplicacao ? null : preencherFala(passo.dicas?.[0].texto ?? "", valores));
   }
   if (texto.length > LIMITE_FALA) texto = textoDoEquivoco(equivoco ?? "", valores, textos, { aplicacao: true, previsao: true }) || textos.respostas.aindaNao;
-  return fala(passo, `ainda-nao:${passo.id}:${ep.resposta}`, texto, { categoria: "retorno", selo: "ainda-nao", expressao: "medindo", alvo: passo.dicas?.[0].alvo });
+  return fala(passo, `ainda-nao:${passo.id}:${ep.resposta}`, texto, { categoria: "retorno", selo: "ainda-nao", expressao: "medindo", alvo: passo.dicas?.[0].alvo, recado });
 }
 
 /** "Com 5 em cada, 5 carroças levariam 25. Na esteira há 30." Sem dizer quanto dá. */
@@ -520,12 +565,20 @@ export function falaDeAjuda(passo: Passo, e: Execucao, textos: TextosReacao, pel
 export function falaDeAbertura(a: Atividade, passo: Passo, e: Execucao, textos: TextosReacao, pele: NomesPele | null): FalaFaixa {
   const m = pele ? medidasComNomes(e.bancada?.atual ?? null, pele) : {};
   if (passo.fase === "aplicacao" && a.tipo === "missao") {
-    return fala(passo, `abertura:${passo.id}`, passo.nonio ? preencherFala(passo.nonio, m) : textos.aberturaAplicacao, { categoria: "passo", expressao: "quieto" });
+    return fala(passo, `abertura:${passo.id}`, passo.nonio ? preencherFala(passo.nonio, m) : textos.aberturaAplicacao, {
+      categoria: "passo",
+      expressao: "quieto",
+      recado: passo.nonio ? recadoDoPasso(passo, "abertura", m) : undefined,
+    });
   }
   const daCena = passo.tipo !== "narrativa" ? passo.falas?.filter((f) => f.quem === "nonio").map((f) => f.texto).join(" ") : undefined;
   const propria = passo.nonio ?? passo.chegada?.texto ?? (daCena && daCena.length <= LIMITE_FALA ? daCena : undefined);
   const texto = preencherFala(propria ?? textos.aberturas[passo.tipo] ?? "", m);
-  return fala(passo, `abertura:${passo.id}`, texto, { categoria: "passo", expressao: passo.tipo === "narrativa" ? "neutro" : "atento" });
+  return fala(passo, `abertura:${passo.id}`, texto, {
+    categoria: "passo",
+    expressao: passo.tipo === "narrativa" ? "neutro" : "atento",
+    recado: passo.nonio ? recadoDoPasso(passo, "abertura", m) : undefined,
+  });
 }
 
 /** A oferta de ajuda depois de tentativas travadas (automática: a postura decide). */
@@ -572,11 +625,14 @@ export function falaDoEstado(
       categoria: "retorno",
       selo: "acertou",
       expressao: "satisfeito",
+      recado: recadoDeAcerto(passo, m),
     });
   }
   if ((passo.tipo === "prever" && ep.situacao === "conferindo") || (passo.tipo === "aposta" && ep.situacao === "vencido")) {
     const explicacao = preencherFala(passo.explicacao ?? "", m);
-    if (ep.retorno === "acertou") return fala(passo, `acertou:${passo.id}`, explicacao || textos.respostas.conferiu, { categoria: "retorno", selo: "acertou", expressao: "satisfeito" });
+    if (ep.retorno === "acertou") {
+      return fala(passo, `acertou:${passo.id}`, explicacao || textos.respostas.conferiu, { categoria: "retorno", selo: "acertou", expressao: "satisfeito", recado: recadoDoPasso(passo, "acerto", m) });
+    }
     if (ep.resposta === null) return fala(passo, `nao-sei:${passo.id}`, juntar(textos.respostas.naoSei, explicacao).slice(0, LIMITE_FALA), { categoria: "retorno", expressao: "atento" });
     return fala(passo, `ainda-nao:final:${passo.id}`, preencherFala(textos.respostas.conferiu, { ...m, explicacao }), { categoria: "retorno", selo: "ainda-nao", expressao: "medindo" });
   }

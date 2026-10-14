@@ -8,14 +8,14 @@ import { maoLivreLigada } from "../maquinas/bancada/bancada";
 import type { Execucao } from "../missoes/motor";
 import type { Atividade, Passo } from "../missoes/tipos";
 
-export type IdApresentacao = "faixa" | "mao-livre" | "aposta" | "menu-corte" | "bicas" | "fichas";
+export type IdApresentacao = "bolha" | "mao-livre" | "aposta" | "menu-corte" | "bicas" | "fichas";
 
 /** Ordem de prioridade quando um passo traz mais de uma ferramenta nova. */
-export const ORDEM_APRESENTACOES: readonly IdApresentacao[] = ["faixa", "mao-livre", "aposta", "menu-corte", "bicas", "fichas"];
+export const ORDEM_APRESENTACOES: readonly IdApresentacao[] = ["bolha", "mao-livre", "aposta", "menu-corte", "bicas", "fichas"];
 
 /** As ferramentas que este passo põe na mão do jogador. */
 export function ferramentasDoPasso(passo: Passo, e: Execucao): IdApresentacao[] {
-  const lista: IdApresentacao[] = ["faixa"];
+  const lista: IdApresentacao[] = ["bolha"];
   const m = e.bancada?.atual ?? null;
   const operavel = (passo.tipo === "operar" || passo.tipo === "aposta") && m !== null && !m.fechada;
   if (operavel && maoLivreLigada(m.config)) {

@@ -91,7 +91,7 @@ export const ACERTOS: Readonly<Record<string, string>> = {
   "partilha.fechada.sobra": "Fechou: {cadaNome} em cada {receptor}, e {sobraNome} na bandeja.",
   "partilha.carga-exata": "Fechou: {bicasNome} {receptores}, com {cadaNome} em cada.",
   "transporte.tudo-saiu": "Tudo saiu em {bicasNome} {receptores}, nenhuma acima do teto.",
-  "partilha.solucoes-distintas": "Fechou de dois jeitos: {cadaNome} em cada {receptor}, pedaços diferentes.",
+  "partilha.solucoes-distintas": "Fechou de dois jeitos. Em cada {receptor}, {cadaNome}, com pedaços diferentes.",
   "partilha.unitarias-distintas": "Fechou à maneira do escriba: {cadaNome} em cada {receptor}.",
   "maquina.mostra-divisao": "A máquina mostra a conta: {cadaNome} em cada {receptor}.",
   "partilha.inteiras-por-bica": "{cadaNome} em cada {receptor}, posta à mão.",

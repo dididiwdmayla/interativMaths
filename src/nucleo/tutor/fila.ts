@@ -43,6 +43,8 @@ export interface FalaFaixa {
   readonly atencao?: boolean;
   /** Passo em que a fala nasceu: a faixa não mostra fala de outro passo. */
   readonly passo: string;
+  /** O recado curto (até 60), quando a primeira frase do texto não cabe nele. */
+  readonly recado?: string;
 }
 
 export const PERMANENCIA_MINIMA_MS = 2500;

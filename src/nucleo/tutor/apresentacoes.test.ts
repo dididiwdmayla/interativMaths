@@ -19,21 +19,23 @@ function no(a: Atividade, id: string) {
 const livre = { jaNestePasso: false, retornoVisivel: false };
 
 describe("apresentações", () => {
-  it("a faixa vem primeiro, na abertura da missão", () => {
+  it("a bolinha vem primeiro, na abertura da missão", () => {
     const { e, p } = no(MISSAO_1, "pedido");
-    expect(proximaApresentacao(MISSAO_1, p, e, {}, livre)).toBe("faixa");
-    expect(proximaApresentacao(MISSAO_1, p, e, { faixa: 1 }, livre)).toBeNull();
+    expect(proximaApresentacao(MISSAO_1, p, e, {}, livre)).toBe("bolha");
+    expect(proximaApresentacao(MISSAO_1, p, e, { bolha: 1 }, livre)).toBeNull();
+    // Quem viu a faixa da v0.3 vê a bolinha uma vez: o Nônio mudou de lugar.
+    expect(proximaApresentacao(MISSAO_1, p, e, { faixa: 1 }, livre)).toBe("bolha");
   });
 
   it("a mão livre se apresenta no primeiro passo de mão", () => {
     const { e, p } = no(MISSAO_1, "a-mao");
-    expect(ferramentasDoPasso(p, e)).toEqual(["faixa", "mao-livre"]);
-    expect(proximaApresentacao(MISSAO_1, p, e, { faixa: 1 }, livre)).toBe("mao-livre");
+    expect(ferramentasDoPasso(p, e)).toEqual(["bolha", "mao-livre"]);
+    expect(proximaApresentacao(MISSAO_1, p, e, { bolha: 1 }, livre)).toBe("mao-livre");
   });
 
   it("aposta, menu de corte, bicas e fichas aparecem onde existem", () => {
     const comparar = no(MISSAO_4, "comparar");
-    expect(ferramentasDoPasso(comparar.p, comparar.e)).toEqual(["faixa", "mao-livre", "aposta", "menu-corte"]);
+    expect(ferramentasDoPasso(comparar.p, comparar.e)).toEqual(["bolha", "mao-livre", "aposta", "menu-corte"]);
     const volta = no(MISSAO_1, "volta");
     expect(ferramentasDoPasso(volta.p, volta.e)).toContain("bicas");
     const fracao = no(MISSAO_4, "duas-tres");

@@ -54,9 +54,9 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await expect(v(page, "[data-estacao='partilha.arco1.carga-igual']")).toHaveAttribute("data-status", "disponivel");
   await tocar(page, "[data-estacao='partilha.arco1.carga-igual'] [data-acao=entrar]");
 
-  // Missão 1. A faixa do Nônio se apresenta na primeira vez.
+  // Missão 1. A bolinha do Nônio se apresenta na primeira vez.
   await passo(page, "pedido");
-  await entender(page, "faixa");
+  await entender(page, "bolha");
   await tocar(page, "[data-acao=seguir]");
   await passo(page, "palpite");
   await mais(page, "resposta", 4);
@@ -74,9 +74,13 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await tocar(page, "[data-acao=seguir]");
 
   await passo(page, "repartir");
-  // Sem chave no servidor, a conversa não aparece: a faixa tem só o Me ajuda.
-  await expect(v(page, "[data-acao=nonio]")).toBeVisible();
-  await expect(page.locator("[data-acao=perguntar]")).toHaveCount(0);
+  // A bolinha no lugar da faixa. Sem chave no servidor, a janelinha abre sem o Pergunte por escrito.
+  await expect(page.locator("[data-faixa-nonio]")).toHaveCount(0);
+  await tocar(page, "[data-bolha-nonio]");
+  await expect(v(page, "[data-janela-nonio] [data-acao=nonio]")).toBeVisible();
+  await expect(page.locator("[data-conversa=secao]")).toHaveCount(0);
+  await tocar(page, "[data-acao=fechar-janela]");
+  await expect(page.locator("[data-janela-nonio]")).toHaveCount(0);
 
   // Um fechamento desigual: "ainda não", passageiro; o gesto seguinte volta a neutro.
   const tela = v(page, "[data-tela=missao]");

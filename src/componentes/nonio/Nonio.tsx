@@ -76,6 +76,7 @@ export function Nonio({
   tamanho = 64,
   rotulo = "Nônio",
   pes = true,
+  vivo = false,
 }: {
   expressao?: ExpressaoNonio;
   /** Largura em px. */
@@ -83,6 +84,8 @@ export function Nonio({
   rotulo?: string;
   /** Sem os pezinhos (o Nônio do cabeçalho). */
   pes?: boolean;
+  /** A antena balança devagar de vez em quando (a bolinha). Com movimento reduzido, fica parada. */
+  vivo?: boolean;
 }) {
   // Desenho pequeno pede traço mais grosso para continuar legível.
   const traco = tamanho <= 40 ? 2.8 : tamanho <= 80 ? 2.4 : 2.1;
@@ -110,10 +113,12 @@ export function Nonio({
       </g>
       <g style={{ transform: `rotate(${expressao === "duvida" ? -6 : 0}deg)`, transformOrigin: "28px 8px", transition: transicao }}>
         {/* Antena com a bolinha-ponteiro */}
-        <g style={{ transform: `rotate(${ANTENA[expressao]}deg)`, transformOrigin: "28px -28px", transition: transicao }}>
-          <line x1={28} y1={-28} x2={28} y2={-38.5} />
-          <circle cx={28} cy={-41} r={4} fill="var(--marca-texto)" />
-          <circle cx={28} cy={-41} r={4} fill="var(--nonio-rosto)" className="camada" style={{ opacity: expressao === "quieto" ? 1 : 0 }} />
+        <g className={vivo ? "nonio-antena-viva" : undefined}>
+          <g style={{ transform: `rotate(${ANTENA[expressao]}deg)`, transformOrigin: "28px -28px", transition: transicao }}>
+            <line x1={28} y1={-28} x2={28} y2={-38.5} />
+            <circle cx={28} cy={-41} r={4} fill="var(--marca-texto)" />
+            <circle cx={28} cy={-41} r={4} fill="var(--nonio-rosto)" className="camada" style={{ opacity: expressao === "quieto" ? 1 : 0 }} />
+          </g>
         </g>
         {pes && (
           <>

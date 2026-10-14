@@ -565,62 +565,6 @@
 
 /* ---------- Nônio, cabeçalho, bancada ---------- */
 
-/* A faixa do Nônio: rosto à esquerda, balão com nome, selo, fala e ações. */
-.faixa-nonio {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.faixa-balao {
-  padding: 9px 13px 11px;
-}
-
-.faixa-fala {
-  margin: 2px 0 0;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.35;
-}
-
-.faixa-balao > .selo + .faixa-fala {
-  margin-top: 6px;
-}
-
-.faixa-ponto {
-  display: inline-flex;
-  margin-right: 6px;
-  vertical-align: 1px;
-}
-
-.faixa-acoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 9px;
-}
-
-.faixa-nonio[data-compacta="sim"] .faixa-balao {
-  padding: 7px 11px 8px;
-}
-
-.faixa-nonio[data-compacta="sim"] .faixa-fala {
-  font-size: 14px;
-}
-
-.faixa-nonio[data-compacta="sim"] .faixa-acoes {
-  margin-top: 6px;
-}
-
-/* A faixa do Nônio colada no topo da folha que sobe. */
-.faixa-na-folha {
-  padding: 10px 14px 10px;
-  border: 2px solid var(--contorno);
-  border-bottom: 1.5px solid var(--pauta);
-  border-radius: 18px 18px 0 0;
-  background: var(--folha);
-}
-
 /* ---------- A faixa do objetivo ---------- */
 
 .objetivo {
@@ -662,6 +606,13 @@
   background: var(--marca-texto);
   box-shadow: inset 0 0 0 2px var(--contorno);
   color: var(--sobre-marca);
+}
+
+/* O "ainda não" passageiro: a palavra e o ponto vermelho, até o gesto seguinte. Nunca texto vermelho. */
+.objetivo-etiqueta[data-etiqueta="Ainda não"] {
+  background: var(--folha);
+  box-shadow: inset 0 0 0 2px var(--vermelho);
+  color: var(--tinta);
 }
 
 .objetivo-etiqueta[data-etiqueta="Desafio"] {
@@ -1109,8 +1060,8 @@ html[data-animacoes="leves"] .folha-sobe {
   flex: 1;
   min-height: 0;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto minmax(150px, 1fr) auto auto;
-  grid-template-areas: "pedido" "nota" "maquina" "faixa" "controles";
+  grid-template-rows: auto auto minmax(150px, 1fr) auto;
+  grid-template-areas: "pedido" "nota" "maquina" "controles";
 }
 
 .palco-pedido {
@@ -1147,14 +1098,6 @@ html[data-animacoes="leves"] .folha-sobe {
   transition: border-color var(--t-caneta) var(--curva-firme);
 }
 
-.palco-faixa {
-  grid-area: faixa;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 12px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
-}
-
 .palco-controles {
   grid-area: controles;
   position: relative;
@@ -1178,11 +1121,10 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (min-width: 1024px) {
   .palco-grade {
     grid-template-columns: minmax(0, 760px) 380px;
-    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
       "maquina nota"
-      "maquina faixa"
       "maquina controles";
     justify-content: center;
     column-gap: 24px;
@@ -1198,9 +1140,6 @@ html[data-animacoes="leves"] .folha-sobe {
   .palco-maquina {
     margin: 0;
     padding: 10px;
-  }
-  .palco-faixa {
-    margin: 0 0 14px;
   }
   .palco-nota {
     margin: 0 4px 16px;
@@ -1225,11 +1164,10 @@ html[data-animacoes="leves"] .folha-sobe {
 @media (orientation: landscape) and (min-width: 640px) and (max-width: 1023px) {
   .palco-grade {
     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
-    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
     grid-template-areas:
       "maquina pedido"
       "maquina nota"
-      "maquina faixa"
       "maquina controles";
     column-gap: 12px;
     padding: 10px 14px;
@@ -1239,8 +1177,7 @@ html[data-animacoes="leves"] .folha-sobe {
     border-radius: 12px;
     margin-bottom: 8px;
   }
-  .palco-maquina,
-  .palco-faixa {
+  .palco-maquina {
     margin: 0 0 8px;
   }
   .palco-controles,
@@ -1282,22 +1219,284 @@ html[data-animacoes="leves"] .folha-sobe {
 }
 }
 
-/* ---------- Pergunte ao Nônio (referência 4) ---------- */
+/* ---------- O Nônio flutuante (v04.html, referências 1 a 4) ---------- */
 
-.conversa-folha {
-  max-height: calc(100dvh - 120px);
-  min-height: min(560px, calc(100dvh - 120px));
+/* O canto inferior direito da máquina é do Nônio: a bolinha a 10 px das bordas e o recado à
+   esquerda dela, alinhado ao meio. O resto do canto deixa o toque passar para a máquina. */
+.nonio-canto {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  pointer-events: none;
 }
 
-.conversa-lista {
+.nonio-canto > * {
+  pointer-events: auto;
+}
+
+/* Passo sem máquina: o mesmo lugar, no canto da tela. */
+.nonio-canto-fixo {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 20;
+}
+
+/* Na apresentação, a bolinha sobe acima do véu junto com o canto. */
+.nonio-canto-fixo:has([data-apresentando]) {
+  z-index: 45;
+}
+
+/* Na vitrine, o canto fica no fluxo. */
+.nonio-canto.nonio-canto-vitrine {
+  position: static;
+  width: 100%;
+}
+
+.bolha-nonio {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  padding: 2px 0 0;
+  border: 2px solid var(--contorno);
+  border-radius: 50%;
+  background: var(--folha);
+  box-shadow: 0 4px 0 var(--sombra);
+  transition: transform 90ms var(--curva-firme);
+}
+
+.bolha-nonio:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--sombra);
+}
+
+.bolha-nonio[aria-expanded="true"] {
+  background: var(--caneta-palida);
+}
+
+/* O ponto de fala nova: marca-texto com contorno, no canto de cima. */
+.bolha-ponto {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--contorno);
+  border-radius: 50%;
+  background: var(--marca-texto);
+}
+
+/* A antena balança devagar a cada uns 8 s; parada com movimento reduzido e no modo leve. */
+@keyframes antena-balanca {
+  0%,
+  86%,
+  100% {
+    transform: rotate(0deg);
+  }
+  89% {
+    transform: rotate(-10deg);
+  }
+  92% {
+    transform: rotate(8deg);
+  }
+  95% {
+    transform: rotate(-4deg);
+  }
+}
+
+.nonio-antena-viva {
+  transform-origin: 28px -28px;
+  animation: antena-balanca 8s var(--curva-firme) infinite;
+}
+
+html[data-animacoes="leves"] .nonio-antena-viva,
+[data-ambiente="pausado"] .nonio-antena-viva {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nonio-antena-viva {
+    animation: none;
+  }
+}
+
+/* O recado: uma fala curta, com o canto de baixo à direita apontando para a bolinha. */
+.recado-nonio {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  max-width: 300px;
+  padding: 7px 11px;
+  border: 2px solid var(--contorno);
+  border-radius: 14px 14px 4px 14px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.recado-nonio .selo {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 7px;
+  font-size: 12.5px;
+}
+
+.recado-nonio .selo[data-selo="acertou"] {
+  border-width: 0;
+}
+
+/* A janelinha: folha que sobe de baixo (celular), metade direita (deitado), painel (computador). */
+.janela-nonio-veu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  padding: 0;
+  border: 0;
+  background: var(--veu);
+  cursor: default;
+}
+
+.janela-nonio {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 42;
+  display: flex;
+  flex-direction: column;
+  height: 60dvh;
+  min-height: min(440px, 88dvh);
+  max-height: 88dvh;
+  padding: 8px 16px max(16px, env(safe-area-inset-bottom));
+  border-top: 2px solid var(--contorno);
+  border-radius: 22px 22px 0 0;
+  background: var(--folha);
+  color: var(--tinta);
+}
+
+.janela-nonio[data-arrastando] {
+  animation: none;
+}
+
+.janela-nonio-pega {
+  flex: none;
+  padding-bottom: 10px;
+  touch-action: none;
+}
+
+.janela-nonio-corpo {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 9px;
+  gap: 12px;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding: 2px 2px 6px;
 }
+
+.janela-balao {
+  flex: none;
+  padding: 10px 13px 12px;
+  border: 2px solid var(--contorno);
+  border-radius: 14px 14px 14px 4px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  font-size: 15.5px;
+  font-weight: 500;
+  line-height: 1.38;
+}
+
+.janela-antes {
+  color: var(--tinta-suave);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.janela-degrau {
+  width: 22px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--grade);
+}
+
+.janela-degrau[data-feito="sim"] {
+  background: var(--caneta);
+}
+
+.janela-separador {
+  flex: none;
+  height: 2px;
+  background: var(--grade);
+}
+
+/* Enquanto o Nônio aponta com a janelinha aberta, a máquina fica acima do véu, abaixo da folha. */
+.palco[data-nonio-apontando="sim"] .palco-maquina {
+  z-index: 41;
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .bolha-nonio {
+    width: 44px;
+    height: 44px;
+  }
+  .bolha-nonio svg {
+    width: 34px;
+    height: auto;
+  }
+  .janela-nonio {
+    left: 50%;
+    top: 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    border-top: 0;
+    border-left: 2px solid var(--contorno);
+    border-radius: 18px 0 0 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .janela-nonio-veu {
+    background: transparent;
+  }
+  .janela-nonio {
+    left: auto;
+    right: var(--janela-direita, 28px);
+    bottom: var(--janela-base, 120px);
+    width: 400px;
+    height: auto;
+    min-height: 0;
+    max-height: var(--janela-altura, 70dvh);
+    padding-bottom: 16px;
+    border: 2px solid var(--contorno);
+    border-radius: 18px;
+    box-shadow: 0 4px 0 var(--sombra);
+  }
+  .janela-nonio .alca-folha {
+    display: none;
+  }
+}
+
+/* ---------- Pergunte ao Nônio (referência 4) ---------- */
 
 .conversa-eu,
 .conversa-ele {
@@ -1430,16 +1629,6 @@ html[data-animacoes="leves"] .folha-sobe {
   border-color: var(--grafite);
   box-shadow: none;
   color: var(--tinta-suave);
-}
-
-@media (min-width: 1024px) {
-  /* No computador: um painel na coluna da direita, da altura da tela. */
-  .conversa-folha {
-    width: 440px;
-    height: calc(100dvh - 32px);
-    max-height: none;
-    margin: 16px;
-  }
 }
 
 /* ---------- Apresentações ---------- */

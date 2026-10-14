@@ -11,6 +11,8 @@ export interface TextoRetorno {
   readonly consequencia: string;
   /** Uma pergunta ou o próximo gesto. Sai na aplicação, onde o Nônio só diz a consequência. */
   readonly pergunta: string;
+  /** O recado da bolinha (até 60), quando a primeira frase da consequência não cabe nele. */
+  readonly recado?: string;
 }
 
 export interface Equivoco extends TextoRetorno {
@@ -43,6 +45,7 @@ export const EQUIVOCOS: readonly Equivoco[] = [
     nome: "Corte que não fecha",
     conceito: "fra.parte",
     consequencia: "Em {partes}, saíram {pedacos} pedaços para {bicas} {receptores}, e eles não se repartem por igual nesta máquina.",
+    recado: "Em {partes}, os pedaços não se repartem por igual.",
     pergunta: "Desfaça o corte e tente outro número de partes.",
   },
   {
@@ -79,6 +82,7 @@ export const EQUIVOCOS: readonly Equivoco[] = [
     nome: "Fração de cabeça para baixo",
     conceito: "fra.quociente",
     consequencia: "Assim cada {receptor} ganharia mais de {umaPeca}, e só há {totalNome} para {abertasNome}.",
+    recado: "Assim cada {receptor} ganharia mais de {umaPeca}.",
     pergunta: "Quem vai em cima: {osPecas} ou {osReceptores}?",
   },
 ];

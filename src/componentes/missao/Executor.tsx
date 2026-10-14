@@ -5,14 +5,15 @@
  * O estado da execução vive no progresso: fechar e reabrir o navegador devolve o mesmo passo,
  * com a máquina no mesmo estado. Girar o aparelho só muda o CSS.
  *
- * O Nônio mora numa faixa entre a máquina e a bancada: lê a máquina, diz o retorno de cada
- * conferência (verde quando acertou; "ainda não", passageiro, quando não bateu) e dá a escada
- * de ajuda a pedido. Quem decide é o motor; a faixa só fala o que ele decidiu.
+ * O Nônio é uma bolinha sobre o canto da máquina: lê a máquina, diz o retorno de cada conferência
+ * (verde quando acertou; "ainda não", passageiro, quando não bateu) em recados curtos que somem
+ * sozinhos, e abre uma janelinha com a fala inteira, a escada de ajuda e a conversa. Quem decide
+ * é o motor; o Nônio só fala o que ele decidiu.
  */
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { operarVarias, quantidadeNaBica, bicasEmUso } from "@/nucleo/maquinas/bancada/bancada";
+import { operarVarias, pilhaDe, quantidadeNaBica, bicasEmUso } from "@/nucleo/maquinas/bancada/bancada";
 import type { AcaoBancada, Bancada as EstadoBancada, EstadoBancada as EstadoMaquina } from "@/nucleo/maquinas/bancada/tipos";
 import { metasDeComposicao } from "@/nucleo/maquinas/bancada/validadores";
 import type { DiferencaMaquinas } from "@/nucleo/maquinas/bancada/diferenca";
@@ -41,15 +42,19 @@ import { CATEGORIAS_RUA } from "@/conteudo/rua";
 import { PELES, type Pele } from "@/conteudo/peles";
 import { AJUDA } from "@/conteudo/reacoes";
 import { GESTOS } from "@/conteudo/gestos";
-import { FALHAS_CONVERSA, PERGUNTAS_PADRAO, TEXTOS_CONVERSA } from "@/conteudo/tutor";
+import { FALHAS_CONVERSA, PERGUNTAS_PADRAO, TEXTOS_CONVERSA, TEXTOS_JANELA } from "@/conteudo/tutor";
 import { Bancada, descreverBancada, type MarcasBancada } from "@/componentes/maquinas/Bancada";
 import { PainelBancada } from "@/componentes/maquinas/PainelBancada";
 import { Palco } from "@/componentes/maquinas/Palco";
 import { Nonio } from "@/componentes/nonio/Nonio";
-import { FaixaNonio, type AcaoAjuda } from "@/componentes/nonio/FaixaNonio";
-import { BarraJunto, FolhaCasoParecido } from "@/componentes/nonio/AjudaNonio";
+import { BarraJunto, CasoNaJanela } from "@/componentes/nonio/AjudaNonio";
 import { useFalaQuandoCalmo, useFilaNonio } from "@/componentes/nonio/useFila";
-import { ConversaNonio } from "@/componentes/nonio/ConversaNonio";
+import { BolhaNonio } from "@/componentes/nonio/BolhaNonio";
+import { RecadoNonio } from "@/componentes/nonio/RecadoNonio";
+import { JanelaNonio, type AjudaJanela } from "@/componentes/nonio/JanelaNonio";
+import { useNonio } from "@/componentes/nonio/useNonio";
+import { recadoDaFala } from "@/nucleo/tutor/recado";
+import { marcadoresDaPele } from "@/nucleo/tutor/reacoes";
 import { Apresentacao } from "@/componentes/nonio/Apresentacao";
 import { proximaApresentacao } from "@/nucleo/tutor/apresentacoes";
 import { historicoParaEnviar, perguntar, useConversaDisponivel, type MensagemTela } from "@/componentes/nonio/useConversa";
@@ -66,7 +71,7 @@ import { Objetivo, type Etiqueta } from "./Objetivo";
 import { ManualRasgado } from "./Manual";
 import type { MarcaResposta } from "./Respostas";
 import { descreverAcao, NOME_DA_FASE } from "./textos";
-import { FaixaNaFolha, FolhaFrase, FolhaNotacao, FolhaRegistro, PainelPalpite, PainelPrever, PainelVencido, Seguir } from "./Vistas";
+import { FolhaFrase, FolhaNotacao, FolhaRegistro, PainelPalpite, PainelPrever, PainelVencido, Seguir } from "./Vistas";
 
 interface Fim {
   via: "guiada" | "prova" | "registro";
@@ -113,10 +118,11 @@ export function ExecutorAtividade({
   const { fila, oferecerFala } = useFilaNonio(postura);
   // Pergunte ao Nônio: o histórico vive só aqui, na memória da execução aberta.
   const [conversa, setConversa] = useState<{ mensagens: MensagemTela[]; perguntas: number; esperando: boolean }>({ mensagens: [], perguntas: 0, esperando: false });
-  const [conversaAberta, setConversaAberta] = useState(false);
+  /** A janelinha do Nônio: a fala inteira, a escada e a conversa. */
+  const [janelaAberta, setJanelaAberta] = useState(false);
   /** O passo em que uma apresentação já apareceu nesta visita (no máximo uma por passo). */
   const [apresentadaEm, setApresentadaEm] = useState<string | null>(null);
-  const conversaAbertaRef = useRef(false);
+  const janelaAbertaRef = useRef(false);
   const conversaPermitida = a.tipo !== "sondagem" && atividadePorId(a.id) !== null && progresso.preferencias.conversa === "ligada";
   const conversaNoAr = useConversaDisponivel(pronto && conversaPermitida);
 
@@ -127,6 +133,12 @@ export function ExecutorAtividade({
   const oferta = pronto && !fim && passo && a.tipo !== "sondagem" ? falaDeOferta(passo, exec, postura, TEXTOS_REACAO) : null;
   useFalaQuandoCalmo(oferta, fila, oferecerFala, PERMANENCIA_MINIMA_MS + 3500);
   const gesto = passo ? proximoGesto(passo, exec, { textos: GESTOS, reacoes: TEXTOS_REACAO, pele }) : null;
+  // A fala do momento: a da fila, se for deste passo; senão, a que o estado do passo pede.
+  const palpite = passo ? palpiteDoPasso(a, exec) : null;
+  const falaAtual: FalaFaixa | null = passo ? (falaDoPasso(fila, passo.id) ?? falaDoEstado(a, passo, exec, TEXTOS_REACAO, pele, palpite)) : null;
+  // A sondagem é quieta: sem retorno colorido, sem escada; o Nônio só lê a máquina.
+  const quieta = a.tipo === "sondagem";
+  const nonio = useNonio({ fala: falaAtual, postura, janelaAberta, quieta });
   const lembrete = useLembrete(
     pronto && !fim && passo !== null && passoDeMaquina(passo) && exec.passo.situacao !== "vencido" ? `${passo.id}:${exec.bancada?.atual.seq ?? 0}:${exec.passo.situacao}` : null,
     (n) => {
@@ -140,7 +152,19 @@ export function ExecutorAtividade({
   if (!passo) return <Carregando />;
   const total = passosDoModo(a, modo).length;
 
+  const abrirJanela = () => {
+    janelaAbertaRef.current = true;
+    setJanelaAberta(true);
+  };
+  const fecharJanela = () => {
+    janelaAbertaRef.current = false;
+    setJanelaAberta(false);
+    setCasoAberto(false);
+  };
+
   const enviar = (entrada: Entrada) => {
+    // Um gesto: o recado do Nônio some (a reação a este gesto pode trazer outro).
+    nonio.gesto();
     const agora = agoraDoJogo(progresso);
     const r = aplicarEntrada(a, exec, entrada, { agora, conceitoDoEquivoco });
     atualizar((p, t) => aplicarEfeitos(iniciarAtividade(p, a.id, t), a, r.exec, r.efeitos, t));
@@ -174,7 +198,7 @@ export function ExecutorAtividade({
     }
     if (r.exec.indice !== exec.indice) {
       setCotaEscolhida(null);
-      setCasoAberto(false);
+      fecharJanela();
     }
     const concluida = r.efeitos.find((e): e is Extract<Efeito, { tipo: "concluida" }> => e.tipo === "concluida");
     if (concluida) {
@@ -186,13 +210,10 @@ export function ExecutorAtividade({
     }
   };
 
-  /* ---------- A faixa do Nônio ---------- */
+  /* ---------- O Nônio flutuante ---------- */
 
-  const palpite = palpiteDoPasso(a, exec);
-  const falaAtual: FalaFaixa = falaDoPasso(fila, passo.id) ?? falaDoEstado(a, passo, exec, TEXTOS_REACAO, pele, palpite);
+  if (!falaAtual) return <Carregando />;
   const chaveRascunho = `${passo.id}:${exec.passo.respostas}:${exec.passo.tentativas}`;
-  // A sondagem é quieta: sem retorno colorido, sem escada; o Nônio só lê a máquina.
-  const quieta = a.tipo === "sondagem";
   const selo = quieta || (rascunho === chaveRascunho && exec.passo.retorno === "ainda-nao") ? null : seloVisivel(falaAtual, exec);
   const retorno = selo ?? "neutro";
   const sit = exec.passo.situacao;
@@ -200,24 +221,32 @@ export function ExecutorAtividade({
   const temEscada = !quieta && passo.dicas !== undefined && TIPOS_COM_ESCADA.includes(passo.tipo) && (sit === "ativo" || sit === "convite");
   const podeJunto = passo.tipo === "operar" || passo.tipo === "frase" || passo.tipo === "aposta";
   const pedirAjuda = () => {
-    if (nivel < 3) enviar({ tipo: "dica" });
-    else if (podeJunto) enviar({ tipo: "junto" });
-    else setCasoAberto(true);
+    if (nivel < 3) {
+      // A ajuda pedida abre a janelinha: é lá que ela cabe inteira.
+      abrirJanela();
+      enviar({ tipo: "dica" });
+    } else if (podeJunto) {
+      // Fazer junto acontece embaixo da máquina: a janelinha sai da frente.
+      fecharJanela();
+      enviar({ tipo: "junto" });
+    } else {
+      abrirJanela();
+      setCasoAberto(true);
+    }
   };
   const rotuloAjuda = nivel === 0 ? "Me ajuda" : nivel < 3 ? "Mais ajuda" : podeJunto ? "Resolver junto" : "Ver o caso";
   const ajudaNaResposta = passo.tipo === "prever" && selo === "ainda-nao";
-  const acaoAjuda: AcaoAjuda | null =
-    temEscada && nivel < 4 && !ajudaNaResposta ? { rotulo: rotuloAjuda, onPedir: pedirAjuda, oferta: falaAtual.categoria === "oferta" } : null;
+  const acaoAjuda: AjudaJanela | null = temEscada && nivel < 4 ? { rotulo: rotuloAjuda, onPedir: pedirAjuda, nivel, oferta: falaAtual.categoria === "oferta" } : null;
   const expressao = quieta || (falaAtual.categoria === "passo" && postura === "quieto") ? "quieto" : falaAtual.expressao;
 
   /* ---------- Pergunte ao Nônio ---------- */
 
-  const podePerguntar = conversaNoAr && !casoAberto;
+  const podePerguntar = conversaNoAr;
   const avisoConversa = !("conversa" in progresso.apresentacoes);
   const conversaFechada = conversa.perguntas >= LIMITES_TUTOR.perguntasPorExecucao;
   const sugestoes = passo.perguntas ?? PERGUNTAS_PADRAO[passo.tipo];
   const novaMensagem = (m: Omit<MensagemTela, "id">, c: { mensagens: MensagemTela[] }): MensagemTela => ({ ...m, id: (c.mensagens.at(-1)?.id ?? 0) + 1 });
-  /** A última resposta vai para a faixa (pedida) e, com alvo, aponta na máquina. */
+  /** A resposta que chega com a janelinha fechada vira recado (pedida) e, com alvo, aponta. */
   const levarParaFaixa = (m: MensagemTela | undefined) => {
     if (!m || m.autor !== "nonio" || m.aviso) return;
     oferecerFala({
@@ -229,15 +258,6 @@ export function ExecutorAtividade({
       passo: passo.id,
       alvo: m.alvo ?? undefined,
     });
-  };
-  const abrirConversa = () => {
-    conversaAbertaRef.current = true;
-    setConversaAberta(true);
-  };
-  const fecharConversa = () => {
-    conversaAbertaRef.current = false;
-    setConversaAberta(false);
-    levarParaFaixa(conversa.mensagens.at(-1));
   };
   const enviarPergunta = async (texto: string) => {
     if (conversa.esperando || conversaFechada) return;
@@ -269,27 +289,16 @@ export function ExecutorAtividade({
       const r = novaMensagem(resposta, c);
       const mensagens = [...c.mensagens, r];
       if (perguntas >= LIMITES_TUTOR.perguntasPorExecucao) mensagens.push({ id: r.id + 1, autor: "nonio", texto: TEXTOS_CONVERSA.limite, aviso: true });
-      if (!conversaAbertaRef.current) levarParaFaixa(r);
+      if (!janelaAbertaRef.current) levarParaFaixa(r);
       return { mensagens, perguntas, esperando: false };
     });
   };
-  const folhaConversa = conversaAberta ? (
-    <ConversaNonio
-      mensagens={conversa.mensagens}
-      esperando={conversa.esperando}
-      sugestoes={sugestoes}
-      fechada={conversaFechada}
-      aviso={avisoConversa}
-      onEntendi={() => atualizar((p, t) => marcarApresentacao(p, "conversa", t))}
-      onEnviar={(t) => void enviarPergunta(t)}
-      onFechar={fecharConversa}
-    />
-  ) : null;
+  const ultimaResposta = [...conversa.mensagens].reverse().find((m) => m.autor === "nonio" && !m.aviso) ?? null;
 
   /* ---------- Apresentações ---------- */
 
   const apresentar =
-    casoAberto || conversaAberta
+    janelaAberta
       ? null
       : proximaApresentacao(a, passo, exec, progresso.apresentacoes, { jaNestePasso: apresentadaEm === passo.id, retornoVisivel: selo !== null });
   const apresentacao = apresentar ? (
@@ -304,51 +313,92 @@ export function ExecutorAtividade({
   ) : null;
 
   const origemDesvio = progresso.campanha.desvio?.destino === a.id ? atividadePorId(progresso.campanha.desvio.origem) : null;
-  const faixa = (compacta: boolean) => (
-    <>
-      {!compacta && origemDesvio && (
-        <Link href={rotaDe(origemDesvio)} className="block rotate-[-0.6deg] rounded-md border-2 border-contorno bg-marca-texto text-sobre-marca px-3 py-2 text-[14px] font-semibold" data-desvio="">
-          Desvio. Quando quiser, volte para {origemDesvio.titulo}: a máquina está como você deixou.
-        </Link>
-      )}
-      {!compacta && a.categoria && <CategoriaRua categoria={a.categoria} />}
-      <FaixaNonio
-        fala={falaAtual}
-        selo={selo}
-        retorno={retorno}
-        expressao={expressao}
-        ajuda={acaoAjuda}
-        onPerguntar={podePerguntar ? abrirConversa : null}
-        compacta={compacta}
-        apontando={falaAtual.alvo !== undefined}
-        extra={
-          sondagem ? (
-            <Link
-              href={`/partilha/sondagem?conceito=${encodeURIComponent(sondagem)}&origem=${encodeURIComponent(a.id)}`}
-              className="botao-pequeno mt-2"
-              data-convite-sondagem={sondagem}
-            >
-              Uma pergunta
-            </Link>
-          ) : null
-        }
-      />
-    </>
+  /** O que antes morava com a faixa: o caminho de volta do desvio e a categoria da Rua. */
+  const avisos =
+    origemDesvio || a.categoria ? (
+      <div className="flex flex-col gap-2.5">
+        {origemDesvio && (
+          <Link href={rotaDe(origemDesvio)} className="block rotate-[-0.6deg] rounded-md border-2 border-contorno bg-marca-texto text-sobre-marca px-3 py-2 text-[14px] font-semibold" data-desvio="">
+            Desvio. Quando quiser, volte para {origemDesvio.titulo}: a máquina está como você deixou.
+          </Link>
+        )}
+        {a.categoria && <CategoriaRua categoria={a.categoria} />}
+      </div>
+    ) : null;
+
+  // Ele aponta (o círculo a lápis azul na máquina) enquanto a fala está à vista: no recado ou na janelinha.
+  const alvoApontado = janelaAberta ? (ultimaResposta?.alvo ?? falaAtual.alvo ?? null) : nonio.recado ? (falaAtual.alvo ?? null) : null;
+  const pelePasso = exec.bancada ? PELES[exec.bancada.atual.config.pele] : null;
+
+  /** A bolinha e o recado: no canto da máquina, ou no canto da tela quando o passo não tem máquina. */
+  const canto = (fixo: boolean) => (
+    <div className={`nonio-canto ${fixo ? "nonio-canto-fixo" : ""}`} data-nonio-canto="">
+      {nonio.recado && !janelaAberta && <RecadoNonio texto={recadoDaFala(falaAtual)} selo={selo} onTocar={abrirJanela} />}
+      <BolhaNonio expressao={expressao} novidade={nonio.novidade} onAbrir={abrirJanela} aberta={janelaAberta} />
+    </div>
   );
 
-  const folhaCaso =
-    casoAberto && passo.dicas ? (
-      <FolhaCasoParecido
-        dica={passo.dicas[2]}
-        medidas={{ ...medidasVivas(exec.bancada?.atual ?? null), feitas: String(exec.passo.solucoes.length) }}
-        podeJunto={podeJunto && sit === "ativo" && nivel < 4}
-        onJunto={() => {
-          setCasoAberto(false);
-          enviar({ tipo: "junto" });
-        }}
-        onFechar={() => setCasoAberto(false)}
-      />
-    ) : null;
+  /** A fala atual, sempre numa região viva para o leitor de tela, mesmo sem recado. */
+  const voz = (
+    <p className="so-leitor" role="status" aria-live="polite" data-visor="" data-fala-nonio={falaAtual.id} data-selo={selo ?? undefined}>
+      {selo === "acertou" ? "Acertou. " : selo === "ainda-nao" ? "Ainda não. " : ""}
+      {falaAtual.texto}
+    </p>
+  );
+
+  const janela = janelaAberta ? (
+    <JanelaNonio
+      fala={falaAtual}
+      selo={selo}
+      expressao={expressao}
+      apontando={textoApontando(alvoApontado, pelePasso, exec.bancada?.atual ?? null)}
+      antes={nonio.antes}
+      ajuda={acaoAjuda}
+      caso={
+        casoAberto && passo.dicas
+          ? {
+              conteudo: (
+                <CasoNaJanela
+                  dica={passo.dicas[2]}
+                  medidas={{ ...medidasVivas(exec.bancada?.atual ?? null), feitas: String(exec.passo.solucoes.length) }}
+                  podeJunto={podeJunto && sit === "ativo" && nivel < 4}
+                  onJunto={() => {
+                    fecharJanela();
+                    enviar({ tipo: "junto" });
+                  }}
+                />
+              ),
+              onVoltar: () => setCasoAberto(false),
+            }
+          : null
+      }
+      extra={
+        sondagem ? (
+          <Link
+            href={`/partilha/sondagem?conceito=${encodeURIComponent(sondagem)}&origem=${encodeURIComponent(a.id)}`}
+            className="botao-secundario self-start"
+            data-convite-sondagem={sondagem}
+          >
+            Uma pergunta
+          </Link>
+        ) : null
+      }
+      conversa={
+        podePerguntar
+          ? {
+              mensagens: conversa.mensagens,
+              esperando: conversa.esperando,
+              sugestoes,
+              fechada: conversaFechada,
+              aviso: avisoConversa,
+              onEntendi: () => atualizar((p, t) => marcarApresentacao(p, "conversa", t)),
+              onEnviar: (t) => void enviarPergunta(t),
+            }
+          : null
+      }
+      onFechar={fecharJanela}
+    />
+  ) : null;
 
   const atributos = {
     "data-pronto": "sim",
@@ -359,6 +409,8 @@ export function ExecutorAtividade({
     "data-fase": passo.fase,
     "data-situacao": sit,
     "data-retorno": retorno,
+    "data-janela": janelaAberta ? "aberta" : "fechada",
+    "data-nonio-apontando": janelaAberta && alvoApontado ? "sim" : "nao",
   };
 
   const cabecalho = (
@@ -386,7 +438,13 @@ export function ExecutorAtividade({
                 ? "Registro"
                 : "Objetivo";
   const pedido = (
-    <Objetivo etiqueta={etiqueta} instrucao={desafio ? (passo.convite.instrucao ?? passo.convite.texto) : passo.instrucao} gesto={gesto} lembrete={lembrete} />
+    <Objetivo
+      etiqueta={etiqueta}
+      aindaNao={selo === "ainda-nao"}
+      instrucao={desafio ? (passo.convite.instrucao ?? passo.convite.texto) : passo.instrucao}
+      gesto={gesto}
+      lembrete={lembrete}
+    />
   );
 
   if (passo.tipo === "narrativa" || !exec.bancada) {
@@ -407,7 +465,7 @@ export function ExecutorAtividade({
             </>
           )}
           {passo.falasSeMarca && progresso.campanha.marcas.includes(passo.falasSeMarca.marca) && <Falas falas={passo.falasSeMarca.falas} />}
-          <div className="flex flex-col gap-2.5">{faixa(false)}</div>
+          {avisos}
           {passo.tipo === "registro" ? (
             <FolhaRegistro passo={passo} frase={Object.values(exec.frases).at(-1) ?? ""} onGuardar={() => enviar({ tipo: "seguir" })} />
           ) : passo.tipo === "palpite" ? (
@@ -418,8 +476,9 @@ export function ExecutorAtividade({
             <Seguir rotulo={passo.tipo === "narrativa" ? (passo.botao ?? "Continuar") : "Continuar"} onClick={() => enviar({ tipo: "seguir" })} />
           )}
         </TelaNarrativa>
-        {folhaCaso}
-        {folhaConversa}
+        {canto(true)}
+        {voz}
+        {janela}
         {apresentacao}
       </>
     );
@@ -436,7 +495,7 @@ export function ExecutorAtividade({
     bicasAtencao: aindaNao ? bicasDoAlvo(alvo, bancada.atual) : [],
     sobraAtencao: aindaNao && alvo === "esteira",
   };
-  const realce = !aindaNao && alvo && (sit === "ativo" || sit === "convite") ? alvo : null;
+  const realce = !aindaNao && alvoApontado && (sit === "ativo" || sit === "convite") ? alvoApontado : null;
   const cotaDica = nivel >= 2 && sit === "ativo" ? passo.dicas?.[1].cota : undefined;
   const vivas = medidasVivas(bancada.atual);
   const cotaExtra = cotaDica ? { alvo: cotaDica.alvo, texto: textoComMedidas(cotaDica.texto, vivas) } : null;
@@ -465,7 +524,7 @@ export function ExecutorAtividade({
 
   // Acima da máquina: o bilhete da aposta; a Dália, quando a máquina muda ou quando abre a conversa.
   const falasDaDalia = passo.falas?.filter((f) => f.quem === "dalia").map((f) => f.texto) ?? [];
-  const nota =
+  const notaDoPasso =
     passo.tipo === "aposta" ? (
       <Bilhete texto={passo.aposta} />
     ) : passo.chegada && intacto ? (
@@ -475,6 +534,13 @@ export function ExecutorAtividade({
     ) : falasDaDalia.length > 0 && intacto ? (
       <div className="ficha px-4 pb-3 pt-2">
         <FalaDalia texto={falasDaDalia} compacta />
+      </div>
+    ) : null;
+  const nota =
+    avisos || notaDoPasso ? (
+      <div className="flex flex-col gap-2.5">
+        {avisos}
+        {notaDoPasso}
       </div>
     ) : null;
 
@@ -560,7 +626,6 @@ export function ExecutorAtividade({
   } else if (passo.tipo === "frase") {
     sobreposicao = (
       <FolhaSobe>
-        <FaixaNaFolha>{faixa(true)}</FaixaNaFolha>
         <FolhaFrase
           passo={passo}
           exec={exec}
@@ -581,7 +646,6 @@ export function ExecutorAtividade({
     const frase = Object.values(exec.frases).at(-1) ?? "";
     sobreposicao = (
       <FolhaSobe>
-        <FaixaNaFolha>{faixa(true)}</FaixaNaFolha>
         <FolhaNotacao
           passo={passo}
           frase={frase}
@@ -597,7 +661,6 @@ export function ExecutorAtividade({
   } else if (passo.tipo === "registro") {
     sobreposicao = (
       <FolhaSobe>
-        <FaixaNaFolha>{faixa(true)}</FaixaNaFolha>
         <FolhaRegistro passo={passo} frase={Object.values(exec.frases).at(-1) ?? ""} onGuardar={() => enviar({ tipo: "seguir" })} />
       </FolhaSobe>
     );
@@ -616,15 +679,40 @@ export function ExecutorAtividade({
             {maquina}
           </>
         }
-        faixa={faixa(false)}
+        nonio={canto(false)}
         controles={controles}
         sobreposicao={sobreposicao}
       />
-      {folhaCaso}
-      {folhaConversa}
+      {voz}
+      {janela}
       {apresentacao}
     </>
   );
+}
+
+/** O subtítulo da janelinha: o que o Nônio está apontando, com os nomes da pele. */
+function textoApontando(alvo: AlvoMaquina | null, pele: Pele | null, e: EstadoMaquina | null): string | null {
+  if (!alvo) return null;
+  const a = TEXTOS_JANELA.apontandoA;
+  const nomes = e?.config.nomesBicas;
+  if (alvo === "pilha" && pele && e) {
+    // "a broa na esteira", "as sacas na esteira", "os pedaços na esteira"
+    const p = pilhaDe(e.esteira, e.pilha);
+    if (p) {
+      const inteira = p.tamanho.n === 1 && p.tamanho.d === 1;
+      const nome = inteira ? pele.peca : pele.pedaco;
+      const plural = p.quantidade > 1;
+      const artigo = nome.genero === "f" ? (plural ? "as" : "a") : plural ? "os" : "o";
+      return `${a.prefixo} ${artigo} ${plural ? nome.plural : nome.singular} ${a.naEsteira}`;
+    }
+  }
+  if (alvo === "esteira" || alvo === "pilha" || alvo === "bandeja" || alvo === "fatiador") return a[alvo];
+  if (!pele) return null;
+  const m = marcadoresDaPele(pele);
+  if (alvo === "bicas") return `${a.prefixo} ${m.osReceptores}`;
+  const i = Number(alvo.slice(5));
+  const artigo = pele.receptor.genero === "f" ? "a" : "o";
+  return `${a.prefixo} ${artigo} ${pele.receptor.singular} ${nomes?.[i] ?? i + 1}`;
 }
 
 function textoComMedidas(modelo: string, vivas: Record<string, string>): string {
@@ -746,6 +834,7 @@ function MaquinaDoPasso({
       marcas={demo ? { aceita: false } : passo.tipo === "prever" && exec.passo.situacao === "conferindo" ? { aceita: true } : marcas}
       chegada={demo ? null : chegada}
       metas={metas}
+      cantoNonio
     />
   );
 }
@@ -809,7 +898,7 @@ function TelaNarrativa({
     <main {...atributos} className="flex min-h-dvh flex-col">
       {cabecalho}
       <div className="palco-pedido lg:hidden">{pedido}</div>
-      <div className="area-segura area-segura-base mx-auto flex w-full max-w-[600px] flex-1 flex-col gap-5 py-6">
+      <div className="area-segura area-segura-base mx-auto flex w-full max-w-[600px] flex-1 flex-col gap-5 pb-[92px] pt-6">
         <div className="palco-pedido hidden lg:flex">{pedido}</div>
         {children}
       </div>

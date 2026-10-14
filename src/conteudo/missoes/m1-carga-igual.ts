@@ -83,6 +83,7 @@ export const MISSAO_1: Atividade = {
       pedido: "Uma saca em cada carroça, à mão.",
       instrucao: "Ponha uma saca em cada carroça, com a mão.",
       nonio: "Antes da alavanca, a mão: toque numa saca na esteira e depois numa carroça.",
+      recados: { abertura: "Antes da alavanca, a mão: uma saca de cada vez." },
       acerto: "Uma saca em cada carroça, posta à mão. Na esteira ainda há {sobraNome}.",
       maquina: { config: MAQUINA },
       objetivo: { validador: "partilha.inteiras-por-bica", params: { n: 1 } },

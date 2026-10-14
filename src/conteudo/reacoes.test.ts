@@ -1,7 +1,7 @@
 /**
  * Checagens das falas do Nônio: todo motivo e todo equívoco têm fala; rodando todas as soluções
- * de teste e sabotagens, cada fala da faixa cabe em 160 caracteres, sem marcador sobrando e
- * sem as palavras que julgam.
+ * de teste e sabotagens (a degustação junto), cada fala cabe em 160 caracteres, sem marcador
+ * sobrando e sem as palavras que julgam, e todo recado possível da bolinha cabe em 60.
  */
 import { describe, expect, it } from "vitest";
 import { MOTIVOS_VALIDACAO } from "@/nucleo/maquinas/bancada/validadores";
@@ -12,7 +12,9 @@ import { CONCEITOS_COM_GERADOR } from "@/nucleo/geradores/questoes";
 import type { Postura } from "@/nucleo/progresso/tipos";
 import { falaDeAbertura, falaDeAjuda, falaDeOferta, LIMITE_FALA, reagir } from "@/nucleo/tutor/reacoes";
 import type { FalaFaixa } from "@/nucleo/tutor/fila";
+import { categoriaComRecado, LIMITE_RECADO, recadoCabe, recadoDaFala } from "@/nucleo/tutor/recado";
 import { ATIVIDADES } from "./atividades";
+import { DEGUSTACAO } from "./degustacao";
 import { EQUIVOCOS } from "./equivocos";
 import { PELES } from "./peles";
 import { MOTIVOS, TEXTOS_REACAO } from "./reacoes";
@@ -26,7 +28,15 @@ function conferirFala(f: FalaFaixa | null, onde: string): void {
   expect(f.texto, `${onde}: vazia`).not.toBe("");
   expect(f.texto, `${onde}: marcador sobrando`).not.toMatch(/[{}]/);
   expect(f.texto, `${onde}: palavra que julga`).not.toMatch(PROIBIDAS);
+  // Toda fala que pode virar recado (na postura mais falante) tem um recado que cabe, sem corte.
+  if (categoriaComRecado(f.categoria, "presente")) {
+    expect(recadoCabe(f), `${onde}: recado não cabe em ${LIMITE_RECADO}: "${f.recado ?? f.texto}"`).toBe(true);
+    expect(recadoDaFala(f).length, `${onde}: recado`).toBeLessThanOrEqual(LIMITE_RECADO);
+    expect(recadoDaFala(f), `${onde}: recado com marcador`).not.toMatch(/[{}]/);
+  }
 }
+
+const COM_DEGUSTACAO: readonly Atividade[] = [...ATIVIDADES, DEGUSTACAO];
 
 const ctx = { agora: 1, conceitoDoEquivoco: (id: string) => EQUIVOCOS.find((e) => e.id === id)?.conceito ?? null };
 
@@ -75,14 +85,14 @@ describe("falas do Nônio", () => {
     }
   });
 
-  it.each(ATIVIDADES.map((a) => [a.id, a] as const))("soluções e sabotagens de %s: falas curtas e limpas", (_, a) => {
+  it.each(COM_DEGUSTACAO.map((a) => [a.id, a] as const))("soluções e sabotagens de %s: falas curtas e limpas", (_, a) => {
     for (const postura of POSTURAS) {
       for (const s of [...a.solucoesDeTeste, ...a.sabotagens]) percorrer(a, s.modo, s.entradas, postura);
     }
   });
 
   it("degraus de ajuda de todo passo cabem na faixa", () => {
-    for (const a of [...ATIVIDADES, ...GERADAS]) {
+    for (const a of [...COM_DEGUSTACAO, ...GERADAS]) {
       for (const modo of ["guiada", "prova"] as const) {
         let e = iniciarExecucao(a, modo);
         for (let i = 0; i < passosDoModo(a, modo).length; i++) {

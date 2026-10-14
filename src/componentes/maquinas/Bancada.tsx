@@ -49,6 +49,8 @@ export interface PropsBancada {
   chegada?: { readonly pecasNovas: readonly { readonly tamanho: string; readonly quantidade: number }[]; readonly bicasAbriram: readonly number[] } | null;
   /** O que cada bica precisa mostrar, a lápis, enquanto está vazia ("2/8?"). */
   metas?: Readonly<Record<number, string>>;
+  /** O canto inferior direito é da bolinha do Nônio: a bandeja vai para a esquerda. */
+  cantoNonio?: boolean;
 }
 
 function ativarComTeclado(e: KeyboardEvent, f: () => void) {
@@ -123,6 +125,7 @@ export function Bancada({
   proporcao,
   chegada = null,
   metas,
+  cantoNonio = false,
 }: PropsBancada) {
   const id = useId().replace(/:/g, "");
   // A chegada: a bica nova começa a lápis e passa a caneta; as peças novas entram pela esteira.
@@ -146,7 +149,7 @@ export function Bancada({
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
-  const L = calcularLayout(estado, forma, proporcao ?? medida.proporcao);
+  const L = calcularLayout(estado, forma, proporcao ?? medida.proporcao, cantoNonio);
   // A letra de mão só aparece quando sai com 19 px ou mais na tela.
   const escala = Math.min(medida.largura / LARGURA, (medida.largura * (proporcao ?? medida.proporcao)) / L.altura);
   const letraDeMao = escala * 22 >= 19;
@@ -507,7 +510,7 @@ export function Bancada({
 
         {/* Voo das peças numa volta: sai de onde a pilha estava e chega em cada bica aberta */}
         {ev?.tipo === "volta" && (
-          <g key={`voo-${estado.seq}`} aria-hidden="true">
+          <g key={`voo-${estado.seq}`} aria-hidden="true" style={{ pointerEvents: "none" }}>
             {ev.bicas.map((i) => {
               const lb = L.bicas[i];
               if (!lb) return null;
