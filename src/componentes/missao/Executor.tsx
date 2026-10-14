@@ -145,7 +145,8 @@ export function ExecutorAtividade({
   const pele = exec.bancada ? PELES[exec.bancada.atual.config.pele] : null;
   const oferta = pronto && !fim && passo && a.tipo !== "sondagem" ? falaDeOferta(passo, exec, postura, TEXTOS_REACAO) : null;
   useFalaQuandoCalmo(oferta, fila, oferecerFala, PERMANENCIA_MINIMA_MS + 3500);
-  const gesto = passo ? proximoGesto(passo, exec, { textos: GESTOS, reacoes: TEXTOS_REACAO, pele }) : null;
+  // Depois de comprimir, a notação já está na folha: o gesto que falta é Continuar.
+  const gesto = !passo ? null : passo.tipo === "notacao" && comprimida === passo.id ? { texto: GESTOS.vencido, tom: "gesto" as const } : proximoGesto(passo, exec, { textos: GESTOS, reacoes: TEXTOS_REACAO, pele });
   // A fala do momento: a da fila, se for deste passo; senão, a que o estado do passo pede.
   const palpite = passo ? palpiteDoPasso(a, exec) : null;
   const falaAtual: FalaFaixa | null = passo ? (falaDoPasso(fila, passo.id) ?? falaDoEstado(a, passo, exec, TEXTOS_REACAO, pele, palpite)) : null;

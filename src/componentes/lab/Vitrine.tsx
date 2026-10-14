@@ -2,8 +2,9 @@
 
 /**
  * /lab/vitrine: a identidade Quadriculado inteira, para conferir o sistema numa página só.
- * Materiais, tokens, letra, receitas de componente, kit de desenho, peças, Nônio, guia (faixa,
- * selos, objetivo, bilhete, menu de corte, folhas), joias, notação.
+ * Materiais, tokens, letra, receitas de componente, kit de desenho, peças, Nônio, guia (a bolinha,
+ * o recado, a janelinha, selos, objetivo, bilhete, menu de corte, folhas), rascunho e conta, uma
+ * página do Manual, tudo no escuro, joias, notação.
  */
 import { useState, type ReactNode } from "react";
 import { racional } from "@/nucleo/racional/racional";
@@ -40,6 +41,7 @@ import { IconeRecomecar } from "@/componentes/icones/IconeRecomecar";
 import { IconeVisto } from "@/componentes/icones/IconeVisto";
 import { IconeVoltar } from "@/componentes/icones/IconeVoltar";
 import { VitrineGuia } from "./VitrineGuia";
+import { VitrineV04 } from "./VitrineV04";
 
 const TOKENS: { grupo: string; nomes: string[] }[] = [
   { grupo: "Papel", nomes: ["papel", "grade", "grade-suave", "folha", "pauta", "margem"] },
@@ -343,6 +345,8 @@ export function Vitrine() {
         </Secao>
 
         <VitrineGuia Secao={Secao} />
+
+        <VitrineV04 Secao={Secao} />
 
         <Secao titulo="Joias e estágios">
           <svg viewBox="0 0 300 300" className="traco-fixo block w-full max-w-md" aria-label="Quatro joias em quatro estágios" role="img">

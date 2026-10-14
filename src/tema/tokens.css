@@ -113,7 +113,8 @@
 }
 
 /* ---------- O escuro: a mesma tabela, com a luz apagada ---------- */
-:root[data-tema="escuro"] {
+:root[data-tema="escuro"],
+[data-tema="escuro"] {
   color-scheme: dark;
 
   /* Papel */

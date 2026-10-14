@@ -3,8 +3,8 @@
 Jogo web, em português do Brasil, que ensina matemática por experimentação. O jogador chega ao
 Engenho, uma máquina do tamanho de uma cidade desenhada num caderno, que está desbotando para lápis,
 e passa cada distrito a caneta de novo descobrindo por que ele funciona. Esta versão traz o Arco 1 de A Partilha (repartir e o
-que fazer com o que sobra), o Caderno, a Planta, o Relicário, o Museu e a Rua, com o Nônio guiando
-cada missão.
+que fazer com o que sobra), o Caderno, o Manual, a Planta, o Relicário, o Museu e a Rua, com o
+Nônio guiando cada missão. Claro ou escuro, em tela cheia ou instalado no celular.
 
 ## Rodar
 
@@ -24,8 +24,8 @@ quando o projeto foi ligado. O jogo funciona sem variável de ambiente nenhuma.
 
 ## Ligar a conversa com o Nônio (opcional)
 
-"Pergunte ao Nônio" responde perguntas livres sobre a missão com o Claude Haiku 5.5, da Anthropic.
-Sem a chave, o botão "Perguntar" não aparece e o resto é igual.
+"Pergunte por escrito", na janelinha do Nônio, responde perguntas livres sobre a missão com o
+Claude Haiku 5.5, da Anthropic. Sem a chave, ele não aparece e o resto é igual.
 
 1. No Console da Anthropic (platform.claude.com), crie uma chave de API, ponha crédito e, se
    quiser, um limite de gasto mensal.
@@ -49,10 +49,23 @@ desligar as perguntas no menu ("Perguntas por escrito ao Nônio (usa IA)").
 `/` decide para onde ir (abertura, calibragem ou mapa). Depois: `/mapa`, `/partilha` (o distrito),
 `/partilha/carga-igual` e as outras missões (`?modo=prova` para a prova direta, `?modo=registro` para
 fazer só o registro), `/partilha/revisita`, `/museu/paes-de-ahmes`, `/rua/tres-pizzas`,
-`/caderno`, `/planta`, `/relicario`, `/menu`.
+`/caderno`, `/manual` (e `/manual/divisao-com-resto` e as outras páginas), `/planta`, `/relicario`,
+`/menu`.
+
+## Claro, escuro, tela cheia e instalar no celular
+
+- **Claro ou escuro:** a lua (ou o sol) no topo alterna; o Menu tem Automático (segue o aparelho),
+  Claro e Escuro. A escolha fica guardada e o jogo já abre do jeito certo, sem piscar.
+- **Tela cheia:** o botão dos quatro cantos no topo (ou no Menu) esconde as barras do navegador;
+  sai com o mesmo botão, com Esc ou com o voltar do Android. Só aparece onde o navegador deixa.
+- **Instalar:** no Android, o Chrome oferece "Instalar app" (ou Adicionar à tela inicial). No
+  iPhone, o Safari não deixa site em tela cheia: em Compartilhar, Adicionar à Tela de Início; o
+  jogo instalado abre sem as barras (o Menu ensina isso no próprio iPhone).
 
 `/degustacao` é a ilhota de cinco a dez minutos para quem nunca viu o jogo; funciona sozinha e
-embutida (dentro de um iframe ou com `?embed=1`) na recepção do interativAI. Endereço oficial:
+embutida (dentro de um iframe ou com `?embed=1`) na recepção do interativAI. Ela segue o claro ou o
+escuro do aparelho e aceita `?tema=claro` ou `?tema=escuro`; embutida, a tela cheia só existe se o
+iframe tiver `allow="fullscreen"`. Endereço oficial:
 https://matematica.interativai.com.
 
 ## Laboratório (fora da navegação e dos buscadores)
@@ -63,9 +76,9 @@ https://matematica.interativai.com.
   as soluções de teste no motor), **adiantar o relógio um dia** (a revisita aparece no mapa), ver
   evidências e estados.
 - `/lab/vitrine`: a identidade Quadriculado inteira (materiais, tokens, letra, receitas, kit de
-  desenho, Nônio, a faixa do Nônio em todos os estados, selos, objetivo, bilhete, menu de corte,
-  folhas de etapas e de conversa, joias, notação). A referência aprovada está em
-  `docs/referencia-visual/` (`guia.html` é a da v0.3).
+  desenho, Nônio, a bolinha nos estados, o recado, a janelinha, selos, objetivo, bilhete, menu de
+  corte, o rascunho, as duas contas, uma página do Manual, tudo de novo no escuro, joias,
+  notação). A referência aprovada está em `docs/referencia-visual/` (`v04.html` é a da v0.4).
 
 ## Documentos
 
