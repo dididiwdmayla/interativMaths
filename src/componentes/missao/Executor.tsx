@@ -67,6 +67,7 @@ import { atividadePorId, conceitoDoEquivoco, proximaMissao, rotaDe, SONDAGEM_ATI
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
+import { BotaoTelaCheia } from "@/componentes/ui/TelaCheia";
 import { IconePagina } from "@/componentes/icones/IconePagina";
 import { TEXTOS_MANUAL, linhaDoCabecalho, paginaDoConceito, restauradasDe, tituloDaPagina } from "@/componentes/manual/dados";
 import type { IdConceito } from "@/nucleo/curriculo/curriculo";
@@ -436,6 +437,8 @@ export function ExecutorAtividade({
       direita={
         <>
           {a.tipo !== "sondagem" && <BotaoReferencia a={a} />}
+          {/* A degustação não tem o topo do app: a tela cheia fica aqui (embutida, só com allow="fullscreen"). */}
+          {a.tipo === "degustacao" && <BotaoTelaCheia />}
           {total > 1 && <BotaoEtapas passos={passosDoModo(a, modo)} atual={exec.indice} />}
         </>
       }

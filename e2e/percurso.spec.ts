@@ -174,6 +174,9 @@ test("abertura, calibragem, mapa e missão 1 até o Caderno, com o progresso vol
   await expect(v(page, "[data-pagina='partilha.arco1.carga-igual']")).toBeVisible();
   await expect(v(page, "[data-pagina='partilha.arco1.carga-igual']")).toContainText("24 sacas repartidas entre 4 carroças dão 6 em cada.");
 
+  // A tela cheia mora no topo, onde o navegador deixa.
+  await expect(v(page, "[data-tela-cheia]")).toHaveAttribute("data-tela-cheia", "inativa");
+
   // A luz do caderno: a lua do topo apaga, e o escuro continua depois de recarregar.
   await expect(page.locator("html")).toHaveAttribute("data-tema", "claro");
   await tocar(page, "[data-botao-tema]");

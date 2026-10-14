@@ -2,7 +2,7 @@
 
 /**
  * Cabeçalho das telas principais: o Nônio pequeno e a marca; à direita, o contador de joias (depois
- * da primeira), a lua ou o sol, e o menu. Abaixo, a fila de lugares, a mesma em todas as telas. No computador, a fila sobe para a
+ * da primeira), a lua ou o sol, a tela cheia (onde o navegador deixa) e o menu. Abaixo, a fila de lugares, a mesma em todas as telas. No computador, a fila sobe para a
  * mesma linha. Lugar ainda fechado fica a lápis e, tocado, diz quando abre.
  */
 import Link from "next/link";
@@ -15,6 +15,7 @@ import { IconeMenu } from "@/componentes/icones/IconeMenu";
 import { IconeVoltar } from "@/componentes/icones/IconeVoltar";
 import { Nonio } from "@/componentes/nonio/Nonio";
 import { Marca } from "./Marca";
+import { BotaoTelaCheia } from "./TelaCheia";
 import { BotaoTema } from "./Tema";
 
 export type Lugar = "mapa" | "caderno" | "manual" | "planta" | "relicario" | "museu" | "rua" | "menu";
@@ -95,6 +96,7 @@ export function CabecalhoJogo({ atual }: { atual?: Lugar }) {
             </Link>
           )}
           <BotaoTema />
+          <BotaoTelaCheia />
           <Link href="/menu" className="botao-icone" aria-label="Menu" aria-current={atual === "menu" ? "page" : undefined} data-nav="menu">
             <IconeMenu />
           </Link>

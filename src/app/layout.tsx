@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   },
   description: DESCRICAO,
   applicationName: NOME,
+  // Instalado no iPhone (Compartilhar, Adicionar à Tela de Início), abre sem as barras do Safari.
+  appleWebApp: { capable: true, title: NOME, statusBarStyle: "default" },
   openGraph: { type: "website", locale: "pt_BR", siteName: NOME, title: "interativMaths — o Engenho", description: DESCRICAO },
   twitter: { card: "summary_large_image" },
 };

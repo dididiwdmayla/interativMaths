@@ -219,6 +219,8 @@ test.describe("degustação embutida", () => {
     await expect(ilhota.locator("[data-degustacao]")).toHaveAttribute("data-embutida", "sim");
     await expect(ilhota.locator("[data-degustacao]")).toHaveAttribute("data-recepcao", "sim");
     await expect(ilhota.locator("[data-acao=voltar]")).toHaveCount(0);
+    // Sem allow="fullscreen" no iframe, a tela cheia não existe: o botão não aparece.
+    await expect(ilhota.locator("[data-tela-cheia]")).toHaveCount(0);
 
     await jogar(ilhota);
     await expect.poll(async () => (await mensagens(page)).map((m) => m.tipo)).toContain("concluiu");

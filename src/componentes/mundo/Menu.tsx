@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Menu: aparência (a luz do caderno), postura do Nônio, perguntas por escrito (IA), cotas, animações,
+ * Menu: aparência (a luz do caderno), tela cheia, postura do Nônio, perguntas por escrito (IA), cotas, animações,
  * rever abertura, apagar progresso.
  * Sem controle de som: som não entra nesta versão.
  */
@@ -11,6 +11,9 @@ import { definirPreferencias, progressoNovo, type Aparencia, type Preferencias }
 import { IconeAutomatico } from "@/componentes/icones/IconeAutomatico";
 import { IconeLua } from "@/componentes/icones/IconeLua";
 import { IconeSol } from "@/componentes/icones/IconeSol";
+import { IconeCelular } from "@/componentes/icones/IconeCelular";
+import { IconeTelaCheia } from "@/componentes/icones/IconeTelaCheia";
+import { useAvisoInstalar, useTelaCheia } from "@/componentes/ui/TelaCheia";
 import { substituirProgresso } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { TEXTOS_CONVERSA } from "@/conteudo/tutor";
@@ -78,6 +81,33 @@ function GrupoAparencia({ valor, onMudar }: { valor: Aparencia; onMudar: (a: Apa
   );
 }
 
+/** Tela cheia (referência 9): o botão onde o navegador deixa; no iPhone, como instalar. */
+function GrupoTelaCheia() {
+  const { disponivel, ativa, alternar } = useTelaCheia();
+  const instalar = useAvisoInstalar();
+  if (!disponivel && !instalar) return null;
+  return (
+    <section className="ficha m-0 flex min-w-0 flex-col gap-2 p-4" aria-label="Tela cheia" data-preferencia="tela-cheia">
+      <h2 className="m-0 text-[17px] font-extrabold">Tela cheia</h2>
+      <p className="m-0 text-[14px] font-medium text-tinta-suave">Esconde as barras do navegador. Sai com o voltar ou com Esc.</p>
+      {disponivel && (
+        <button type="button" className="botao-secundario mt-1 w-full" onClick={alternar} aria-pressed={ativa} data-tela-cheia={ativa ? "ativa" : "inativa"}>
+          <IconeTelaCheia sair={ativa} />
+          {ativa ? "Sair da tela cheia" : "Entrar em tela cheia"}
+        </button>
+      )}
+      {instalar && (
+        <p className="m-0 mt-1 flex gap-2 rounded-[10px] border-2 border-dashed border-grafite bg-grafite-claro px-3 py-2.5 text-[14px] font-medium leading-[1.4]" data-aviso-iphone="">
+          <IconeCelular />
+          <span>
+            <b>No iPhone,</b> o Safari não deixa um site ocupar a tela inteira. Instale o jogo: <b>Compartilhar, depois Adicionar à Tela de Início</b>. Ele abre sem as barras.
+          </span>
+        </p>
+      )}
+    </section>
+  );
+}
+
 export function Menu() {
   const { pronto, progresso, atualizar } = useProgresso();
   const [confirmando, setConfirmando] = useState(false);
@@ -120,6 +150,7 @@ export function Menu() {
         </header>
         <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
           <GrupoAparencia valor={prefs.aparencia} onMudar={(aparencia) => mudar({ aparencia })} />
+          <GrupoTelaCheia />
           <Grupo
             id="postura"
             titulo="Postura do Nônio"
