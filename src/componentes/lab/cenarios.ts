@@ -158,3 +158,11 @@ export function progressoAbacoRodadaNoMeio(agora: number): Progresso {
   const q = definirJoia(p, "abaco", e, t);
   return { ...q, relogio: { deslocamentoMs: Math.max(0, t + 60_000 - agora) } };
 }
+
+/** Às vésperas de lapidar: a próxima rodada perfeita sobe a joia de talhada para lapidada. */
+export function progressoAbacoQuaseLapidado(agora: number): Progresso {
+  const joia = ABACO;
+  const p = progressoAbacoTalhado(agora);
+  if (!joia) return p;
+  return lapidarAte(p, agora, (e, t) => e.estagio >= 2 || jogarRodadaDoAbaco(joia, e, PARAMETROS_LAPIDACAO, t).estagioDepois >= 2, 21);
+}

@@ -369,7 +369,7 @@ function OperacaoDaRodada({
             </div>
           )
         )}
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <div className="flex flex-wrap items-center justify-between gap-y-1">
           <button
             type="button"
             className="botao-secundario whitespace-nowrap"

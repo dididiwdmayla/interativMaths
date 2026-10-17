@@ -96,7 +96,16 @@ Depois da missão 4 abrem o Museu ("Os pães de Ahmes") e a Rua ("Três pizzas, 
 
 Relógios usam rubis como mancais. As joias do jogo são habilidades reais do jogador que reduzem o
 atrito do raciocínio (Ábaco, Cálculo Mental, Multiplicação, Estimativa), com quatro estágios de
-lapidação. Não dão poder fictício. O treino é assunto de outra versão.
+lapidação: bruta, talhada, lapidada, polida. Não dão poder fictício.
+
+Desde a v0.5 elas se treinam na **bancada de lapidação**, em rodadas curtas (seis operações, sem
+pressa, sem nota). A primeira é a **Joia do Ábaco**: o soroban, com os complementos de 5 e de 10,
+um algarismo por vez, até o soroban sumir e ficar a imagem dele na cabeça (sombra, de cabeça,
+ditado). A ideia que o jogador leva para casa é o **caminho curto**: cada conta se mexe uma vez só.
+O jogo reconhece o caminho que a mão fez, em qualquer ordem; vai e volta chega lá, mas não firma.
+Uma técnica firma com lances limpos em mais de uma rodada, e as do segundo estágio só em dias
+diferentes: a mão aprende com intervalo, e o jogo diz isso sem tom de cobrança. O estágio nunca
+desce. As outras três joias entram pelo mesmo treino, sem refazer nada.
 
 ## O Nônio
 

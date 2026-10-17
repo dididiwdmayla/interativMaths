@@ -4,7 +4,8 @@ Jogo web, em português do Brasil, que ensina matemática por experimentação. 
 Engenho, uma máquina do tamanho de uma cidade desenhada num caderno, que está desbotando para lápis,
 e passa cada distrito a caneta de novo descobrindo por que ele funciona. Esta versão traz o Arco 1 de A Partilha (repartir e o
 que fazer com o que sobra), o Caderno, o Manual, a Planta, o Relicário, o Museu e a Rua, com o
-Nônio guiando cada missão. Claro ou escuro, em tela cheia ou instalado no celular.
+Nônio guiando cada missão, e a primeira joia treinável: a do Ábaco, lapidada no soroban. Claro ou
+escuro, em tela cheia ou instalado no celular.
 
 ## Rodar
 
@@ -12,7 +13,7 @@ Nônio guiando cada missão. Claro ou escuro, em tela cheia ou instalado no celu
 npm install
 npm run dev        # http://localhost:3000
 npm run verificar  # tipos, lint, testes (núcleo e conteúdo) e build
-npm run e2e        # build + o percurso de navegador (Playwright, 390×844 com toque)
+npm run e2e        # build + os percursos de navegador (Playwright, 390×844 com toque)
 ```
 
 Não rode `next build` com o `next dev` aberto: os dois disputam a pasta `.next`.
@@ -50,7 +51,8 @@ desligar as perguntas no menu ("Perguntas por escrito ao Nônio (usa IA)").
 `/partilha/carga-igual` e as outras missões (`?modo=prova` para a prova direta, `?modo=registro` para
 fazer só o registro), `/partilha/revisita`, `/museu/paes-de-ahmes`, `/rua/tres-pizzas`,
 `/caderno`, `/manual` (e `/manual/divisao-com-resto` e as outras páginas), `/planta`, `/relicario`,
-`/menu`.
+`/menu`. Depois da Missão 5: `/relicario/abaco` (a bancada de lapidação: a rodada no soroban) e
+`/relicario/abaco/livre` (o soroban livre, sem rodada).
 
 ## Claro, escuro, tela cheia e instalar no celular
 
@@ -73,14 +75,20 @@ https://matematica.interativai.com.
 - `/lab/maquinas`: a bancada solta, com qualquer configuração e pele, qualquer validador, com ou
   sem mão livre.
 - `/lab/progresso`: zerar, zerar só as apresentações, saltar para pontos do arco (montados rodando
-  as soluções de teste no motor), **adiantar o relógio um dia** (a revisita aparece no mapa), ver
-  evidências e estados.
+  as soluções de teste no motor), **adiantar o relógio um dia** (a revisita aparece no mapa; uma
+  técnica de estágio 2 que espera o intervalo volta a firmar), ver evidências e estados. Saltos da
+  Joia do Ábaco: encontrada, talhada, talhada com o complemento de 5 firmando ou esperando,
+  prestes a lapidar, lapidada, polida, e uma rodada parada no meio de um lance.
+- `/lab/soroban`: o soroban livre com o reconhecedor à vista (digite "26 + 7", faça na máquina e
+  veja cada lance com as marcas, o custo e a distância) e o gerador de rodadas por foco e semente.
 - `/lab/vitrine`: a identidade Quadriculado inteira (materiais, tokens, letra, receitas, kit de
   desenho, Nônio, a bolinha nos estados, o recado, a janelinha, selos, objetivo, bilhete, menu de
   corte, o rascunho, as duas contas, uma página do Manual, tudo de novo no escuro, joias,
-  notação). A referência aprovada está em `docs/referencia-visual/` (`v04.html` é a da v0.4).
+  notação, e da v0.5 o soroban em cada nível, o teclado, a ficha do Relicário e a lapidação). A
+  referência aprovada está em `docs/referencia-visual/` (`v05.html` é a da v0.5).
 
 ## Documentos
 
 `CLAUDE.md` (regras), `docs/PROJETO.md`, `docs/ARQUITETURA.md`, `docs/MAPA-CURRICULAR.md`,
-`docs/DESIGN-SYSTEM.md`, `docs/ROADMAP.md`, `docs/capturas/`.
+`docs/DESIGN-SYSTEM.md`, `docs/ROADMAP.md`, `docs/AUTORIA.md` (para as sessões de conteúdo),
+`docs/capturas/`.

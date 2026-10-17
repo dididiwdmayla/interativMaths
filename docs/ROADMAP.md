@@ -107,7 +107,35 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
     a instalar.
   - Fecho: contador de joias só depois da primeira; o gesto da notação diz "toque em Continuar"
     depois de comprimir; `/lab/vitrine` com a bolinha, o recado, a janelinha, o rascunho, as duas
-    contas, uma página do Manual e tudo no escuro; documentos; capturas em `docs/capturas/v0.4/`.
+    contas, uma página do Manual e tudo no escuro; documentos; capturas (trocadas pelas da v0.5).
+
+- v0.5 — **A Joia do Ábaco: o soroban, a lapidação e o Relicário vivo** (referência nova em
+  `docs/referencia-visual/v05.html`, que chegou cortada no meio da tela 5):
+  - Base: tokens do soroban no claro e no escuro; progresso v4 (treino por técnica e a rodada em
+    andamento) com migração testada contra um progresso v3 gravado pela v0.4; a Joia do Ábaco com
+    as seis técnicas (Ler e mostrar e 5 e 10 juntos novas) e os critérios corrigidos; estágio em
+    toda técnica das quatro joias.
+  - Motor do soroban (`nucleo/soroban`): gestos, plano do lance com as marcas, reconhecimento
+    (limpo em qualquer ordem, vai e volta com o Desfazer), item (mãos, leitura, sombra, de cabeça,
+    ditado), gerador por semente. Testes: a propriedade custo = distância para todo estado de três
+    hastes e todo lance que cabe, os 17 casos conhecidos, o reconhecimento, 200 sementes por foco.
+    `/lab/soroban` com o reconhecedor e o gerador.
+  - Treino genérico (`nucleo/joias`): firmar (6 limpos, 2 rodadas, 20 horas no estágio 2 e 3; o
+    imaginado fecha de cabeça ou no ditado), foco que pula a técnica esperando, revisão,
+    manutenção, estágio que nunca desce; registro por joia. Saltos novos no `/lab/progresso`.
+  - Bancada (`/relicario/abaco`): abertura (técnica nova com o soroban pequeno e o exemplo, ou
+    curta), a operação um algarismo por vez, o Nônio com o caminho no nível guiado, ajuda em quatro
+    degraus (caso parecido calculado pelo núcleo, caminho junto desenhado nas contas), os pares,
+    ver o caminho curto, rascunho a lápis e conta a caneta, fim da rodada e a folha da lapidação;
+    retomada no mesmo lance depois de recarregar. Soroban imaginado: sombra, de cabeça, ditado.
+  - Relicário vivo (ficha da joia em lapidação, técnicas, Lapidar e Soroban livre) e
+    `/relicario/abaco/livre`; o fim da Missão 5 aponta o Lapidar.
+  - Caminho do conteúdo: `docs/AUTORIA.md` com exemplos que passam nas checagens
+    (`src/conteudo/exemplos`), `textos.test.ts` em todo o conteúdo, Museu e Rua abertos pelo
+    catálogo. `CLAUDE.md` e `AGENTS.md` apontam para o AUTORIA.
+  - Fecho: vitrine com o soroban e a lapidação, percurso `e2e/lapidacao.spec.ts`, capturas em
+    `docs/capturas/v0.5/`. Com o contador de joias, a tela cheia sai do topo em telas estreitas
+    (a linha passava dos 390 px).
 
 ## Parcialmente implementado
 - Pergunte por escrito (a conversa com o Nônio): verificado com simulação e testes da rota; **não
@@ -119,8 +147,13 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   novo; há o botão de zerar e, para a captura, basta tocar em Entendi).
 - Planta: as linhas de dependência são curvas e podem passar por trás de outras etiquetas quando
   dois conceitos estão na mesma coluna; legível, mas um traçado com desvio seria melhor.
-- Joias: contratos, estágios e campos no progresso prontos; só a Joia do Ábaco é encontrada (fim do
-  arco). Treino e bancada de lapidação aparecem como em projeto.
+- Joias: o treino é genérico, mas só a Joia do Ábaco tem bancada. Cálculo Mental, Multiplicação e
+  Estimativa já dizem o estágio de cada técnica e entram por um registro novo.
+- Referência v05: as telas 5 (resto), 6, 7 e 8 não chegaram (o apêndice veio cortado); foram feitas
+  pelo texto do pedido. Colar o resto do `v05.html` permite a comparação completa.
+- Toque no soroban: verificado no Chromium com toque emulado; falta o polegar num celular de verdade
+  (alvos de 60 × 28 por conta, a exceção consciente aos 44 px).
+- A bancada não tem "Pergunte por escrito": o servidor monta contexto de missão, não de rodada.
 - Equivalência de frações: aparece como prévia (Missão 4, comparação; Missão 5, dois jeitos), sem
   formalização nem conceito ativo.
 - Palpites: guardados no progresso para a futura Joia da Estimativa; ainda não geram evidência.
@@ -129,7 +162,9 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
 - Conversa: limite de uso por servidor (hoje o limite de 20 perguntas por execução é do cliente);
   medir latência e custo reais na prévia.
 - Som, que a v0.3 ainda deixa de fora.
-- Treino das joias, começando pelo soroban (sessão própria).
+- As outras joias treináveis: Cálculo Mental, Multiplicação e Estimativa (registro novo cada uma,
+  sem refazer o treino).
+- A conversa com o Nônio na bancada (contexto de rodada no servidor).
 - Arco 2 de A Partilha: equivalência, comparação, fração de quantidade, razão e proporção.
 - O Contrapeso (incógnitas e equações) e os outros distritos.
 - Segunda exposição do museu e novas cenas da Rua (as três categorias já existem nos dados).
@@ -158,6 +193,9 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   porque o painel começa pronto (já era assim na Missão 4). Na degustação, esperar a máquina
   deixaria a descoberta mais forte; é mudança de comportamento das missões, então ficou anotada.
 - Sem som no jogo (fora do escopo): a regra "sons só depois do primeiro toque" não tem o que aplicar.
+- Soroban com o polegar, no celular: conferir se a conta certa responde (as de baixo ficam a
+  28 px umas das outras), se o toque perto da régua não pega a vizinha e se a rolagem não dispara
+  um gesto. Se errar o alvo, aumentar a altura das contas antes de mexer na regra.
 
 ## Fora do escopo atual
 - Conta, login, banco, sincronização; multiplayer, ranking, loja, economia; aplicativo nativo;

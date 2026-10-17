@@ -6,11 +6,12 @@ caneta** e entre **rascunho e passado a limpo**: o que ainda não foi feito est�
 existe e funciona, a caneta. O quadriculado é o rascunho (a máquina); a folha pautada é o passado
 a limpo (o Caderno). O Engenho desbota para lápis; entender um distrito é passá-lo a caneta.
 
-**Referência aprovada:** `docs/referencia-visual/`. A atual é **`v04.html`** (nove telas: missão
-com o Nônio flutuante, janelinha, acerto com a conta, conta armada, o Manual, uma página do
-Manual, a referência da missão, a missão no escuro, aparência e tela cheia). As anteriores
-(`mapa.html`, `missao.html`, `pecas.html`, `guia.html`) valem no que a v04 não mudou. Toda tela
-nova se confere contra ela, em 390 × 844, lado a lado.
+**Referência aprovada:** `docs/referencia-visual/`. A atual é **`v05.html`** (o Relicário vivo, a
+abertura da rodada, o lance guiado, o acerto pelo caminho curto, o caminho junto, a lapidação, a
+sombra, o lance no escuro; o arquivo chegou cortado no meio da tela 5, e as telas 5 a 8 foram
+feitas pelo texto do pedido). `v04.html` (missão com o Nônio flutuante, janelinha, conta, Manual,
+escuro) e as anteriores (`mapa.html`, `missao.html`, `pecas.html`, `guia.html`) valem no que as
+novas não mudaram. Toda tela nova se confere contra ela, em 390 × 844, lado a lado.
 
 ## Materiais (regra de interface, sem exceção)
 
@@ -45,7 +46,8 @@ borda e todo traço de desenho), `--sombra` (a sombra dura), e o texto sobre cor
 `--verde-tinta` (texto), `--verde-escuro`, `--verde-palido`. Bilhete: `--bilhete`,
 `--bilhete-tinta`. O Nônio: `--nonio-cupula`, `--nonio-rosto`, `--nonio-aba`, `--nonio-traco`,
 `--nonio-olho`. Materiais: `--pao`, `--pao-miolo`, `--saca`, `--madeira`, `--palha`, `--agua`,
-`--agua-clara`. Joias com `-luz`. Véu: `--veu`. Movimento: `--t-caneta`, `--t-assentar`,
+`--agua-clara`. Joias com `-luz`. O soroban: `--soroban-conta`, `--soroban-conta-luz` (a faceta de
+cima), `--soroban-livre` (a conta afastada). Véu: `--veu`. Movimento: `--t-caneta`, `--t-assentar`,
 `--t-folha`, `--curva-firme`, `--curva-saida`. O Tailwind lê os mesmos nomes.
 
 Regra: **borda e traço usam `--contorno`, sombra usa `--sombra`, texto sobre cor usa `sobre-*`.**
@@ -121,6 +123,34 @@ lápis; pilha com chave e número a caneta; sobra numa bandeja a lápis; engasgo
 - **Conta, a caneta:** só depois do acerto. Cartão folha com contorno e sombra dura; números em
   Rubik 800, sinais em caneta, resultado com marca-texto, o nome de cada termo embaixo. Na Missão
   3, a conta armada: as voltas do jogador viram os quocientes parciais da chave.
+
+## O soroban (objeto, v05.html)
+
+Desenhado a partir dos algarismos (viewBox 330 × 304, escala com a largura): cinco hastes a cada
+60; contas bicônicas, hexágono de 52 × 26, passo de 28; acima da régua a de cima e o vão dela;
+abaixo, quatro contas e um vão. Moldura e régua em `--madeira`, leito em `--folha`, hastes em
+`--contorno`, pontos da régua em marca-texto (unidades e milhar). Conta **encostada** (a que
+conta) em `--soroban-conta` com a faceta de cima em `--soroban-conta-luz`; **afastada** em
+`--soroban-livre`; as duas com contorno. Na madeira as contas são da mesma cor: aqui a que conta
+fica azul, para ler mais rápido. **Haste da vez**: faixa marca-texto pálido e o rótulo numa
+etiqueta marca-texto. **Lance feito limpo**: visto verde ao lado do algarismo. **Acerto**: borda
+verde na ficha e a haste do último lance em verde pálido. **Que vai se mexer** (o caminho junto):
+borda de caneta, seta e o número da ordem na conta que se toca. Rótulos em cima e algarismos
+embaixo (zeros à esquerda em grafite) conforme o nível; na sombra, as contas não aparecem.
+**O toque é a exceção consciente aos 44 px:** a largura da haste (60) na altura de cada conta
+(28); o vão não faz nada. Contas deslizam 160 ms (`transform`); com movimento reduzido, não deslizam.
+
+## A bancada de lapidação
+
+A rodada usa o palco da missão: faixa da operação (o verbo, a operação grande com o algarismo da
+vez em marca-texto e os feitos sublinhados em verde, a linha do gesto em caneta), o soroban na
+ficha quadriculada com o Nônio no canto de baixo, e o painel (rascunho a lápis, Os pares,
+Desfazer, Zerar; no fim, a conta passada a caneta com um lance por linha e a etiqueta da técnica
+em caneta pálida). Ler e o imaginado trazem o teclado (teclas de 46 px, a caixa marca-texto pálido;
+"ainda não" é borda vermelha e névoa). O soroban pequeno (uma ou duas hastes) mostra o exemplo
+e o caso parecido, com a ordem em marca-texto à direita. **A lapidação**: a folha que sobe sobre
+o véu; a gema anterior esmaece e encolhe, a nova se desenha faceta por faceta (só opacidade e
+transform), "lapidada!" à mão em verde. Sem nota, porcentagem ou sequência de dias.
 
 ## O Manual
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { JOIAS } from "@/conteudo/joias";
 import { PARAMETROS_LAPIDACAO } from "@/conteudo/lapidacao";
 import { situacaoDaTecnica, treinoDe } from "@/nucleo/joias/treino";
+import { jogarRodadaDoAbaco } from "@/nucleo/joias/abaco";
 import { relogioDoJogo } from "@/nucleo/progresso";
 import { lanceAtual, restaurarItem, type ItemRodada } from "@/nucleo/soroban/item";
 import {
@@ -11,6 +12,7 @@ import {
   progressoAbacoEncontrado,
   progressoAbacoLapidado,
   progressoAbacoPolido,
+  progressoAbacoQuaseLapidado,
   progressoAbacoRodadaNoMeio,
   progressoAbacoTalhado,
 } from "./cenarios";
@@ -29,6 +31,12 @@ describe("saltos do Ábaco no laboratório", () => {
     expect(progressoAbacoTalhado(AGORA).joias.abaco.estagio).toBe(1);
     expect(progressoAbacoLapidado(AGORA).joias.abaco.estagio).toBe(2);
     expect(progressoAbacoPolido(AGORA).joias.abaco.estagio).toBe(3);
+  });
+
+  it("prestes a lapidar: talhada, e a próxima rodada perfeita lapida", () => {
+    const p = progressoAbacoQuaseLapidado(AGORA);
+    expect(p.joias.abaco.estagio).toBe(1);
+    expect(jogarRodadaDoAbaco(ABACO, p.joias.abaco, PARAMETROS_LAPIDACAO, agoraDoJogo(p)).estagioDepois).toBe(2);
   });
 
   it("talhado com o 5 firmando, e com o 5 esperando", () => {

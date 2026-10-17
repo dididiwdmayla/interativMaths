@@ -21,13 +21,19 @@ src/
     campanha/    situação derivada (missões disponíveis, eco, revisita, sondagem)
     geradores/   aleatório com semente, questões e atividades geradas (revisita, sondagem)
     tutor/       fila de falas, reações, guardas, apresentações, contrato da conversa
-    joias.ts     contrato das joias
+    soroban/     o soroban: estado, gestos, plano do lance (caminho curto e marcas), operação,
+                 item da rodada (reconhecimento), gerador por semente, textos, jogador de teste
+    joias/       contrato das joias, treino genérico (firmar, foco, estágio), registro por joia
+                 (abaco.ts pluga o soroban)
   conteudo/      SÓ DADOS: conceitos (com nome formal), áreas, missões, calibragem, equívocos, peles,
                  joias, museu, rua, eco, reações e gestos (modelos de fala), tutor, apresentações,
-                 rascunho e conta (modelos), manual (as páginas)
+                 rascunho e conta (modelos), manual (as páginas), lapidacao (textos e parâmetros
+                 do treino), exemplos (os do AUTORIA.md, fora do catálogo)
   servidor/      só servidor, nunca importado por cliente: tutor/ (contexto, cliente da Anthropic,
                  resiliência, simulações)
-  componentes/   maquinas, missao, mundo, nonio, notacao, caderno, manual, joias, estado, lab, ui
+  componentes/   maquinas, missao, mundo, nonio, notacao, caderno, manual, joias (Relicário vivo e a
+                 bancada de lapidação), soroban (o soroban em SVG, o pequeno, pares, teclado,
+                 conta), estado, lab, ui
                  (tema, tela cheia, cabeçalho), icones
                  (identidade Quadriculado: docs/DESIGN-SYSTEM.md e docs/referencia-visual/)
   tema/          tokens.css (única cor literal; claro e escuro) e componentes.css (receitas: ficha,
@@ -99,6 +105,34 @@ quando o objetivo se cumpre, sem fechar.
   como quocientes parciais. `contaVerdadeira` confere tudo com `Racional` (teste com todas as
   soluções de teste).
 
+## O soroban (`nucleo/soroban`)
+
+Cinco hastes; cada uma, a de cima (5) e quatro de baixo (1); só conta o que encosta. Um **gesto**
+é um toque numa conta (o grupo certo anda junto) e devolve o **movimento**. **Custo** de uma lista
+de movimentos: quantas contas andaram; **distância** entre dois estados: o mínimo que precisa andar.
+`planoDoLance(soroban, lance)` dá o alvo, os movimentos na ordem em que se ensina (a vizinha
+primeiro: "pôr 7 é pôr 10 e tirar 3") e as **marcas** (`direto`, `complemento-5`,
+`complemento-10`, `juntos`, `cadeia`). Propriedade testada à exaustão (todo estado de três hastes,
+todo lance que cabe): o custo do plano é igual à distância. O **item** (`item.ts`) guarda o
+soroban e os gestos do lance aberto; o lance fecha sozinho quando o soroban fica igual ao alvo:
+**limpo** se o custo dos gestos é a distância (qualquer ordem), senão **com vai e volta** (o
+Desfazer conta como movimento). Modos: mãos (mostrar, somar, subtrair), leitura, sombra, de cabeça,
+ditado. `itemFeito` devolve a evidência (por técnica, se conta). O **gerador** sorteia pela semente
+entre candidatos enumerados e filtrados pelo plano (técnica do foco presente, nenhuma não vista).
+`textos.ts` lê o estado em palavras com os modelos do conteúdo (gesto, recado, ajuda, pares,
+rascunho, conta, caso parecido).
+
+## O treino das joias (`nucleo/joias`)
+
+Genérico, não sabe o que é soroban. Técnica com `estagio` (1, 2, 3); situação: firme, firmando,
+esperando (falta só o intervalo), a lápis. Firma com `limposParaFirmar` lances limpos em
+`rodadasParaFirmar` rodadas que contaram (cada uma com `limposPorRodada`), e nas de estágio 2 e 3,
+`intervaloHoras` entre a primeira e a última; `fechaCom` exige o nível da última (o imaginado fecha
+de cabeça ou no ditado). `decidirRodada`: técnica (a primeira do próximo estágio que não está firme
+nem esperando), revisão (todas esperam) ou manutenção (polida). O estágio nunca desce. Cada joia
+treinável entra por um `RegistroJoia` em `registros.ts` (gerar os itens, validar um item salvo);
+`abaco.ts` liga o soroban. Os parâmetros moram em `conteudo/lapidacao.ts`.
+
 ## O Manual e o nome formal
 
 - **Nome formal** (`curriculo/formal.ts`): área do distrito (`conteudo/areas.ts`) e conteúdo dos
@@ -161,6 +195,10 @@ ponto; um teste confere), `perguntas?` (sugestões da conversa), `chegada?`, `no
 
 ## Como acrescentar uma missão
 
+Para as sessões de conteúdo, a receita curta (com exemplos que passam nas checagens) está em
+`docs/AUTORIA.md`. O Museu e a Rua abrem pelo catálogo (`portaDoLugar`): exposição e cena novas
+são um arquivo de dados e uma linha em `conteudo/atividades.ts`.
+
 1. Crie `src/conteudo/missoes/mN-nome.ts` com a `Atividade` (só dados; use as constantes de
    `comum.ts`). Ids publicados não mudam.
 2. Escreva ao menos uma solução de teste por modo (uma delas com `colocar`, quando há mão livre)
@@ -183,14 +221,16 @@ ponto; um teste confere), `perguntas?` (sugestões da conversa), `chegada?`, `no
 
 ## Progresso (`nucleo/progresso`)
 
-Documento único versionado (`VERSAO_PROGRESSO`, hoje 3), lido com proteção (ilegível vira começo novo e o
+Documento único versionado (`VERSAO_PROGRESSO`, hoje 4), lido com proteção (ilegível vira começo novo e o
 original fica guardado à parte), normalizado campo a campo e migrado por cadeia testada. Guarda
 preferências, calibragem, campanha (atividades, execuções, desvio, conclusões, marcas, palpites),
 evidências (teto 1500), Caderno, joias, museu, cenas, revisitas, o deslocamento do relógio e,
 desde a v2, as apresentações vistas (id e momento) e a preferência `conversa` (ligada ou
 desligada); desde a v3, a preferência `aparencia` (automático, claro, escuro), espelhada em
-`interativmaths:aparencia` para o script do tema. As migrações 1 → 2 e 2 → 3 são testadas com
-progressos reais gravados (`nucleo/progresso/amostras/`). O histórico da conversa nunca é salvo.
+`interativmaths:aparencia` para o script do tema; desde a v4, cada joia guarda o `treino` por técnica
+(limpos, apresentada, rodadas que contaram, firme) e a `rodada` em andamento (itens, feitos e o item
+aberto, com o soroban e os gestos do lance: recarregar volta no mesmo lance). As migrações 1 → 2,
+2 → 3 e 3 → 4 são testadas com progressos reais gravados (`nucleo/progresso/amostras/`). O histórico da conversa nunca é salvo.
 A loja do navegador (`componentes/estado/loja.ts`) usa `useSyncExternalStore`: no servidor e na
 hidratação o estado é "carregando", então a primeira pintura nunca diverge.
 
@@ -198,8 +238,9 @@ hidratação o estado é "carregando", então a primeira pintura nunca diverge.
 
 `/` (porta), `/abertura`, `/calibragem`, `/mapa`, `/partilha`, `/partilha/[atividade]`
 (`?modo=prova|registro`), `/partilha/revisita`, `/partilha/sondagem`, `/museu/[exposicao]`,
-`/rua/[cena]`, `/caderno`, `/manual`, `/manual/[pagina]`, `/planta`, `/relicario`, `/menu`,
-`/lab`, `/lab/maquinas`, `/lab/progresso`, `/lab/vitrine`, `POST /api/tutor`, `/degustacao`
+`/rua/[cena]`, `/caderno`, `/manual`, `/manual/[pagina]`, `/planta`, `/relicario`,
+`/relicario/abaco` (a bancada), `/relicario/abaco/livre`, `/menu`, `/lab`, `/lab/maquinas`,
+`/lab/progresso`, `/lab/soroban`, `/lab/vitrine`, `POST /api/tutor`, `/degustacao`
 (`?embed=1`, `?tema=claro|escuro`), `/manifest.webmanifest`, `/icones/192`, `/icones/512`,
 `/icones/mascaravel`.
 
@@ -221,8 +262,10 @@ nos testes de navegador, filtre por elementos visíveis.
 1. `npm run tipos`, `npm run lint`, `npm run build`.
 2. Núcleo: `src/nucleo/**/*.test.ts`; servidor: `src/servidor/**/*.test.ts` (a rota do tutor com a
    tentativa injetada, sem rede).
-3. Conteúdo: `src/conteudo/**/*.test.ts` e `src/higiene.test.ts`.
-4. Navegador: `npm run e2e` (`e2e/percurso.spec.ts` e `e2e/degustacao.spec.ts`, build de
-   produção): o percurso confere bolinha, rascunho, conta, Manual restaurado, escuro depois de
+3. Conteúdo: `src/conteudo/**/*.test.ts` (com `textos.test.ts`, que percorre todo texto do
+   conteúdo) e `src/higiene.test.ts`.
+4. Navegador: `npm run e2e` (`e2e/percurso.spec.ts`, `e2e/degustacao.spec.ts` e
+   `e2e/lapidacao.spec.ts`, build de produção; `e2e/soroban.ts` joga o caminho curto com o próprio
+   núcleo; `CAPTURAS=1` refaz `docs/capturas/v0.5/`): o percurso confere bolinha, rascunho, conta, Manual restaurado, escuro depois de
    recarregar; a degustação nos três layouts, embutida e com `?tema=`.
 Não rode `next build` com o `next dev` aberto: os dois disputam a pasta `.next`.
