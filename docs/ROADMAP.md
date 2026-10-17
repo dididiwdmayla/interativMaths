@@ -136,6 +136,19 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
   - Fecho: vitrine com o soroban e a lapidação, percurso `e2e/lapidacao.spec.ts`, capturas em
     `docs/capturas/v0.5/`. Com o contador de joias, a tela cheia sai do topo em telas estreitas
     (a linha passava dos 390 px).
+- v0.5.1 — **A referência inteira e cinco acertos na bancada do soroban**:
+  - `docs/referencia-visual/v05.html` completa (telas 5 a 8 como aprovadas, oito telas).
+  - O soroban nunca encolhe para caber: nas mãos e na sombra ele fica na largura inteira e o
+    painel cede. A sombra tem dois momentos: mãos ("Dizer quanto ficou") e dizer (o teclado no
+    lugar do painel; tocar no soroban volta às mãos, o número fica guardado).
+  - O caminho junto escreve o porquê: `passosDoLance` no núcleo monta os passos do plano com os
+    modelos de `PASSOS_JUNTO` (conteúdo); os números do painel são os das contas; o título "Os
+    pares" com "Me ajuda · 4 de 4" e só as linhas do 10 e do 5 que o lance usa.
+  - A folha da lapidação como a tela 6 e a nota da sombra dentro do leito.
+  - A rodada grava 300 ms depois do gesto, e na hora em `pagehide` e com a página oculta.
+  - Verificação: `npm run verificar`, `npm run e2e` (alvo de toque em 390 × 844 e 360 × 780,
+    sozinho e nos dois momentos da sombra), `src/conteudo/passos-junto.test.ts`, capturas 05, 06
+    e 07 de `docs/capturas/v0.5/` refeitas.
 
 ## Parcialmente implementado
 - Pergunte por escrito (a conversa com o Nônio): verificado com simulação e testes da rota; **não
