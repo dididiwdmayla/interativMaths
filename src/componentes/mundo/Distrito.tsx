@@ -54,9 +54,9 @@ export function Distrito() {
     chamados.push({ id: "eco", titulo: "Eco: tonéis e casas", linha: "A mesma ideia com outra roupa.", href: rotaDe(eco) });
   }
   if (concluida(progresso, M4)) {
-    for (const id of ["museu.paes-de-ahmes", "rua.tres-pizzas"]) {
-      const a = ATIVIDADES.find((x) => x.id === id);
-      if (a && !concluida(progresso, a.id)) chamados.push({ id, titulo: a.titulo, linha: a.tipo === "exposicao" ? "O Museu abriu." : "A Rua abriu.", href: rotaDe(a) });
+    // Toda exposição e toda cena do catálogo: conteúdo novo entra só como dado.
+    for (const a of ATIVIDADES.filter((x) => x.tipo === "exposicao" || x.tipo === "cena")) {
+      if (!concluida(progresso, a.id)) chamados.push({ id: a.id, titulo: a.titulo, linha: a.tipo === "exposicao" ? "O Museu abriu." : "A Rua abriu.", href: rotaDe(a) });
     }
   }
 

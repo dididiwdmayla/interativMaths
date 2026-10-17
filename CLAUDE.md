@@ -5,6 +5,8 @@ Visão e tom em `docs/PROJETO.md`; módulos e contratos em `docs/ARQUITETURA.md`
 A referência visual aprovada mora em `docs/referencia-visual/`; toda tela nova se confere contra ela
 (identidade Quadriculado, regras em `docs/DESIGN-SYSTEM.md`).
 
+Sessão de conteúdo: siga `docs/AUTORIA.md`.
+
 ## Antes e depois
 - Antes de começar, leia o status em `docs/ROADMAP.md` e continue da primeira etapa não concluída.
 - No fim, atualize o `docs/ROADMAP.md` (quatro seções: implementado e verificado; parcialmente

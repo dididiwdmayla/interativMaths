@@ -42,6 +42,7 @@ import { IconeVisto } from "@/componentes/icones/IconeVisto";
 import { IconeVoltar } from "@/componentes/icones/IconeVoltar";
 import { VitrineGuia } from "./VitrineGuia";
 import { VitrineV04 } from "./VitrineV04";
+import { VitrineV05 } from "./VitrineV05";
 
 const TOKENS: { grupo: string; nomes: string[] }[] = [
   { grupo: "Papel", nomes: ["papel", "grade", "grade-suave", "folha", "pauta", "margem"] },
@@ -347,6 +348,8 @@ export function Vitrine() {
         <VitrineGuia Secao={Secao} />
 
         <VitrineV04 Secao={Secao} />
+
+        <VitrineV05 Secao={Secao} />
 
         <Secao titulo="Joias e estágios">
           <svg viewBox="0 0 300 300" className="traco-fixo block w-full max-w-md" aria-label="Quatro joias em quatro estágios" role="img">

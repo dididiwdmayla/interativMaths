@@ -15,9 +15,10 @@ import { EQUIVOCOS } from "./equivocos";
 import { MOTIVOS } from "./reacoes";
 import { ATIVIDADES } from "./atividades";
 import { DEGUSTACAO } from "./degustacao";
+import { EXEMPLOS_DE_AUTORIA } from "./exemplos";
 
-/** O catálogo do jogo e a degustação (que fica fora do catálogo, mas passa pelas mesmas checagens). */
-export const TODAS: readonly Atividade[] = [...ATIVIDADES, DEGUSTACAO];
+/** O catálogo do jogo, a degustação e os exemplos do AUTORIA.md (fora do catálogo, mas com as mesmas checagens). */
+export const TODAS: readonly Atividade[] = [...ATIVIDADES, DEGUSTACAO, ...EXEMPLOS_DE_AUTORIA];
 
 const ctx = (agora: number) => ({
   agora,

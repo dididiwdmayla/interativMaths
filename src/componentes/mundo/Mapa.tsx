@@ -15,7 +15,7 @@ import { REGRAS_CALIBRAGEM } from "@/conteudo/calibragem";
 import { CONCEITOS_DO_ARCO_1 } from "@/conteudo/conceitos";
 import { MISSOES_ARCO_1 } from "@/conteudo/missoes";
 import { ATIVIDADES } from "@/conteudo/atividades";
-import { existeAtividade, rotaDe, SONDAGEM_ATIVA } from "@/componentes/estado/catalogo";
+import { portaDoLugar, rotaDe, SONDAGEM_ATIVA } from "@/componentes/estado/catalogo";
 import { agoraDoJogo } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { IconeAvancar } from "@/componentes/icones/IconeAvancar";
@@ -170,8 +170,10 @@ export function Mapa() {
   const feitas = MISSOES_ARCO_1.filter((m) => concluida(progresso, m.id)).length;
   const passadaALimpo = arcoConcluido(progresso, MISSOES_ARCO_1);
   const transferencia = concluida(progresso, M4);
-  const museuAberto = transferencia && existeAtividade("museu.paes-de-ahmes");
-  const ruaAberta = transferencia && existeAtividade("rua.tres-pizzas");
+  const portaMuseu = portaDoLugar("exposicao", (id) => concluida(progresso, id));
+  const portaRua = portaDoLugar("cena", (id) => concluida(progresso, id));
+  const museuAberto = transferencia && portaMuseu !== null;
+  const ruaAberta = transferencia && portaRua !== null;
   const revisita = revisitaDisponivel(progresso, CONCEITOS_DO_ARCO_1, agora).length > 0 || progresso.revisitas.atual !== null;
   const sondagem = SONDAGEM_ATIVA && sondagensPendentes(progresso, CONCEITOS_DO_ARCO_1, agora).length > 0;
   const eco = ATIVIDADES.some((a) => a.id === ECO) && ecoDisponivel(progresso, M4, ECO);
@@ -200,7 +202,7 @@ export function Mapa() {
         <div ref={vistaRef} className="absolute inset-0 overflow-x-auto overflow-y-hidden overscroll-x-contain" data-folha-mapa="">
           <div className="relative lg:mx-auto" style={{ width: W * escala, height: H * escala }}>
             <div className="absolute left-0 top-0" style={{ width: W, height: H, transform: `scale(${escala})`, transformOrigin: "0 0" }}>
-              <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="absolute left-0 top-0 block" role="img" aria-label={`O Engenho desenhado em papel quadriculado: A Partilha a caneta, ${feitas} de 5 missões; os outros distritos ainda a lápis.`}>
+              <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="absolute left-0 top-0 block" role="img" aria-label={`O Engenho desenhado em papel quadriculado: A Partilha a caneta, ${feitas} de ${MISSOES_ARCO_1.length} missões; os outros distritos ainda a lápis.`}>
                 <path d="M22 62 C 60 56, 110 66, 152 58" fill="none" stroke="var(--marca-texto)" strokeWidth={9} strokeLinecap="round" />
                 <Rabisco tipo="mais" x={41} y={188} />
                 <Rabisco tipo="triangulo" x={346} y={261} />
@@ -246,13 +248,13 @@ export function Mapa() {
                 href="/partilha"
                 className="absolute rounded-2xl"
                 style={{ left: AREAS.partilha[0], top: AREAS.partilha[1], width: AREAS.partilha[2], height: AREAS.partilha[3] + 46 }}
-                aria-label={`A Partilha: entrar. ${feitas} de 5 missões feitas.`}
+                aria-label={`A Partilha: entrar. ${feitas} de ${MISSOES_ARCO_1.length} missões feitas.`}
                 id="andar-partilha"
                 data-destino="andar-partilha"
               />
               <div className="pointer-events-none absolute flex -translate-x-1/2 flex-col items-center gap-1.5" style={{ left: ETIQUETAS.partilha.x, top: ETIQUETAS.partilha.y }}>
                 <span className="etiqueta-lugar text-[17px] font-extrabold">A Partilha</span>
-                <span className="marca-texto text-[13px] font-bold">{passadaALimpo ? "passada a limpo" : `${feitas} de 5 missões`}</span>
+                <span className="marca-texto text-[13px] font-bold">{passadaALimpo ? "passada a limpo" : `${feitas} de ${MISSOES_ARCO_1.length} missões`}</span>
               </div>
 
               {/* Distritos em projeto */}
@@ -265,10 +267,10 @@ export function Mapa() {
                 id="museu"
                 nome="Museu"
                 aberto={museuAberto}
-                href="/museu/paes-de-ahmes"
+                href={portaMuseu ? rotaDe(portaMuseu) : "/mapa"}
                 rotulo={museuAberto ? "Museu das Descobertas: entrar" : "Museu das Descobertas: abre depois da missão 4"}
               />
-              <LugarFechavel id="rua" nome="A Rua" aberto={ruaAberta} href="/rua/tres-pizzas" rotulo={ruaAberta ? "A Rua, matemática invisível: entrar" : "A Rua: abre depois da missão 4"} />
+              <LugarFechavel id="rua" nome="A Rua" aberto={ruaAberta} href={portaRua ? rotaDe(portaRua) : "/mapa"} rotulo={ruaAberta ? "A Rua, matemática invisível: entrar" : "A Rua: abre depois da missão 4"} />
 
               {/* Chamado: bilhete amarelo ao lado do distrito */}
               {chamado && (

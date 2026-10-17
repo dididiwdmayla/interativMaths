@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { JOIAS } from "@/conteudo/joias";
-import { PARAMETROS_LAPIDACAO as P } from "@/conteudo/lapidacao";
 import type { EstadoJoia } from "../progresso/tipos";
 import { ORDEM_TECNICAS_SOROBAN, TECNICAS_SOROBAN as T } from "../soroban/tecnicas";
 import { comecarRodadaDoAbaco, jogarRodadaDoAbaco } from "./abaco";
-import { andamentoDaTecnica, decidirRodada, encerrarRodada, estagioDasTecnicas, situacaoDaTecnica, treinoDe } from "./treino";
+import { andamentoDaTecnica, decidirRodada, encerrarRodada, estagioDasTecnicas, situacaoDaTecnica, treinoDe, type ParametrosLapidacao } from "./treino";
+
+/** Os parâmetros do teste ficam aqui: o conteúdo pode afinar os do jogo sem quebrar o núcleo. */
+const P: ParametrosLapidacao = { operacoesPorRodada: 6, limposParaFirmar: 6, rodadasParaFirmar: 2, limposPorRodada: 2, intervaloHoras: 20, intercaladas: 2 };
 
 const ABACO = JOIAS.find((j) => j.id === "abaco") ?? JOIAS[0];
 const HORA = 3_600_000;

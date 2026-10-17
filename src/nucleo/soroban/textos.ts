@@ -232,15 +232,18 @@ export function casoParecido(ld: LanceDaOperacao): Operacao | null {
   const alvo = marcasDeTecnica(ld.plano.marcas).join(",");
   const tipo = ld.lance.tipo;
   const x = valorDaHaste(ld.inicio[ld.lance.haste]);
-  for (let s = 1; s <= 19; s++) {
-    for (let e = 1; e <= 9; e++) {
-      if (s % 10 === x && e === ld.lance.d) continue;
-      const r = tipo === "por" ? s + e : s - e;
-      if (r < 1 || r > 99 || r % 10 === 0) continue;
-      const op: Operacao = tipo === "por" ? { tipo: "somar", a: s, b: e } : { tipo: "subtrair", a: s, b: e };
-      const l = lancesDaOperacao(op, 2);
-      const digito = l[l.length - 1];
-      if (marcasDeTecnica(digito.plano.marcas).join(",") === alvo) return op;
+  // Primeiro os números pequenos e sem resultado redondo; se não houver, qualquer um até 99.
+  for (const redondo of [false, true]) {
+    for (let s = 1; s <= 99; s++) {
+      for (let e = 1; e <= 9; e++) {
+        if (s % 10 === x && e === ld.lance.d) continue;
+        const r = tipo === "por" ? s + e : s - e;
+        if (r < 1 || r > 99 || (!redondo && r % 10 === 0)) continue;
+        const op: Operacao = tipo === "por" ? { tipo: "somar", a: s, b: e } : { tipo: "subtrair", a: s, b: e };
+        const l = lancesDaOperacao(op, 2);
+        const digito = l[l.length - 1];
+        if (marcasDeTecnica(digito.plano.marcas).join(",") === alvo) return op;
+      }
     }
   }
   return null;

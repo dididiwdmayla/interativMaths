@@ -70,9 +70,7 @@ function LinhaTecnica({ t, a }: { t: TecnicaJoia; a: Andamento }) {
   );
 }
 
-function FichaEmLapidacao({ joia, estado }: { joia: Joia; estado: EstadoJoia }) {
-  const { agora } = useProgresso();
-  const t = agora();
+export function FichaEmLapidacao({ joia, estado, agora: t }: { joia: Joia; estado: EstadoJoia; agora: number }) {
   const p = PARAMETROS_LAPIDACAO;
   const polida = estado.estagio >= 3;
   const proximo = !polida ? joia.estagios[estado.estagio + 1] : null;
@@ -160,7 +158,7 @@ function OutraJoia({ joia, estado }: { joia: Joia; estado: EstadoJoia | undefine
 }
 
 export function RelicarioVivo() {
-  const { progresso } = useProgresso();
+  const { progresso, agora } = useProgresso();
   const abaco = JOIAS.find((j) => j.id === "abaco");
   const estado = progresso.joias.abaco;
   if (!abaco || !estado) return null;
@@ -172,7 +170,7 @@ export function RelicarioVivo() {
           <p className="m-0 text-[12.5px] font-semibold text-tinta-suave">Habilidades suas, não poderes</p>
           <h1 className="m-0 mt-0.5 text-[26px] font-extrabold leading-[1.1]">Relicário</h1>
         </header>
-        <FichaEmLapidacao joia={abaco} estado={estado} />
+        <FichaEmLapidacao joia={abaco} estado={estado} agora={agora()} />
         {JOIAS.filter((j) => j.id !== abaco.id).map((j) => (
           <OutraJoia key={j.id} joia={j} estado={progresso.joias[j.id]} />
         ))}

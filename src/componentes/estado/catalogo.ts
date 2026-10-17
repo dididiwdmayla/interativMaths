@@ -53,3 +53,17 @@ export const SONDAGEM_ATIVA = true;
 export function existeAtividade(id: string): boolean {
   return ATIVIDADES.some((a) => a.id === id);
 }
+
+/** As exposições do Museu ou as cenas da Rua do catálogo, na ordem do catálogo. */
+export function atividadesDoLugar(tipo: "exposicao" | "cena"): readonly Atividade[] {
+  return ATIVIDADES.filter((a) => a.tipo === tipo);
+}
+
+/**
+ * A porta do Museu ou da Rua: a primeira exposição (ou cena) ainda não feita; se todas foram,
+ * a primeira. Exposição e cena novas entram só como dado (um arquivo e uma linha no catálogo).
+ */
+export function portaDoLugar(tipo: "exposicao" | "cena", feita: (id: string) => boolean): Atividade | null {
+  const todas = atividadesDoLugar(tipo);
+  return todas.find((a) => !feita(a.id)) ?? todas[0] ?? null;
+}

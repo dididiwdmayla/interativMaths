@@ -369,10 +369,10 @@ function OperacaoDaRodada({
             </div>
           )
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <button
             type="button"
-            className="botao-secundario"
+            className="botao-secundario whitespace-nowrap"
             aria-pressed={paresAbertos}
             onClick={() => {
               if (!paresAbertos) enviar({ tipo: "pares" });
@@ -383,11 +383,11 @@ function OperacaoDaRodada({
             <IconeOsPares />
             {TEXTOS_BANCADA.osPares}
           </button>
-          <button type="button" className="botao-discreto" onClick={() => enviar({ tipo: "desfazer" })} disabled={e.aberto.pilha.length === 0} data-acao="desfazer">
+          <button type="button" className="botao-discreto whitespace-nowrap" onClick={() => enviar({ tipo: "desfazer" })} disabled={e.aberto.pilha.length === 0} data-acao="desfazer">
             <IconeDesfazer />
             {TEXTOS_BANCADA.desfazer}
           </button>
-          <button type="button" className="botao-discreto" onClick={() => enviar({ tipo: "zerar" })} data-acao="zerar">
+          <button type="button" className="botao-discreto whitespace-nowrap" onClick={() => enviar({ tipo: "zerar" })} data-acao="zerar">
             <IconeRecomecar />
             {TEXTOS_BANCADA.zerar}
           </button>
