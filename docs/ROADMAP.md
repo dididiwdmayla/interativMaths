@@ -150,6 +150,17 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
     sozinho e nos dois momentos da sombra), `src/conteudo/passos-junto.test.ts`, capturas 05, 06
     e 07 de `docs/capturas/v0.5/` refeitas.
 
+- Conteúdo 1 — **Três cenas da Rua e a exposição Quantas vezes**:
+  - Rua: `rua.racao-do-sitio` (aplicação direta), `rua.cinco-tercas` (analogia conceitual) e
+    `rua.o-compasso` (transferência com treino próprio), cada uma em arquivo próprio e no catálogo.
+  - Museu: `museu.quantas-vezes`, com as três faixas e cinco fontes conferidas em 17/10/2026.
+  - Mesmas peles, validadores, medidas e equívocos; soluções (incluindo 7, 7, 6, 6 e 6/8),
+    sabotagens e escadas de três dicas. Abertura depois da Missão 4.
+  - Verificação: `npm test` e `npm run verificar` passaram (42 arquivos, 564 testes; tipos,
+    lint e build). Sem mudanças fora de `src/conteudo/`, além deste roadmap.
+  - Recados da lapidação mantidos: só `limpo` aceita lista; os demais momentos ainda são textos
+    únicos. Variantes gerais dependem de outra sessão que altere o contrato de consumo.
+
 ## Parcialmente implementado
 - Pergunte por escrito (a conversa com o Nônio): verificado com simulação e testes da rota; **não
   exercitado contra a API real nesta sessão** (sem chave no ambiente). A primeira prévia com `ANTHROPIC_API_KEY` na Vercel é o
@@ -180,7 +191,6 @@ Status do trabalho. Leia antes de começar; atualize no fim de cada sessão.
 - A conversa com o Nônio na bancada (contexto de rodada no servidor).
 - Arco 2 de A Partilha: equivalência, comparação, fração de quantidade, razão e proporção.
 - O Contrapeso (incógnitas e equações) e os outros distritos.
-- Segunda exposição do museu e novas cenas da Rua (as três categorias já existem nos dados).
 - Revisitas espaçadas além da primeira (hoje: uma revisita até consolidar).
 
 ## Decisões
