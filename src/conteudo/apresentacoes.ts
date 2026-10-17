@@ -27,6 +27,10 @@ export const APRESENTACOES = {
     texto: "Monte a resposta com as fichas: toque na casa de cima ou de baixo e depois numa ficha. Limpar começa de novo.",
     alvo: "[data-fichas]",
   },
+  soroban: {
+    texto: "Toque numa conta: ela e as que estão entre ela e a régua andam juntas. Tocar de novo afasta.",
+    alvo: "[data-soroban]",
+  },
 } as const;
 
 export const TEXTO_ENTENDI = "Entendi";

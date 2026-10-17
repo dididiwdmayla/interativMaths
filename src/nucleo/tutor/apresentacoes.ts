@@ -8,10 +8,10 @@ import { maoLivreLigada } from "../maquinas/bancada/bancada";
 import type { Execucao } from "../missoes/motor";
 import type { Atividade, Passo } from "../missoes/tipos";
 
-export type IdApresentacao = "bolha" | "mao-livre" | "aposta" | "menu-corte" | "bicas" | "fichas";
+export type IdApresentacao = "bolha" | "mao-livre" | "aposta" | "menu-corte" | "bicas" | "fichas" | "soroban";
 
 /** Ordem de prioridade quando um passo traz mais de uma ferramenta nova. */
-export const ORDEM_APRESENTACOES: readonly IdApresentacao[] = ["bolha", "mao-livre", "aposta", "menu-corte", "bicas", "fichas"];
+export const ORDEM_APRESENTACOES: readonly IdApresentacao[] = ["bolha", "mao-livre", "aposta", "menu-corte", "bicas", "fichas", "soroban"];
 
 /** As ferramentas que este passo põe na mão do jogador. */
 export function ferramentasDoPasso(passo: Passo, e: Execucao): IdApresentacao[] {

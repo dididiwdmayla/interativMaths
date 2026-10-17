@@ -257,6 +257,7 @@ export function Soroban({
       <svg
         viewBox={`0 0 ${largura} ${altura}`}
         className="soroban-svg traco-fixo"
+        preserveAspectRatio="xMidYMin meet"
         role="group"
         aria-label={visiveis ? `${rotulo ?? LEITOR_SOROBAN.rotulo}, ${LEITOR_SOROBAN.mostrando} ${valor}.` : `${rotulo ?? LEITOR_SOROBAN.rotulo}: ${LEITOR_SOROBAN.semContas}.`}
       >
