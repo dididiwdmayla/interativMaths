@@ -63,6 +63,8 @@ export function jogarItem(e: EstadoItem, modo: ModoDeJogar = {}): EstadoItem {
   }
   const op = x.item.operacao;
   if (op.tipo === "ditado") while (x.mostrados < op.numeros.length) x = aplicarEntradaItem(x, { tipo: "proximo-numero" }).estado;
+  const ajuda = modo.ajuda?.(0) ?? 0;
+  for (let d = 0; d < ajuda; d++) x = aplicarEntradaItem(x, { tipo: "ajuda" }).estado;
   const certo = resultadoDe(x.item.operacao);
   return aplicarEntradaItem(x, { tipo: "responder", valor: modo.errar ? certo + 1 : certo }).estado;
 }

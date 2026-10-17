@@ -3,6 +3,7 @@
  * Os marcadores ({d}, {m}, {livres}, {haste}...) o núcleo preenche com os números do momento.
  * Uma sessão de conteúdo pode afinar daqui: veja docs/AUTORIA.md.
  */
+import type { ParametrosLapidacao } from "@/nucleo/joias/treino";
 
 /** Os nomes das hastes, pela posição (0 = unidades). A quinta haste fica sem rótulo. */
 export const NOMES_POSICAO = [
@@ -32,3 +33,13 @@ export const ROTULOS_MARCA = {
   juntos: "5 e 10 juntos",
   cadeia: "cadeia",
 } as const;
+
+/** Os números do treino. Uma sessão de conteúdo pode afinar (e roda as checagens depois). */
+export const PARAMETROS_LAPIDACAO: ParametrosLapidacao = {
+  operacoesPorRodada: 6,
+  limposParaFirmar: 6,
+  rodadasParaFirmar: 2,
+  limposPorRodada: 2,
+  intervaloHoras: 20,
+  intercaladas: 2,
+};

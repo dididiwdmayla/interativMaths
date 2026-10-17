@@ -12,7 +12,34 @@ import { agoraDoJogo, substituirProgresso } from "@/componentes/estado/loja";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { CabecalhoLugar } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
-import { progressoAteMissao, progressoCalibrado, progressoComSondagem, progressoComTransferencia } from "./cenarios";
+import {
+  progressoAbacoCincoEsperando,
+  progressoAbacoCincoFirmando,
+  progressoAbacoEncontrado,
+  progressoAbacoLapidado,
+  progressoAbacoPolido,
+  progressoAbacoRodadaNoMeio,
+  progressoAbacoTalhado,
+  progressoAteMissao,
+  progressoCalibrado,
+  progressoComSondagem,
+  progressoComTransferencia,
+} from "./cenarios";
+import { JOIAS } from "@/conteudo/joias";
+import { PARAMETROS_LAPIDACAO } from "@/conteudo/lapidacao";
+import { andamentoDaTecnica, treinoDe } from "@/nucleo/joias/treino";
+
+const ABACO = JOIAS.find((j) => j.id === "abaco");
+const NOMES_ESTAGIO = ["bruta", "talhada", "lapidada", "polida"];
+const SALTOS_ABACO: { acao: string; rotulo: string; f: (agora: number) => Progresso }[] = [
+  { acao: "abaco-encontrado", rotulo: "Ábaco encontrado", f: progressoAbacoEncontrado },
+  { acao: "abaco-talhado", rotulo: "Ábaco talhado", f: progressoAbacoTalhado },
+  { acao: "abaco-cinco-firmando", rotulo: "Talhado, 5 firmando", f: progressoAbacoCincoFirmando },
+  { acao: "abaco-cinco-esperando", rotulo: "Talhado, 5 esperando", f: progressoAbacoCincoEsperando },
+  { acao: "abaco-lapidado", rotulo: "Ábaco lapidado", f: progressoAbacoLapidado },
+  { acao: "abaco-polido", rotulo: "Ábaco polido", f: progressoAbacoPolido },
+  { acao: "abaco-rodada-no-meio", rotulo: "Rodada parada no meio de um lance", f: progressoAbacoRodadaNoMeio },
+];
 
 const NOMES_ESTADO: Record<string, string> = {
   nao_avaliado: "não avaliado",
@@ -101,6 +128,42 @@ export function LabProgresso() {
             Sondagem pendente
           </button>
         </div>
+      </section>
+
+      <section className="ficha flex flex-col gap-2 p-4" data-lab="saltos-abaco">
+        <h2 className="m-0 text-[17px] font-extrabold">Joia do Ábaco</h2>
+        <p className="m-0 text-tinta-suave">Cada salto joga rodadas no motor, como um jogador, a partir do Arco 1 concluído.</p>
+        <div className="flex flex-wrap gap-2">
+          {SALTOS_ABACO.map((s) => (
+            <button key={s.acao} type="button" className="botao-secundario" onClick={() => saltar(s.f)} data-acao={s.acao}>
+              {s.rotulo}
+            </button>
+          ))}
+        </div>
+        {ABACO && progresso.joias.abaco?.encontrada && (
+          <div className="flex flex-col gap-1" data-lab-joia="abaco" data-estagio={progresso.joias.abaco.estagio}>
+            <p className="m-0 font-bold">
+              {NOMES_ESTAGIO[progresso.joias.abaco.estagio]} · {progresso.joias.abaco.treinos} rodadas feitas{progresso.joias.abaco.rodada ? ` · rodada em andamento (${progresso.joias.abaco.rodada.feitos.length} de ${progresso.joias.abaco.rodada.itens.length})` : ""}
+            </p>
+            <table className="w-full text-left text-[0.88rem]">
+              <tbody>
+                {ABACO.tecnicas.map((t) => {
+                  const tr = treinoDe(progresso.joias.abaco, t.id);
+                  const a = andamentoDaTecnica(t, tr, PARAMETROS_LAPIDACAO, agora);
+                  return (
+                    <tr key={t.id} className="border-t border-grade" data-lab-tecnica={t.id} data-tecnica-estado={a.situacao}>
+                      <td className="py-1 pr-2">{t.nome}</td>
+                      <td className="py-1 pr-2">{a.situacao}</td>
+                      <td className="py-1 pr-2">{tr.limpos} limpos</td>
+                      <td className="py-1 pr-2">{tr.rodadas.length} rodadas</td>
+                      <td className="py-1 text-tinta-suave">{a.liberaEm ? `libera ${data(a.liberaEm)}` : ""}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="ficha flex flex-col gap-2 p-4">
