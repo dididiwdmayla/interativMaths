@@ -71,6 +71,8 @@ export async function fazerOperacao(page: Page) {
         const plano = planoDoLance(agora, { tipo: "mostrar", valor: op.tipo === "somar" ? op.a + op.b : op.a - op.b });
         for (const g of gestosDosMovimentos(agora, plano?.movimentos ?? [])) await tocarGesto(page, g);
       }
+      // A sombra: das mãos para o dizer, e o teclado sobe no lugar do painel.
+      if (modo === "sombra") await tocar(page, "[data-acao=dizer]");
       if (op.tipo === "ditado") while (await v(page, "[data-acao=proximo-numero]").isVisible().catch(() => false)) await tocar(page, "[data-acao=proximo-numero]");
       const r = op.tipo === "somar" ? op.a + op.b : op.tipo === "subtrair" ? op.a - op.b : op.tipo === "ditado" ? op.numeros.reduce((t, n) => t + n, 0) : op.valor;
       await digitar(page, r);

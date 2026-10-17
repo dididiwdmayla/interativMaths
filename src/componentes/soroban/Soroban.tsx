@@ -42,28 +42,27 @@ function yBaixo(k: number, encostada: boolean): number {
   return GEOMETRIA.baixoEncostada + GEOMETRIA.passoConta * (encostada ? k : k + 1);
 }
 
-/** Uma conta que vai se mexer no caminho desenhado (degrau 4): a ordem, a direção, se é a que se toca. */
+/** Uma conta que vai se mexer no caminho desenhado (degrau 4): o número do passo e a direção. */
 interface MarcaCaminho {
   readonly ordem: number;
   /** -1: sobe na tela; 1: desce. */
   readonly sentido: -1 | 1;
-  readonly tocar: boolean;
 }
 
 /** Quais contas cada movimento do caminho mexe, a partir do estado de agora. */
-export function contasDoCaminho(estado: EstadoSoroban, movimentos: readonly Movimento[]): Map<string, MarcaCaminho> {
+export function contasDoCaminho(estado: EstadoSoroban, movimentos: readonly Movimento[], ordens?: readonly number[]): Map<string, MarcaCaminho> {
   const saida = new Map<string, MarcaCaminho>();
   let s = estado;
   movimentos.forEach((m, n) => {
     const h = s[m.haste];
-    const ordem = n + 1;
+    const ordem = ordens?.[n] ?? n + 1;
     if (m.cinco !== 0) {
       // Encostar a de cima é descer; afastar, subir.
-      saida.set(`${m.haste}:cima`, { ordem, sentido: m.cinco > 0 ? 1 : -1, tocar: true });
+      saida.set(`${m.haste}:cima`, { ordem, sentido: m.cinco > 0 ? 1 : -1 });
     } else if (m.uns > 0) {
-      for (let k = h.uns; k < h.uns + m.uns; k++) saida.set(`${m.haste}:${k}`, { ordem, sentido: -1, tocar: k === h.uns + m.uns - 1 });
+      for (let k = h.uns; k < h.uns + m.uns; k++) saida.set(`${m.haste}:${k}`, { ordem, sentido: -1 });
     } else {
-      for (let k = h.uns + m.uns; k < h.uns; k++) saida.set(`${m.haste}:${k}`, { ordem, sentido: 1, tocar: k === h.uns + m.uns });
+      for (let k = h.uns + m.uns; k < h.uns; k++) saida.set(`${m.haste}:${k}`, { ordem, sentido: 1 });
     }
     s = aplicarMovimento(s, m);
   });
@@ -79,6 +78,8 @@ export interface MarcasSoroban {
   readonly vistos?: readonly number[];
   /** O caminho junto (degrau 4): as contas que vão se mexer, com borda de caneta, seta e a ordem. */
   readonly caminho?: readonly Movimento[] | null;
+  /** O número do passo escrito de cada movimento do caminho (sem ele, 1, 2, 3...). */
+  readonly ordens?: readonly number[];
 }
 
 function nomeDaHaste(hastes: number, i: number) {
@@ -110,14 +111,12 @@ function Conta({ encostada, caminho }: { encostada: boolean; caminho: MarcaCamin
           <polygon points={PONTOS_CONTA} fill="none" stroke="var(--caneta)" strokeWidth={3.4} strokeLinejoin="round" />
           <path d={`M0 ${-6 * caminho.sentido} V${6 * caminho.sentido}`} stroke={encostada ? "var(--sobre-caneta)" : "var(--caneta)"} strokeWidth={2.4} strokeLinecap="round" fill="none" />
           <path d={`M-4.5 ${1.5 * caminho.sentido} L0 ${7 * caminho.sentido} L4.5 ${1.5 * caminho.sentido}`} stroke={encostada ? "var(--sobre-caneta)" : "var(--caneta)"} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          {caminho.tocar && (
-            <g transform="translate(-21 -11)">
-              <circle r={8.5} fill="var(--marca-texto)" stroke="var(--contorno)" strokeWidth={1.6} />
-              <text y={4.2} textAnchor="middle" fontSize={12} fontWeight={800} fill="var(--sobre-marca)">
-                {caminho.ordem}
-              </text>
-            </g>
-          )}
+          <g transform="translate(-21 -11)">
+            <circle r={8.5} fill="var(--marca-texto)" stroke="var(--contorno)" strokeWidth={1.6} />
+            <text y={4.2} textAnchor="middle" fontSize={12} fontWeight={800} fill="var(--sobre-marca)">
+              {caminho.ordem}
+            </text>
+          </g>
         </g>
       )}
     </>
@@ -218,6 +217,7 @@ export function Soroban({
   contas = "visiveis",
   marcas = {},
   rotulo,
+  nota,
   className = "",
 }: {
   estado: EstadoSoroban;
@@ -229,12 +229,14 @@ export function Soroban({
   contas?: "visiveis" | "escondidas";
   marcas?: MarcasSoroban;
   rotulo?: string;
+  /** A nota à mão dentro do leito, sobre um retalho de folha (a primeira sombra): uma linha por item. */
+  nota?: readonly string[];
   className?: string;
 }) {
   const hastes = estado.length;
   const visiveis = contas === "visiveis";
   const interativa = onGesto !== undefined;
-  const caminho = marcas.caminho ? contasDoCaminho(estado, marcas.caminho) : new Map<string, MarcaCaminho>();
+  const caminho = marcas.caminho ? contasDoCaminho(estado, marcas.caminho, marcas.ordens) : new Map<string, MarcaCaminho>();
   const vistos = new Set(marcas.vistos ?? []);
   const valor = estado.reduce((t, h) => t * 10 + valorDaHaste(h), 0);
   // Zeros à esquerda ficam em grafite.
@@ -295,6 +297,16 @@ export function Soroban({
               {valorDaHaste(h)}
             </text>
           ))}
+        {nota && nota.length > 0 && (
+          <g aria-hidden="true" data-nota-sombra="" pointerEvents="none">
+            <rect x={80} y={160} width={170} height={26 * nota.length + 6} rx={8} fill="var(--folha)" />
+            {nota.map((linha, i) => (
+              <text key={i} x={165} y={182 + 26 * i} textAnchor="middle" fontFamily="var(--fonte-mao), cursive" fontSize={25} fontWeight={700} fill="var(--tinta-suave)">
+                {linha}
+              </text>
+            ))}
+          </g>
+        )}
         {[...vistos].map((i) => (
           <g key={i} transform={`translate(${xDaHaste(i) + 19} 279)`} aria-hidden="true" data-visto={i}>
             <circle r={7} fill="var(--verde)" stroke="var(--contorno)" strokeWidth={1.6} />

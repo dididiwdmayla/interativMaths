@@ -5,7 +5,10 @@
  * O jogador de mentira (./soroban.ts) calcula o caminho curto com o próprio núcleo.
  */
 import { expect, test, type Page } from "@playwright/test";
-import { fazerRodada, gestosDoLance, lanceCurto, tocar, tocarGesto, v } from "./soroban";
+import { gestosDosMovimentos } from "../src/nucleo/soroban/jogador";
+import { planoDoLance } from "../src/nucleo/soroban/plano";
+import { mostrar } from "../src/nucleo/soroban/soroban";
+import { digitar, fazerOperacao, fazerRodada, gestosDoLance, lanceCurto, operacaoDoAtributo, tocar, tocarGesto, v } from "./soroban";
 
 const OPERACAO = "[data-tela=lapidacao][data-fase=operacao]";
 
@@ -100,3 +103,82 @@ test("talhada: o complemento de 5 pelo caminho curto, com vai e volta, e a volta
   await lanceCurto(page);
   await expect(v(page, OPERACAO)).toHaveAttribute("data-lance", "limpo");
 });
+
+/**
+ * O alvo de toque: a caixa de uma conta de baixo (60 × 28 no desenho) no tamanho em que a tela a
+ * mostra. O soroban nunca encolhe para caber; o que cede é o painel.
+ */
+async function caixaDaConta(page: Page): Promise<{ w: number; h: number }> {
+  return v(page, "[data-soroban] svg").evaluate((svg) => {
+    const r = svg.getBoundingClientRect();
+    const escala = Math.min(r.width / 330, r.height / 304);
+    return { w: 60 * escala, h: 28 * escala };
+  });
+}
+
+for (const tamanho of [
+  { width: 390, height: 844 },
+  { width: 360, height: 780 },
+]) {
+  test.describe(`alvo de toque em ${tamanho.width} × ${tamanho.height}`, () => {
+    test.use({ viewport: tamanho });
+    const minimo = { w: (58 * tamanho.width) / 390, h: (27 * tamanho.width) / 390 };
+
+    test("sozinho e os dois momentos da sombra", async ({ page }) => {
+      await saltar(page, "abaco-talhado");
+      await page.goto("/relicario/abaco");
+      await tocar(page, "[data-acao=comecar]");
+      await entenderSoroban(page);
+      const tela = v(page, OPERACAO);
+      for (let guarda = 0; guarda < 6 && (await tela.getAttribute("data-nivel")) !== "sozinho"; guarda++) {
+        await fazerOperacao(page);
+        await tocar(page, "[data-acao=proxima]");
+      }
+      await expect(tela).toHaveAttribute("data-nivel", "sozinho");
+      const sozinho = await caixaDaConta(page);
+      expect(sozinho.w).toBeGreaterThanOrEqual(minimo.w);
+      expect(sozinho.h).toBeGreaterThanOrEqual(minimo.h);
+      const alvo = await v(page, "[data-soroban] [data-haste='4'] [data-conta='baixo-3'] rect").boundingBox();
+      expect(alvo?.width ?? 0).toBeGreaterThanOrEqual(minimo.w);
+      expect(alvo?.height ?? 0).toBeGreaterThanOrEqual(minimo.h);
+
+      // A sombra: mãos, dizer, conferir.
+      await saltar(page, "abaco-lapidado");
+      await page.goto("/relicario/abaco");
+      await tocar(page, "[data-acao=comecar]");
+      await expect(tela).toHaveAttribute("data-modo", "sombra");
+      await expect(tela).toHaveAttribute("data-sombra", "maos");
+      const maos = await caixaDaConta(page);
+      expect(maos.w).toBeGreaterThanOrEqual(minimo.w);
+      expect(maos.h).toBeGreaterThanOrEqual(minimo.h);
+      const op = operacaoDoAtributo((await tela.getAttribute("data-operacao")) ?? "");
+      const r = op.tipo === "somar" ? op.a + op.b : op.tipo === "subtrair" ? op.a - op.b : 0;
+      const agora = mostrar(5, Number(await v(page, "[data-soroban]").getAttribute("data-valor")));
+      const plano = planoDoLance(agora, { tipo: "mostrar", valor: r });
+      for (const g of gestosDosMovimentos(agora, plano?.movimentos ?? [])) await tocarGesto(page, g);
+      await expect(v(page, "[data-soroban]")).toHaveAttribute("data-valor", String(r));
+
+      await tocar(page, "[data-acao=dizer]");
+      await expect(tela).toHaveAttribute("data-sombra", "dizer");
+      const dizer = await caixaDaConta(page);
+      expect(dizer.w).toBeGreaterThanOrEqual(minimo.w);
+      expect(dizer.h).toBeGreaterThanOrEqual(minimo.h);
+      // O teclado inteiro na tela, sem rolar.
+      const conferir = await v(page, "[data-teclado] [data-acao=conferir]").boundingBox();
+      const extra = await v(page, "[data-teclado] [data-tecla=extra]").boundingBox();
+      expect((extra?.y ?? 0) + (extra?.height ?? 0)).toBeLessThanOrEqual(tamanho.height);
+      expect(conferir).not.toBeNull();
+
+      // Tocar no soroban volta às mãos; o número digitado fica guardado.
+      await tocar(page, "[data-teclado] [data-tecla='1']");
+      await tocar(page, "[data-acao=voltar-as-maos]");
+      await expect(tela).toHaveAttribute("data-sombra", "maos");
+      await tocar(page, "[data-acao=dizer]");
+      await expect(v(page, "[data-teclado] [data-valor-digitado]")).toHaveAttribute("data-valor-digitado", "1");
+      await tocar(page, "[data-teclado] [data-tecla=apagar]");
+      await digitar(page, r);
+      await expect(tela).toHaveAttribute("data-situacao", "feito");
+      await expect(tela).toHaveAttribute("data-retorno", "acertou");
+    });
+  });
+}
