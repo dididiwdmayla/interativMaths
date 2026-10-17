@@ -2,8 +2,8 @@
 
 /**
  * A rodada em curso (referências 3, 4, 5, 7 e 8 de v05.html): uma operação por vez, um algarismo
- * por vez. O item vive no progresso a cada gesto (fechar o navegador no meio volta no mesmo
- * lance, com o mesmo soroban). Quem decide é o núcleo (o lance fecha sozinho, limpo ou com vai e
+ * por vez. O item vai para o progresso 300 ms depois do gesto, e na hora ao sair da página
+ * (fechar o navegador no meio volta no mesmo lance, com o mesmo soroban). Quem decide é o núcleo (o lance fecha sozinho, limpo ou com vai e
  * volta); a tela desenha o estado, e o Nônio fala o que o núcleo decidiu.
  */
 import { useEffect, useRef, useState } from "react";
@@ -24,11 +24,11 @@ import {
 } from "@/nucleo/soroban/item";
 import { lancesDaOperacao, resultadoDe, resumoDaOperacao } from "@/nucleo/soroban/operacao";
 import { aplicarMovimento, mostrar, type Soroban as EstadoSoroban } from "@/nucleo/soroban/soroban";
-import { caminhoQueFalta, casoParecido, contaDoItem, exemploDaOperacao, gestoDoItem, movimentosPorHaste, paresDoLance, rascunhoDoItem } from "@/nucleo/soroban/textos";
+import { caminhoJunto, casoParecido, contaDoItem, exemploDaOperacao, gestoDoItem, movimentosPorHaste, paresDoLance, rascunhoDoItem } from "@/nucleo/soroban/textos";
 import { marcasDeTecnica } from "@/nucleo/soroban/plano";
 import { falaDoPasso } from "@/nucleo/tutor/fila";
 import { recadoDaFala } from "@/nucleo/tutor/recado";
-import { CONTA_SOROBAN, GESTOS_SOROBAN, NOMES_POSICAO, PARAMETROS_LAPIDACAO, RASCUNHO_SOROBAN, RECADOS_LAPIDACAO, TEXTOS_BANCADA, AJUDA_LAPIDACAO } from "@/conteudo/lapidacao";
+import { CONTA_SOROBAN, GESTOS_SOROBAN, NOMES_POSICAO, PARAMETROS_LAPIDACAO, PASSOS_JUNTO, RASCUNHO_SOROBAN, RECADOS_LAPIDACAO, TEXTOS_BANCADA, AJUDA_LAPIDACAO } from "@/conteudo/lapidacao";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { Palco } from "@/componentes/maquinas/Palco";
 import { BolhaNonio } from "@/componentes/nonio/BolhaNonio";
@@ -62,6 +62,9 @@ import {
   falaSemAlgarismos,
   textoDaAjuda,
 } from "./falas";
+
+/** A rodada grava no progresso este tempo depois do último gesto. */
+const ATRASO_GRAVAR_MS = 300;
 
 /** O caminho curto passando no soroban: um quadro a cada 500 ms. */
 const QUADRO_MS = 500;
@@ -120,6 +123,8 @@ function OperacaoDaRodada({
   const [replay, setReplay] = useState<{ quadros: EstadoSoroban[]; i: number } | null>(null);
   const [digitado, setDigitado] = useState("");
   const [aindaNao, setAindaNao] = useState(false);
+  // A sombra tem dois momentos: as mãos (o soroban e os botões) e o dizer (o teclado no lugar do painel).
+  const [dizendo, setDizendo] = useState(false);
   const { fila, oferecerFala } = useFilaNonio(postura);
   const passo = chaveDaOperacao(indice);
   const modo = modoDoItem(item);
@@ -150,7 +155,37 @@ function OperacaoDaRodada({
     return () => clearTimeout(t);
   }, [replay]);
 
-  const salvar = (novo: EstadoItem) => atualizar((p, t) => (p.joias.abaco ? definirJoia(p, joia.id, guardarAberto(p.joias.abaco, novo), t) : p));
+  // A rodada grava 300 ms depois do último gesto, e na hora quando a página sai ou fica oculta.
+  const pendente = useRef<EstadoItem | null>(null);
+  const relogio = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const gravarAgora = useRef(() => {});
+  useEffect(() => {
+    gravarAgora.current = () => {
+      if (relogio.current) clearTimeout(relogio.current);
+      relogio.current = null;
+      const novo = pendente.current;
+      pendente.current = null;
+      if (novo) atualizar((p, t) => (p.joias.abaco ? definirJoia(p, joia.id, guardarAberto(p.joias.abaco, novo), t) : p));
+    };
+  }, [atualizar, joia.id]);
+  const salvar = (novo: EstadoItem) => {
+    pendente.current = novo;
+    if (relogio.current) clearTimeout(relogio.current);
+    relogio.current = setTimeout(() => gravarAgora.current(), ATRASO_GRAVAR_MS);
+  };
+  useEffect(() => {
+    const gravar = () => gravarAgora.current();
+    const oculta = () => {
+      if (document.visibilityState === "hidden") gravar();
+    };
+    window.addEventListener("pagehide", gravar);
+    document.addEventListener("visibilitychange", oculta);
+    return () => {
+      window.removeEventListener("pagehide", gravar);
+      document.removeEventListener("visibilitychange", oculta);
+      gravar();
+    };
+  }, []);
 
   const enviar = (ent: EntradaItem) => {
     if (replay) return;
@@ -197,7 +232,10 @@ function OperacaoDaRodada({
     if (degrau <= 3) {
       setJanelaAberta(true);
       oferecerFala(falaDaAjuda(passo, textoDaAjuda(e, atual?.lance ?? null, degrau as 1 | 2 | 3), degrau));
-      if (degrau === 2 && (modo === "maos" || modo === "sombra")) setParesAbertos(true);
+      if (degrau === 2 && (modo === "maos" || modo === "sombra")) {
+        setParesAbertos(true);
+        setDizendo(false);
+      }
       if (degrau === 3 && modo === "maos") setCasoAberto(true);
     } else {
       setJanelaAberta(false);
@@ -211,6 +249,7 @@ function OperacaoDaRodada({
   };
 
   const proxima = () => {
+    gravarAgora.current();
     const feito: ItemFeito = itemFeito(e);
     const ultimo = indice + 1 >= rodada.itens.length;
     const caixa: { fim: FimDeRodada | null } = { fim: null };
@@ -230,7 +269,9 @@ function OperacaoDaRodada({
   const terminado = e.terminado;
   const sorobanNaTela = replay ? replay.quadros[replay.i] : e.soroban;
   const ld = atual?.lance ?? null;
-  const caminho = nivelAjuda >= 4 && atual && !replay ? caminhoQueFalta(e) : null;
+  const junto = nivelAjuda >= 4 && atual && !replay ? caminhoJunto(e, PASSOS_JUNTO, NOMES_POSICAO) : null;
+  const caminho = junto?.movimentos ?? null;
+  const passosJunto = junto ? (junto.passos ?? junto.movimentos.map((m) => movimentosPorHaste([m], e.hastes, NOMES_POSICAO, RASCUNHO_SOROBAN))) : null;
   const ultimoDigito = [...lances].reverse().find((l) => l.lance.tipo !== "mostrar") ?? null;
   const vistos = e.fechados.flatMap((f, i) => {
     const l = lances[i]?.lance;
@@ -240,7 +281,7 @@ function OperacaoDaRodada({
   const daVez = !terminado && !replay && ld && ld.lance.tipo !== "mostrar" && (item.nivel === "com-nonio" || item.nivel === "sozinho") ? ld.lance.haste : null;
   const acerto = terminado && modo === "maos" && ultimoDigito && ultimoDigito.lance.tipo !== "mostrar" ? ultimoDigito.lance.haste : null;
   const escondidas = (modo === "sombra" && !e.verContas && !terminado && !replay) || false;
-  const interativo = (modo === "maos" || modo === "sombra") && !terminado && !replay;
+  const interativo = (modo === "maos" || modo === "sombra") && !terminado && !replay && !dizendo;
   const certo = terminado && e.resposta.certa !== false;
   const retorno = terminado ? (certo ? "acertou" : "ainda-nao") : aindaNao ? "ainda-nao" : "neutro";
   const seloVisivel = falaAtual.selo === "ainda-nao" && !aindaNao && !terminado ? null : (falaAtual.selo ?? null);
@@ -266,7 +307,7 @@ function OperacaoDaRodada({
         : certo
           ? GESTOS_SOROBAN.imaginadoCerto
           : GESTOS_SOROBAN.aindaNao;
-  const gesto = terminado ? resumoFim : gestoDoItem(e, GESTOS_SOROBAN, NOMES_POSICAO, caminho);
+  const gesto = terminado ? resumoFim : gestoDoItem(e, GESTOS_SOROBAN, NOMES_POSICAO, passosJunto?.length ?? null);
   const tomGesto = terminado ? (certo ? "acertou" : "ainda-nao") : "gesto";
 
   const conta = terminado ? <ContaSoroban conta={contaDoItem(e, NOMES_POSICAO, CONTA_SOROBAN.nomes)} /> : null;
@@ -298,26 +339,25 @@ function OperacaoDaRodada({
 
   const maquina = (
     <div className="lapidacao-maquina">
-      <div className="lapidacao-soroban">
+      <div className="lapidacao-soroban relative">
         {sorobanAlvo ? (
           <Soroban
             estado={sorobanAlvo}
             onGesto={interativo ? (g) => enviar({ tipo: "gesto", gesto: g }) : undefined}
             algarismos={comAlgarismos || ((modo === "cabeca" || modo === "ditado") && terminado)}
             contas={escondidas ? "escondidas" : "visiveis"}
-            marcas={{ daVez, acerto, vistos: modo === "maos" ? vistos : [], caminho }}
+            marcas={{ daVez, acerto, vistos: modo === "maos" ? vistos : [], caminho, ordens: junto?.ordens }}
+            nota={modo === "sombra" && escondidas && !("sombra" in progresso.apresentacoes) ? TEXTOS_BANCADA.notaSombra.split("; ").map((l, i, todas) => (i < todas.length - 1 ? `${l};` : l)) : undefined}
           />
         ) : (
           <div className="a-lapis h-full" aria-hidden="true">
             <Soroban estado={mostrar(e.hastes, 0)} contas="escondidas" algarismos={false} rotulos={false} />
           </div>
         )}
+        {modo === "sombra" && dizendo && !terminado && (
+          <button type="button" className="absolute inset-0 bg-transparent" aria-label={TEXTOS_BANCADA.voltarAsMaos} onClick={() => setDizendo(false)} data-acao="voltar-as-maos" />
+        )}
       </div>
-      {modo === "sombra" && !terminado && !e.verContas && !("sombra" in progresso.apresentacoes) && (
-        <p className="letra-mao nota-sombra m-0" data-nota-sombra="">
-          {TEXTOS_BANCADA.notaSombra}
-        </p>
-      )}
       <div className="lapidacao-canto" aria-hidden="true" />
     </div>
   );
@@ -336,21 +376,26 @@ function OperacaoDaRodada({
       </div>
     );
   } else if (modo === "maos") {
-    const passos = caminho ?? [];
+    const passos = passosJunto ?? [];
+    const gruposJunto = [...(pares.dez ? ["dez" as const] : []), ...(pares.cinco ? ["cinco" as const] : [])];
     controles = (
       <div className="flex flex-col gap-2.5">
         {caminho ? (
-          <>
-            <Pares destaque={pares} so={pares.cinco && !pares.dez ? "cinco" : pares.dez && !pares.cinco ? "dez" : undefined} />
+          <div className="flex flex-col gap-2" data-painel="junto">
+            <div className="flex items-center justify-between">
+              <span className="text-[15px] font-extrabold">{PASSOS_JUNTO.titulo}</span>
+              <span className="text-[12.5px] font-semibold text-tinta-suave">{PASSOS_JUNTO.degrau}</span>
+            </div>
+            {gruposJunto.length > 0 && <Pares destaque={pares} grupos={gruposJunto} curto />}
             <ol className="passos-junto" data-passos-junto={passos.length}>
-              {passos.map((m, i) => (
+              {passos.map((texto, i) => (
                 <li key={i}>
                   <span className="passo-ordem">{i + 1}</span>
-                  <span>{movimentosPorHaste([m], e.hastes, NOMES_POSICAO, RASCUNHO_SOROBAN)}</span>
+                  <span>{texto}</span>
                 </li>
               ))}
             </ol>
-          </>
+          </div>
         ) : paresAbertos ? (
           <Pares destaque={nivelAjuda >= 2 ? pares : { cinco: null, dez: null }} so={nivelAjuda >= 2 && pares.cinco && !pares.dez ? "cinco" : nivelAjuda >= 2 && pares.dez && !pares.cinco ? "dez" : undefined} />
         ) : (
@@ -395,13 +440,53 @@ function OperacaoDaRodada({
         {item.nivel === "com-nonio" && !caminho && !paresAbertos && <p className="painel-nota">{TEXTOS_BANCADA.dicaDoToque}</p>}
       </div>
     );
+  } else if (modo === "sombra" && !dizendo) {
+    controles = (
+      <div className="flex flex-col gap-2.5">
+        {paresAbertos && <Pares destaque={nivelAjuda >= 2 ? pares : { cinco: null, dez: null }} />}
+        <div className="flex flex-wrap items-center justify-between gap-y-1">
+          <button
+            type="button"
+            className="botao-secundario whitespace-nowrap"
+            aria-pressed={paresAbertos}
+            onClick={() => {
+              if (!paresAbertos) enviar({ tipo: "pares" });
+              setParesAbertos(!paresAbertos);
+            }}
+            data-acao="pares"
+          >
+            <IconeOsPares />
+            {TEXTOS_BANCADA.osPares}
+          </button>
+          <button type="button" className="botao-discreto whitespace-nowrap" onClick={() => enviar({ tipo: "desfazer" })} disabled={e.aberto.pilha.length === 0} data-acao="desfazer">
+            <IconeDesfazer />
+            {TEXTOS_BANCADA.desfazer}
+          </button>
+          <button type="button" className="botao-discreto whitespace-nowrap" onClick={() => enviar({ tipo: "zerar" })} data-acao="zerar">
+            <IconeRecomecar />
+            {TEXTOS_BANCADA.zerar}
+          </button>
+        </div>
+        <button
+          type="button"
+          className="botao-principal w-full"
+          onClick={() => {
+            setParesAbertos(false);
+            setDizendo(true);
+          }}
+          data-acao="dizer"
+        >
+          {TEXTOS_BANCADA.dizerQuantoFicou}
+        </button>
+      </div>
+    );
   } else {
     const rotulo = modo === "leitura" ? TEXTOS_BANCADA.caixaNumero : modo === "sombra" ? TEXTOS_BANCADA.caixaFicou : TEXTOS_BANCADA.caixaQuantoDeu;
     const op = e.item.operacao;
     const ouvindo = modo === "ditado" && op.tipo === "ditado" && e.mostrados < op.numeros.length;
     controles = (
       <div className="flex flex-col gap-2.5">
-        {paresAbertos && <Pares destaque={{ cinco: null, dez: null }} />}
+        {paresAbertos && modo !== "sombra" && <Pares destaque={{ cinco: null, dez: null }} />}
         {ouvindo ? (
           <button type="button" className="botao-principal w-full" onClick={() => enviar({ tipo: "proximo-numero" })} data-acao="proximo-numero">
             {TEXTOS_BANCADA.proximoNumero}
@@ -422,24 +507,6 @@ function OperacaoDaRodada({
             }}
             extra={modo === "sombra" && !e.verContas ? { rotulo: TEXTOS_BANCADA.verContas, onTocar: () => enviar({ tipo: "ver-contas" }) } : null}
           />
-        )}
-        {modo === "sombra" && (
-          <div className="flex items-center gap-2">
-            <button type="button" className="botao-discreto" onClick={() => enviar({ tipo: "desfazer" })} disabled={e.aberto.pilha.length === 0} data-acao="desfazer">
-              <IconeDesfazer />
-              {TEXTOS_BANCADA.desfazer}
-            </button>
-            <button type="button" className="botao-discreto" onClick={() => enviar({ tipo: "zerar" })} data-acao="zerar">
-              <IconeRecomecar />
-              {TEXTOS_BANCADA.zerar}
-            </button>
-            <button type="button" className="botao-discreto ml-auto" aria-pressed={paresAbertos} onClick={() => {
-              if (!paresAbertos) enviar({ tipo: "pares" });
-              setParesAbertos(!paresAbertos);
-            }} data-acao="pares">
-              {TEXTOS_BANCADA.osPares}
-            </button>
-          </div>
         )}
       </div>
     );
@@ -547,6 +614,7 @@ function OperacaoDaRodada({
           "data-caminho-passando": replay ? "sim" : "nao",
           "data-lapidacao": "rodada",
           "data-ajuda": String(nivelAjuda),
+          "data-sombra": modo === "sombra" && !terminado ? (dizendo ? "dizer" : "maos") : "",
         }}
         cabecalho={cabecalho}
         pedido={<FaixaOperacao e={e} gesto={gesto} tom={tomGesto} />}

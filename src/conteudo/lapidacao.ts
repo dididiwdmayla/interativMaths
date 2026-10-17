@@ -65,6 +65,9 @@ export const TEXTOS_BANCADA = {
   conferir: "Conferir",
   apagar: "Apagar",
   verContas: "Ver contas",
+  /** Na sombra, o botão que troca o painel das mãos pelo teclado. */
+  dizerQuantoFicou: "Dizer quanto ficou",
+  voltarAsMaos: "Voltar às mãos no soroban",
   proximoNumero: "Próximo número",
   verCaminhoCurto: "Ver o caminho curto",
   /** A dica do toque, no painel, enquanto o Nônio acompanha. */
@@ -130,6 +133,39 @@ export const PASSOS_SOROBAN = {
   fica: "fica:",
   aDeCima: "a de cima",
   deBaixo: "{n} de baixo",
+} as const;
+
+/**
+ * Os passos do caminho junto (degrau 4), com o porquê, um modelo por tipo de passo. Marcadores:
+ * {d} o que entra ou sai, {resto} = d − 5, {par} o par do 5, {m} = 10 − d, {x} o algarismo da
+ * haste, {vizinha} e {seguinte} os nomes das hastes da esquerda (dezena, centena: até 999, a
+ * vizinha nunca passa da centena).
+ */
+export const PASSOS_JUNTO = {
+  titulo: "Os pares",
+  degrau: "Me ajuda · 4 de 4",
+  do10: "do 10",
+  do5: "do 5",
+  porBaixo: "Põe {d} embaixo.",
+  porCinco: "Põe o 5.",
+  porCincoEBaixo: "Põe o 5 e {resto} embaixo.",
+  tirarBaixo: "Tira {d} embaixo.",
+  tirarCinco: "Tira o 5.",
+  tirarCincoEBaixo: "Tira o 5 e {resto} embaixo.",
+  cincoPor: "Pôr {d} é pôr 5 e tirar {par}: põe o 5…",
+  cincoPorBaixo: "…e tira {par} embaixo.",
+  cincoTirar: "Tirar {d} sem {d} embaixo: tira o 5…",
+  cincoTirarBaixo: "…e devolve {par} embaixo.",
+  dezPor: "Pôr {d} é pôr 10 e tirar {m}: põe 1 na {vizinha}.",
+  dezTirar: "Tirar {d} é tirar 10 e devolver {m}: tira 1 da {vizinha}.",
+  juntosPor: "Tirar {m} do {x} sem {m} embaixo: tira o 5…",
+  juntosPorBaixo: "…e devolve {par} embaixo.",
+  juntosTirar: "Pôr {m} sem lugar embaixo: põe o 5…",
+  juntosTirarBaixo: "…e tira {par} embaixo.",
+  vaiUmNoQuatro: "Pôr 1 no 4 da {vizinha}: põe o 5 e tira 4 embaixo.",
+  emprestaUmDoCinco: "Tirar 1 do 5 da {vizinha}: tira o 5 e põe 4 embaixo.",
+  vaiUmNoNove: "A {vizinha} está cheia: vira 0 e põe 1 na {seguinte}.",
+  emprestaUmDoZero: "A {vizinha} está vazia: vira 9 e tira 1 da {seguinte}.",
 } as const;
 
 /** O rascunho a lápis: uma linha por lance fechado, com os movimentos que o jogador fez. */

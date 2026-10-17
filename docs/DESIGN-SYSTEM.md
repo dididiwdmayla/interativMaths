@@ -135,10 +135,17 @@ conta) em `--soroban-conta` com a faceta de cima em `--soroban-conta-luz`; **afa
 fica azul, para ler mais rápido. **Haste da vez**: faixa marca-texto pálido e o rótulo numa
 etiqueta marca-texto. **Lance feito limpo**: visto verde ao lado do algarismo. **Acerto**: borda
 verde na ficha e a haste do último lance em verde pálido. **Que vai se mexer** (o caminho junto):
-borda de caneta, seta e o número da ordem na conta que se toca. Rótulos em cima e algarismos
+borda de caneta, seta e o número do passo escrito em cada conta que anda. Rótulos em cima e algarismos
 embaixo (zeros à esquerda em grafite) conforme o nível; na sombra, as contas não aparecem.
 **O toque é a exceção consciente aos 44 px:** a largura da haste (60) na altura de cada conta
 (28); o vão não faz nada. Contas deslizam 160 ms (`transform`); com movimento reduzido, não deslizam.
+**O soroban nunca encolhe para caber; o que cede é o painel.** Em pé, nos níveis que recebem toque
+(as mãos e a sombra), ele ocupa a largura inteira da ficha (em 390 px, cada conta de baixo tem
+60 × 28 de alvo) e a bancada fica com o resto, rolando se precisar. **A sombra tem dois momentos:**
+as mãos (o soroban, Os pares, Desfazer, Zerar e "Dizer quanto ficou") e o dizer (o teclado sobe no
+lugar do painel; tocar no soroban volta às mãos e o número digitado fica guardado). Na primeira
+sombra, "as contas estão aí; só não aparecem" à mão, em `--tinta-suave`, dentro do leito, sobre
+um retalho de `--folha`.
 
 ## A bancada de lapidação
 

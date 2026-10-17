@@ -79,8 +79,9 @@ test("a lapidação e a sombra", async ({ page }) => {
   await page.goto("/relicario/abaco");
   await tocar(page, "[data-acao=comecar]");
   await expect(v(page, OPERACAO)).toHaveAttribute("data-modo", "sombra");
-  // A primeira sombra, com a nota à mão, e o número digitado na caixa "Ficou".
+  // A primeira sombra, no momento "dizer": o teclado no lugar do painel, o número na caixa "Ficou".
   const tela = v(page, OPERACAO);
+  await tocar(page, "[data-acao=dizer]");
   const op = ((await tela.getAttribute("data-operacao")) ?? "").split(":");
   const r = op[0] === "somar" ? Number(op[1]) + Number(op[2]) : Number(op[1]) - Number(op[2]);
   for (const d of String(r)) await tocar(page, `[data-teclado] [data-tecla='${d}']`);

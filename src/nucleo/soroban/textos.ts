@@ -7,7 +7,7 @@
 import { lanceAtual, lancesDoItem, modoDoItem, type EstadoItem, type LanceFechado } from "./item";
 import { algarismosDe, lancesDaOperacao, resultadoDe, type LanceDaOperacao, type Operacao } from "./operacao";
 import { marcasDeTecnica, planoDoLance, type Marca } from "./plano";
-import { mostrar, posicaoDaHaste, sorobanVazio, valorDaHaste, type Movimento, type Soroban } from "./soroban";
+import { aplicarMovimento, iguais, mostrar, posicaoDaHaste, sorobanVazio, valorDaHaste, type Movimento, type Soroban } from "./soroban";
 
 export function preencher(modelo: string, valores: Readonly<Record<string, string | number>>): string {
   return modelo.replace(/\{(\w+)\}/g, (_, k: string) => (k in valores ? String(valores[k]) : `{${k}}`));
@@ -89,7 +89,7 @@ export function listaDeOrdens(n: number): string {
 }
 
 /** O que fazer agora, com verbo, em caneta. null quando o item terminou. */
-export function gestoDoItem(e: EstadoItem, t: ModelosGesto, nomes: readonly NomeDaPosicao[], caminho: readonly Movimento[] | null): string | null {
+export function gestoDoItem(e: EstadoItem, t: ModelosGesto, nomes: readonly NomeDaPosicao[], passosJunto: number | null): string | null {
   if (e.terminado) return null;
   const modo = modoDoItem(e.item);
   const op = e.item.operacao;
@@ -97,7 +97,7 @@ export function gestoDoItem(e: EstadoItem, t: ModelosGesto, nomes: readonly Nome
   if (modo === "cabeca") return t.cabeca;
   if (modo === "ditado") return op.tipo === "ditado" && e.mostrados < op.numeros.length ? t.ditadoOuvir : t.ditadoFim;
   if (modo === "sombra") return e.aberto.movimentos.length === 0 && (op.tipo === "somar" || op.tipo === "subtrair") ? preencher(t.sombra, { a: op.a }) : t.sombraFim;
-  if (caminho && caminho.length > 0) return preencher(t.junto, { lista: listaDeOrdens(caminho.length) });
+  if (passosJunto && passosJunto > 0) return preencher(t.junto, { lista: listaDeOrdens(passosJunto) });
   const atual = lanceAtual(e);
   if (!atual) return null;
   const ld = atual.lance;
@@ -278,4 +278,147 @@ export function exemploDaOperacao(op: Operacao): ExemploDesenhado | null {
 /** O soroban vazio de n hastes (o exemplo de ler e a sombra). */
 export function sorobanDoExemplo(hastes: number, valor: number): Soroban {
   return valor === 0 ? sorobanVazio(hastes) : mostrar(hastes, valor);
+}
+
+/* ---------- Os passos do caminho junto (degrau 4) ---------- */
+
+/** Os modelos dos passos, um por tipo (src/conteudo/lapidacao.ts). */
+export interface ModelosPassos {
+  readonly porBaixo: string;
+  readonly porCinco: string;
+  readonly porCincoEBaixo: string;
+  readonly tirarBaixo: string;
+  readonly tirarCinco: string;
+  readonly tirarCincoEBaixo: string;
+  readonly cincoPor: string;
+  readonly cincoPorBaixo: string;
+  readonly cincoTirar: string;
+  readonly cincoTirarBaixo: string;
+  readonly dezPor: string;
+  readonly dezTirar: string;
+  readonly juntosPor: string;
+  readonly juntosPorBaixo: string;
+  readonly juntosTirar: string;
+  readonly juntosTirarBaixo: string;
+  readonly vaiUmNoQuatro: string;
+  readonly emprestaUmDoCinco: string;
+  readonly vaiUmNoNove: string;
+  readonly emprestaUmDoZero: string;
+}
+
+/** Um passo escrito e os movimentos do plano que ele faz (as contas marcadas com o número dele). */
+export interface PassoDoCaminho {
+  readonly texto: string;
+  /** Índices em plano.movimentos. Vazio só no passo do raciocínio quando a vizinha pede vai-um. */
+  readonly movimentos: readonly number[];
+}
+
+/**
+ * Os passos de um lance de pôr ou tirar, na ordem do plano (a vizinha primeiro), com o porquê:
+ * "Pôr 7 é pôr 10 e tirar 3: põe 1 na dezena." Cada movimento do plano é de exatamente um passo.
+ * null no "mostrar" (ele não tem modelo: o caminho junto escreve as hastes).
+ */
+export function passosDoLance(ld: LanceDaOperacao, t: ModelosPassos, nomes: readonly NomeDaPosicao[]): PassoDoCaminho[] | null {
+  if (ld.lance.tipo === "mostrar") return null;
+  const { haste: i, d } = ld.lance;
+  const por = ld.lance.tipo === "por";
+  const s = ld.inicio;
+  const movs = ld.plano.movimentos;
+  const nome = (j: number) => nomeDaHaste(nomes, s.length, j).rotulo;
+  const daHaste = (j: number) => movs.flatMap((m, k) => (m.haste === j ? [k] : []));
+  const deCima = (j: number) => daHaste(j).filter((k) => movs[k].cinco !== 0);
+  const deBaixo = (j: number) => daHaste(j).filter((k) => movs[k].cinco === 0);
+  const x = valorDaHaste(s[i]);
+  const passos: PassoDoCaminho[] = [];
+
+  /** O lance direto nesta haste (pôr ou tirar `n`), num passo só. */
+  const direto = (pondo: boolean, n: number) => {
+    const modelo = n < 5 ? (pondo ? t.porBaixo : t.tirarBaixo) : n === 5 ? (pondo ? t.porCinco : t.tirarCinco) : pondo ? t.porCincoEBaixo : t.tirarCincoEBaixo;
+    passos.push({ texto: preencher(modelo, { d: n, resto: n - 5 }), movimentos: daHaste(i) });
+  };
+
+  const comDez = por ? x + d > 9 : x < d;
+  if (!comDez) {
+    const cinco = d < 5 && (por ? s[i].uns + d > 4 : s[i].uns < d);
+    if (!cinco) direto(por, d);
+    else {
+      const v = { d, par: 5 - d };
+      passos.push({ texto: preencher(por ? t.cincoPor : t.cincoTirar, v), movimentos: deCima(i) });
+      passos.push({ texto: preencher(por ? t.cincoPorBaixo : t.cincoTirarBaixo, v), movimentos: deBaixo(i) });
+    }
+    return passos;
+  }
+
+  // A vizinha: 1 entra (ou sai) direto, ou pede o vai-um (o empresta-um), às vezes em cadeia.
+  const m = 10 - d;
+  const vizinhaDireta = (j: number) => {
+    const y = valorDaHaste(s[j]);
+    return por ? y !== 4 && y !== 9 : y !== 0 && y !== 5;
+  };
+  passos.push({ texto: preencher(por ? t.dezPor : t.dezTirar, { d, m, vizinha: nome(i - 1) }), movimentos: vizinhaDireta(i - 1) ? daHaste(i - 1) : [] });
+  for (let j = i - 1; !vizinhaDireta(j); j--) {
+    const y = valorDaHaste(s[j]);
+    if ((por && y === 4) || (!por && y === 5)) {
+      passos.push({ texto: preencher(por ? t.vaiUmNoQuatro : t.emprestaUmDoCinco, { vizinha: nome(j) }), movimentos: daHaste(j) });
+      break;
+    }
+    // Cheia (9) ou vazia (0): vira 0 (ou 9) e o 1 passa para a seguinte.
+    const seguinteDireta = vizinhaDireta(j - 1);
+    passos.push({
+      texto: preencher(por ? t.vaiUmNoNove : t.emprestaUmDoZero, { vizinha: nome(j), seguinte: nome(j - 1) }),
+      movimentos: [...daHaste(j), ...(seguinteDireta ? daHaste(j - 1) : [])].sort((a, b) => a - b),
+    });
+    if (seguinteDireta) break;
+  }
+
+  // Esta haste: tira (ou põe) o complemento, direto ou com o 5.
+  const juntos = ld.plano.marcas.includes("juntos");
+  if (!juntos) direto(!por, m);
+  else {
+    const v = { m, x, par: 5 - m };
+    passos.push({ texto: preencher(por ? t.juntosPor : t.juntosTirar, v), movimentos: deCima(i) });
+    passos.push({ texto: preencher(por ? t.juntosPorBaixo : t.juntosTirarBaixo, v), movimentos: deBaixo(i) });
+  }
+  return passos;
+}
+
+/** O passo do caminho de cada movimento do plano, numerado de 1 (as contas marcadas). */
+export function ordensDosPassos(passos: readonly PassoDoCaminho[], movimentos: number): number[] {
+  const ordens = Array.from({ length: movimentos }, () => 0);
+  passos.forEach((p, n) => p.movimentos.forEach((k) => (ordens[k] = n + 1)));
+  return ordens;
+}
+
+/** O caminho junto do lance aberto: os movimentos que faltam, o número de cada um e os passos escritos. */
+export interface CaminhoJunto {
+  readonly movimentos: readonly Movimento[];
+  readonly ordens: readonly number[];
+  /** null quando não há passos com o porquê (o mostrar, ou o soroban fora do caminho do plano). */
+  readonly passos: readonly string[] | null;
+}
+
+/**
+ * Do começo do lance, os passos do plano. Se o jogador já fez parte do plano, os passos que faltam,
+ * numerados de novo a partir de 1. Fora do plano (ou no mostrar), o caminho curto que falta, sem texto.
+ */
+export function caminhoJunto(e: EstadoItem, t: ModelosPassos, nomes: readonly NomeDaPosicao[]): CaminhoJunto | null {
+  const atual = lanceAtual(e);
+  if (!atual) return null;
+  const ld = atual.lance;
+  const passos = passosDoLance(ld, t, nomes);
+  if (passos) {
+    let s = ld.inicio;
+    const movs = ld.plano.movimentos;
+    for (let k = 0; k <= movs.length; k++) {
+      if (k > 0) s = aplicarMovimento(s, movs[k - 1]);
+      if (k === movs.length || !iguais(s, e.soroban)) continue;
+      const faltam = passos.filter((p, n) => (n === 0 && k === 0) || p.movimentos.some((i) => i >= k));
+      const numero = new Map<number, number>();
+      faltam.forEach((p, n) => p.movimentos.forEach((i) => numero.set(i, n + 1)));
+      const indices = movs.map((_, i) => i).filter((i) => i >= k);
+      return { movimentos: indices.map((i) => movs[i]), ordens: indices.map((i) => numero.get(i) ?? 0), passos: faltam.map((p) => p.texto) };
+    }
+  }
+  const resto = caminhoQueFalta(e);
+  return { movimentos: resto, ordens: resto.map((_, i) => i + 1), passos: null };
 }

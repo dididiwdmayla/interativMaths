@@ -42,17 +42,24 @@ function SeloFirme({ hoje }: { hoje: boolean }) {
   );
 }
 
-function Botoes({ onOutra }: { onOutra: () => void }) {
-  return (
-    <div className="flex w-full flex-col gap-2.5">
-      <button type="button" className="botao-principal w-full" onClick={onOutra} data-acao="outra-rodada">
-        {FIM_RODADA.outraRodada}
-      </button>
-      <Link href="/relicario" className="botao-secundario w-full" data-acao="ver-relicario">
-        {FIM_RODADA.verNoRelicario}
-      </Link>
-    </div>
+/** Na folha da lapidação, o Relicário é o principal (a joia nova está lá); no fim de sempre, outra rodada. */
+function Botoes({ onOutra, relicarioPrimeiro = false }: { onOutra: () => void; relicarioPrimeiro?: boolean }) {
+  const outra = (
+    <button key="outra" type="button" className={`${relicarioPrimeiro ? "botao-secundario" : "botao-principal"} w-full`} onClick={onOutra} data-acao="outra-rodada">
+      {FIM_RODADA.outraRodada}
+    </button>
   );
+  const relicario = (
+    <Link key="relicario" href="/relicario" className={`${relicarioPrimeiro ? "botao-principal" : "botao-secundario"} w-full`} data-acao="ver-relicario">
+      {FIM_RODADA.verNoRelicario}
+    </Link>
+  );
+  return <div className="mt-auto flex w-full flex-col gap-2.5">{relicarioPrimeiro ? [relicario, outra] : [outra, relicario]}</div>;
+}
+
+/** "Usar os complementos..." depois de dois-pontos: a primeira letra em minúscula. */
+function minusculaInicial(t: string): string {
+  return t.charAt(0).toLocaleLowerCase("pt-BR") + t.slice(1);
 }
 
 export function FimRodada({ joia, fim, onOutra }: { joia: Joia; fim: FimDeRodada; onOutra: () => void }) {
@@ -68,7 +75,9 @@ export function FimRodada({ joia, fim, onOutra }: { joia: Joia; fim: FimDeRodada
 
   if (subiu) {
     const novo = NOMES_ESTAGIO[fim.estagioDepois];
-    const firmes = joia.tecnicas.filter((x) => x.estagio <= fim.estagioDepois && treinoDe(estado, x.id).firmeEm !== null);
+    // Só as técnicas do estágio que acabou de chegar.
+    const firmes = joia.tecnicas.filter((x) => x.estagio === fim.estagioDepois && treinoDe(estado, x.id).firmeEm !== null);
+    const antes = NOMES_ESTAGIO[fim.estagioAntes];
     const proximo = fim.estagioDepois < 3 ? joia.estagios[fim.estagioDepois + 1] : null;
     return (
       <main data-pronto="sim" data-tela="lapidacao" data-fase="fim" data-passo="fim" data-lapidacao={novo} className="relative min-h-dvh">
@@ -82,33 +91,30 @@ export function FimRodada({ joia, fim, onOutra }: { joia: Joia; fim: FimDeRodada
             aria-label={preencher(FIM_RODADA.ficou, { estagio: novo })}
           >
             <div className="alca-folha" aria-hidden="true" />
-            <div className="relative flex items-center justify-center gap-3">
-              <svg viewBox="0 0 60 60" width={60} height={60} aria-hidden="true" className="traco-fixo">
+            <div className="relative h-[170px] w-[300px] flex-none">
+              <svg viewBox="0 0 300 170" width={300} height={170} aria-hidden="true" className="traco-fixo">
                 <g className="gema-antes">
-                  <Gema x={30} y={30} r={22} estagio={fim.estagioAntes} base={joia.cor.base} luz={joia.cor.luz} />
+                  <Gema x={62} y={92} r={29} estagio={fim.estagioAntes} base={joia.cor.base} luz={joia.cor.luz} />
                 </g>
+                <path d="M112 92 H152 M144 84 L153 92 L144 100" fill="none" stroke="var(--caneta)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+                <g className="gema-nova">
+                  <Gema x={218} y={89} r={56} estagio={fim.estagioDepois} base={joia.cor.base} luz={joia.cor.luz} />
+                </g>
+                <text x={62} y={148} textAnchor="middle" fontSize={13} fontWeight={600} fill="var(--tinta-suave)">
+                  {antes}
+                </text>
               </svg>
-              <svg viewBox="0 0 40 20" width={40} height={20} aria-hidden="true">
-                <path d="M4 10 H32 M26 4 L33 10 L26 16" fill="none" stroke="var(--caneta)" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <svg viewBox="0 0 120 120" width={120} height={120} aria-hidden="true" className="traco-fixo gema-nova">
-                <Gema x={60} y={60} r={48} estagio={fim.estagioDepois} base={joia.cor.base} luz={joia.cor.luz} />
-              </svg>
-              <p className="letra-mao absolute -right-4 -top-1 m-0 rotate-[-6deg] text-[30px] text-verde-escuro" aria-hidden="true">
+              <span className="letra-mao absolute -bottom-1 right-1.5 rotate-[-5deg] text-[32px] text-verde-escuro" aria-hidden="true">
                 {preencher(FIM_RODADA.aMao, { estagio: novo })}
-              </p>
-            </div>
-            <h1 className="m-0 text-[23px] font-extrabold leading-tight">
-              <span className="marca-texto" data-cresce="">
-                {preencher(FIM_RODADA.ficou, { estagio: novo })}
               </span>
-            </h1>
-            <p className="m-0 max-w-[420px] text-[16px] font-medium leading-[1.4]">
-              <span className="text-tinta-suave">{FIM_RODADA.maoMudou}</span> {joia.estagios[fim.estagioDepois].criterio}
+            </div>
+            <h1 className="m-0 text-[24px] font-extrabold leading-tight">{preencher(FIM_RODADA.ficou, { estagio: novo })}</h1>
+            <p className="m-0 max-w-[420px] text-[15.5px] font-medium leading-[1.42]">
+              {FIM_RODADA.maoMudou} {minusculaInicial(joia.estagios[fim.estagioDepois].criterio)}
             </p>
-            <div className="flex w-full max-w-[420px] flex-col text-left" data-firmes="">
+            <div className="flex w-full max-w-[420px] flex-col gap-0.5 rounded-[14px] border-2 border-contorno px-3 py-2.5 text-left" data-firmes="">
               {firmes.map((x) => (
-                <div key={x.id} className="flex min-h-[32px] items-center justify-between gap-2 border-b-[1.5px] border-dashed border-pauta py-0.5" data-tecnica={x.id} data-tecnica-estado="firme">
+                <div key={x.id} className="flex min-h-[30px] items-center justify-between gap-2" data-tecnica={x.id} data-tecnica-estado="firme">
                   <span className="text-[14.5px] font-bold">{x.nome}</span>
                   <SeloFirme hoje={fim.firmaram.includes(x.id)} />
                 </div>
@@ -116,11 +122,11 @@ export function FimRodada({ joia, fim, onOutra }: { joia: Joia; fim: FimDeRodada
             </div>
             <Trilha joia={joia} estagio={fim.estagioDepois} className="mx-auto" />
             {proximo && (
-              <p className="m-0 max-w-[420px] text-[14px] font-semibold leading-[1.35]">
-                <span className="text-tinta-suave">{preencher(FIM_RODADA.proximo, { estagio: proximo.nome })}</span> {proximo.criterio}
+              <p className="m-0 w-full max-w-[420px] text-left text-[14px] font-semibold leading-[1.4] text-tinta-suave">
+                {preencher(FIM_RODADA.proximo, { estagio: proximo.nome })} {minusculaInicial(proximo.criterio)}
               </p>
             )}
-            <Botoes onOutra={onOutra} />
+            <Botoes onOutra={onOutra} relicarioPrimeiro />
           </section>
         </div>
       </main>
