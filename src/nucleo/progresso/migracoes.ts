@@ -61,7 +61,26 @@ const DE_2_PARA_3: Migracao = {
   },
 };
 
-export const MIGRACOES: readonly Migracao[] = [DE_0_PARA_1, DE_1_PARA_2, DE_2_PARA_3];
+/**
+ * v0.5: as joias ganham o treino por técnica e a rodada em andamento. Nenhuma joia tinha treino
+ * antes (a bancada estava em projeto): cada uma começa com o treino vazio e sem rodada. Os ids da
+ * joia e das técnicas que existiam não mudam.
+ */
+const DE_3_PARA_4: Migracao = {
+  de: 3,
+  descricao: "treino das joias por técnica e rodada em andamento",
+  migrar: (doc) => {
+    const joias: Documento = ehObjeto(doc.joias) ? doc.joias : {};
+    const saida: Documento = {};
+    for (const [id, j] of Object.entries(joias)) {
+      if (!ehObjeto(j)) continue;
+      saida[id] = { ...j, treino: ehObjeto(j.treino) ? j.treino : {}, rodada: null };
+    }
+    return { ...doc, joias: saida };
+  },
+};
+
+export const MIGRACOES: readonly Migracao[] = [DE_0_PARA_1, DE_1_PARA_2, DE_2_PARA_3, DE_3_PARA_4];
 
 export function versaoDe(doc: Documento): number {
   const v = doc.versao;

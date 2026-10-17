@@ -101,6 +101,15 @@
   --turmalina: #f08cc1;
   --turmalina-luz: #ffd3ea;
 
+  /*
+   * O soroban (v0.5) é objeto: a moldura e a régua são --madeira. A conta que conta (encostada na
+   * régua) é azul de caneta, para ler mais rápido, com a faceta de cima mais clara; a afastada é
+   * clara como o leito. No soroban de madeira as contas são todas da mesma cor.
+   */
+  --soroban-conta: #2456e6;
+  --soroban-conta-luz: #8fb0ff;
+  --soroban-livre: #ffffff;
+
   /* Véu por trás de folhas que sobem e de apresentações */
   --veu: rgba(27, 36, 64, 0.32);
 
@@ -168,6 +177,11 @@
   --pao-miolo: #f3d49b;
   --saca: #cfae80;
   --madeira: #b98457;
+
+  /* O soroban: a conta acende um pouco, como a cúpula do Nônio; a afastada escurece com o leito */
+  --soroban-conta: #3d6bff;
+  --soroban-conta-luz: #a9c0ff;
+  --soroban-livre: #24304f;
 
   --veu: rgba(3, 5, 12, 0.6);
 }

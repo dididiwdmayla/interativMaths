@@ -2,6 +2,7 @@
 
 Siga as regras de `CLAUDE.md` (vale para Claude Code, Codex e qualquer outro agente).
 Status do trabalho em `docs/ROADMAP.md`.
+Sessão de conteúdo (missões, cenas, exposições, páginas, falas, textos da lapidação): siga `docs/AUTORIA.md`.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

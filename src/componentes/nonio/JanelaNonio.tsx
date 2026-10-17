@@ -64,6 +64,7 @@ export function JanelaNonio({
   extra,
   conversa,
   onFechar,
+  rotuloAntes = TEXTOS_JANELA.antes,
 }: {
   fala: Pick<FalaFaixa, "id" | "texto">;
   selo: SeloFala | null;
@@ -79,6 +80,8 @@ export function JanelaNonio({
   /** null: sem a conversa (sem chave no servidor, sondagem, preferência desligada). */
   conversa: ConversaJanela | null;
   onFechar: () => void;
+  /** "Antes, neste passo:" na missão; "Antes, nesta operação:" na bancada. */
+  rotuloAntes?: string;
 }) {
   const painel = useRef<HTMLElement>(null);
   const fechar = useRef<HTMLButtonElement>(null);
@@ -176,7 +179,7 @@ export function JanelaNonio({
               </div>
               {antes.length > 0 && (
                 <p className="janela-antes m-0" data-antes={antes.length}>
-                  {TEXTOS_JANELA.antes}{" "}
+                  {rotuloAntes}{" "}
                   {antes.map((f) => (
                     <span key={f.id}>“{f.texto}” </span>
                   ))}

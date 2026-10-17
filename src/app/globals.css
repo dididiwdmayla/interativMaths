@@ -32,6 +32,10 @@
   --color-verde-palido: var(--verde-palido);
   --color-bilhete: var(--bilhete);
   --color-veu: var(--veu);
+  --color-madeira: var(--madeira);
+  --color-soroban-conta: var(--soroban-conta);
+  --color-soroban-conta-luz: var(--soroban-conta-luz);
+  --color-soroban-livre: var(--soroban-livre);
 
   --font-interface: var(--fonte-interface);
   --font-mao: var(--fonte-mao);

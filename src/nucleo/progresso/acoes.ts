@@ -117,7 +117,15 @@ export function encontrarJoia(p: Progresso, id: string, agora: number): Progress
     estagio: 0,
     treinos: atual?.treinos ?? 0,
     tecnicas: atual?.tecnicas ?? [],
+    treino: atual?.treino ?? {},
+    rodada: atual?.rodada ?? null,
   };
+  return tocar({ ...p, joias: { ...p.joias, [id]: joia } }, agora);
+}
+
+/** Troca o estado de uma joia (o treino calcula o novo estado; aqui só se guarda). */
+export function definirJoia(p: Progresso, id: string, joia: EstadoJoia, agora: number): Progresso {
+  if (p.joias[id] === joia) return p;
   return tocar({ ...p, joias: { ...p.joias, [id]: joia } }, agora);
 }
 

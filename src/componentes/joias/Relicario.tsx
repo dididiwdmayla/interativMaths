@@ -2,30 +2,32 @@
 
 /**
  * O Relicário: as joias do jogador, desenhadas a tinta com facetas chapadas; mais facetas a cada
- * estágio. Joia ainda não encontrada fica a lápis. A bancada de lapidação está em projeto: também
- * a lápis, e sem botão de treino nesta versão.
+ * estágio. Joia ainda não encontrada fica a lápis. Antes da primeira joia, a bancada de lapidação
+ * fica a lápis; depois da Joia do Ábaco, o Relicário vivo (RelicarioVivo.tsx).
  */
 import { JOIAS } from "@/conteudo/joias";
 import type { EstadoJoia } from "@/nucleo/progresso";
 import { useProgresso } from "@/componentes/estado/useProgresso";
-import { Engrenagem } from "@/componentes/mundo/kit";
 import { CabecalhoJogo } from "@/componentes/ui/Cabecalho";
 import { Carregando } from "@/componentes/ui/Carregando";
 import { Gema } from "./Gema";
+import { Mecanismo } from "./Mecanismo";
+import { RelicarioVivo } from "./RelicarioVivo";
 
 const NOMES_ESTAGIO = ["bruta", "talhada", "lapidada", "polida"] as const;
-const ENGASTES: [number, number][] = [
-  [150, 74],
-  [226, 150],
-  [150, 226],
-  [74, 150],
-];
 
 export function Relicario() {
   const { pronto, progresso } = useProgresso();
   if (!pronto) return <Carregando />;
+  // Antes de encontrar a Joia do Ábaco, tudo como na v0.4; depois, o Relicário vivo.
+  if (progresso.joias.abaco?.encontrada) return <RelicarioVivo />;
+  return <RelicarioVitrine />;
+}
+
+/** O Relicário antes da primeira joia: a vitrine, com a bancada a lápis. */
+function RelicarioVitrine() {
+  const { progresso } = useProgresso();
   const estado = (id: string): EstadoJoia | undefined => progresso.joias[id];
-  const achadas = JOIAS.filter((j) => estado(j.id)?.encontrada).length;
   return (
     <main data-pronto="sim" data-tela="relicario" className="min-h-dvh pb-16">
       <CabecalhoJogo atual="relicario" />
@@ -39,22 +41,7 @@ export function Relicario() {
         </p>
 
         <section className="ficha-quadriculada mx-auto w-full max-w-[360px] p-3">
-          <svg viewBox="0 0 300 300" className="traco-fixo mx-auto block w-full max-w-[300px]" role="img" aria-label={`Relicário com quatro engastes; ${achadas === 1 ? "1 joia encontrada" : `${achadas} joias encontradas`}.`}>
-            <circle cx={150} cy={150} r={124} fill="var(--folha)" stroke="var(--contorno)" strokeWidth={2.6} />
-            <circle cx={150} cy={150} r={108} fill="none" stroke="var(--contorno)" strokeWidth={1.6} strokeDasharray="2 7" />
-            <rect x={138} y={14} width={24} height={14} rx={4} fill="var(--caneta-clara)" stroke="var(--contorno)" strokeWidth={2.4} />
-            <Engrenagem x={150} y={150} r={34} dentes={12} girando />
-            {JOIAS.map((j) => {
-              const [x, y] = ENGASTES[j.engaste];
-              const e = estado(j.id);
-              return (
-                <g key={j.id} data-engaste={j.id}>
-                  <circle cx={x} cy={y} r={27} fill={e?.encontrada ? "var(--marca-texto-palido)" : "var(--folha)"} stroke={e?.encontrada ? "var(--contorno)" : "var(--grafite)"} strokeWidth={2.4} strokeDasharray={e?.encontrada ? undefined : "5 5"} />
-                  {e?.encontrada && <Gema x={x} y={y} r={18} estagio={e.estagio} base={j.cor.base} luz={j.cor.luz} />}
-                </g>
-              );
-            })}
-          </svg>
+          <Mecanismo joias={progresso.joias} />
         </section>
 
         <ul className="m-0 grid grid-cols-1 gap-4 p-0 md:grid-cols-2">

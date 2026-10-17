@@ -1,7 +1,8 @@
 /**
- * As quatro joias do Relicário. SÓ DADOS. Nesta versão nenhuma é treinável.
+ * As quatro joias do Relicário. SÓ DADOS. Na v0.5 só a do Ábaco é treinável; as outras três
+ * já dizem o estágio de cada técnica e entram pelo mesmo treino quando ganharem a bancada.
  */
-import type { Joia } from "@/nucleo/joias";
+import type { Joia } from "@/nucleo/joias/contrato";
 
 export const JOIAS: readonly Joia[] = [
   {
@@ -9,22 +10,26 @@ export const JOIAS: readonly Joia[] = [
     nome: "Joia do Ábaco",
     mineral: "granada",
     cor: { base: "var(--granada)", luz: "var(--granada-luz)" },
-    habilidade: "Calcular com o soroban e, depois, com um ábaco imaginado.",
-    treino: ["Contas curtas no soroban, com as contas do próprio jogo.", "Aos poucos o soroban some e fica a imagem dele na cabeça."],
+    habilidade: "Calcular com o soroban e, depois, com o soroban imaginado.",
+    treino: ["Operações curtas no soroban, um algarismo por vez.", "Aos poucos o soroban some e fica a imagem dele na cabeça."],
     estagios: [
       { nome: "bruta", criterio: "Encontrada." },
-      { nome: "talhada", criterio: "Somar e subtrair no soroban com as cinco contas de baixo." },
-      { nome: "lapidada", criterio: "Usar os complementos de 5 e de 10 sem olhar a tabela." },
-      { nome: "polida", criterio: "Fazer a mesma conta com o ábaco imaginado." },
+      { nome: "talhada", criterio: "Mostrar, ler, somar e subtrair no soroban sem trocar contas." },
+      { nome: "lapidada", criterio: "Usar os complementos de 5 e de 10 sem olhar os pares." },
+      { nome: "polida", criterio: "Fazer as mesmas operações com o soroban imaginado." },
     ],
     tecnicas: [
-      { id: "soroban.unidades", nome: "Contas de baixo" },
-      { id: "soroban.complemento-5", nome: "Complemento de 5" },
-      { id: "soroban.complemento-10", nome: "Complemento de 10" },
-      { id: "soroban.imaginado", nome: "Ábaco imaginado" },
+      { id: "soroban.ler", nome: "Ler e mostrar", estagio: 1, aLapis: "a primeira" },
+      { id: "soroban.unidades", nome: "Contas diretas", estagio: 1, aLapis: "depois de ler" },
+      { id: "soroban.complemento-5", nome: "Complemento de 5", estagio: 2, aLapis: "depois das diretas" },
+      { id: "soroban.complemento-10", nome: "Complemento de 10", estagio: 2, aLapis: "depois do 5" },
+      { id: "soroban.juntos", nome: "5 e 10 juntos", estagio: 2, aLapis: "depois do 10" },
+      { id: "soroban.imaginado", nome: "Soroban imaginado", estagio: 3, aLapis: "no último estágio", fechaCom: ["de-cabeca", "ditado"] },
     ],
     requisito: { tipo: "atividade", atividade: "partilha.arco1.encomenda" },
     engaste: 0,
+    treinavel: true,
+    formal: "Aritmética · Soroban",
   },
   {
     id: "calculo-mental",
@@ -40,12 +45,13 @@ export const JOIAS: readonly Joia[] = [
       { nome: "polida", criterio: "Escolher o caminho conforme a conta." },
     ],
     tecnicas: [
-      { id: "mental.decompor", nome: "Decompor" },
-      { id: "mental.compensar", nome: "Compensar" },
-      { id: "mental.escolher", nome: "Escolher o caminho" },
+      { id: "mental.decompor", nome: "Decompor", estagio: 1, aLapis: "no primeiro estágio" },
+      { id: "mental.compensar", nome: "Compensar", estagio: 2, aLapis: "no segundo estágio" },
+      { id: "mental.escolher", nome: "Escolher o caminho", estagio: 3, aLapis: "no último estágio" },
     ],
     requisito: { tipo: "em_projeto" },
     engaste: 1,
+    treinavel: false,
   },
   {
     id: "multiplicacao",
@@ -61,12 +67,13 @@ export const JOIAS: readonly Joia[] = [
       { nome: "polida", criterio: "Os fatos até 10 × 10 sem hesitar." },
     ],
     tecnicas: [
-      { id: "mult.dobro", nome: "Dobrar" },
-      { id: "mult.grupo-a-mais", nome: "Um grupo a mais" },
-      { id: "mult.trocar-ordem", nome: "Trocar a ordem" },
+      { id: "mult.dobro", nome: "Dobrar", estagio: 2, aLapis: "no segundo estágio" },
+      { id: "mult.grupo-a-mais", nome: "Um grupo a mais", estagio: 2, aLapis: "no segundo estágio" },
+      { id: "mult.trocar-ordem", nome: "Trocar a ordem", estagio: 1, aLapis: "no primeiro estágio" },
     ],
     requisito: { tipo: "em_projeto" },
     engaste: 2,
+    treinavel: false,
   },
   {
     id: "estimativa",
@@ -82,10 +89,11 @@ export const JOIAS: readonly Joia[] = [
       { nome: "polida", criterio: "Desconfiar de um resultado implausível antes de conferir." },
     ],
     tecnicas: [
-      { id: "estimativa.ordem", nome: "Ordem de grandeza" },
-      { id: "estimativa.arredondar", nome: "Arredondar para estimar" },
+      { id: "estimativa.ordem", nome: "Ordem de grandeza", estagio: 1, aLapis: "no primeiro estágio" },
+      { id: "estimativa.arredondar", nome: "Arredondar para estimar", estagio: 2, aLapis: "no segundo estágio" },
     ],
     requisito: { tipo: "em_projeto" },
     engaste: 3,
+    treinavel: false,
   },
 ];

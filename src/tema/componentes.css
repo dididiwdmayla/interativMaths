@@ -2183,3 +2183,438 @@ a.manual-pag:active {
   background: var(--marca-texto);
   color: var(--sobre-marca);
 }
+
+/* ---------- O soroban (v05.html, referências 3 a 8) ---------- */
+
+.soroban {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.soroban-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.soroban-svg [data-conta] {
+  cursor: pointer;
+}
+
+/* As contas deslizam: só transform, 160 ms. Com movimento reduzido, mudam de lugar sem deslizar. */
+.soroban-conta {
+  transition: transform 160ms var(--curva-firme);
+}
+
+/* Na sombra, as contas aparecem esmaecendo quando o jogador confere ou pede para ver. */
+.soroban-contas {
+  transition: opacity 320ms var(--curva-firme);
+}
+
+.soroban-haste:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soroban-conta {
+    transition: none;
+  }
+}
+
+/* ---------- O teclado da leitura e do soroban imaginado ---------- */
+
+.teclado-caixa {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  height: 50px;
+  padding: 0 14px;
+  border: 2px solid var(--contorno);
+  border-radius: 12px;
+  background: var(--marca-texto-palido);
+  color: var(--tinta);
+}
+
+.teclado-rotulo {
+  color: var(--tinta-suave);
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.teclado-valor {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.teclado-grade {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tecla {
+  height: 46px;
+  border: 2px solid var(--contorno);
+  border-radius: 12px;
+  background: var(--folha);
+  box-shadow: 0 3px 0 var(--sombra);
+  color: var(--tinta);
+  font-size: 21px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  transition: transform 90ms var(--curva-firme);
+}
+
+.tecla:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--sombra);
+}
+
+.tecla-texto {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tecla:disabled {
+  border-color: var(--grafite);
+  box-shadow: none;
+  color: var(--tinta-suave);
+}
+
+/* Os pares do 5 e do 10: fichas pequenas; as que importam, em marca-texto. */
+.par {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 9px;
+  border: 2px solid var(--contorno);
+  border-radius: 9px;
+  background: var(--folha);
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.par[data-marcado="sim"] {
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+}
+
+/* A conta do soroban: um lance por linha, embaixo da conta. */
+.conta-separador {
+  height: 1.5px;
+  margin: 3px 0 2px;
+  background: var(--grade);
+}
+
+.conta-lance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.conta-lance strong {
+  font-weight: 800;
+}
+
+/* Etiqueta da técnica: caneta pálida, como o selo "firmando". */
+.selo-caneta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border-radius: 7px;
+  background: var(--caneta-palida);
+  color: var(--caneta-escura);
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------- A bancada de lapidação (v05.html, referências 2 a 8) ---------- */
+
+/* A faixa da operação ocupa o lugar do pedido. */
+.palco-pedido:has(> .faixa-operacao) {
+  display: block;
+  padding-top: 8px;
+  padding-bottom: 9px;
+}
+
+.faixa-operacao {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  min-height: 84px;
+}
+
+.faixa-linha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.faixa-op {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 5px;
+  min-width: 0;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.faixa-sinal {
+  padding: 0 3px;
+  color: var(--caneta);
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.faixa-q {
+  color: var(--grafite);
+}
+
+.faixa-contador {
+  align-self: center;
+  margin-left: 6px;
+  color: var(--tinta-suave);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.faixa-ditado {
+  font-size: 26px;
+}
+
+.alg {
+  position: relative;
+  display: inline-block;
+  padding: 0 2px;
+  border-radius: 5px;
+}
+
+.alg-agora {
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+}
+
+.alg-feito::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: -5px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--verde);
+}
+
+/* A máquina da bancada: o soroban em cima, o canto do Nônio livre embaixo. */
+.lapidacao-maquina {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.lapidacao-soroban {
+  flex: 1;
+  min-height: 0;
+  padding: 6px 2px 0;
+}
+
+.lapidacao-canto {
+  flex: none;
+  height: 66px;
+}
+
+/* A dica do toque e as notas do painel. */
+.painel-nota {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Os passos escritos do caminho junto. */
+.passos-junto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passos-junto li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.passo-ordem {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--contorno);
+  border-radius: 50%;
+  background: var(--marca-texto);
+  color: var(--sobre-marca);
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+/* A abertura da rodada: as três linhas com a conta pequena no lugar do marcador. */
+.linha-rodada {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.linha-rodada svg {
+  flex: none;
+  margin-top: 4px;
+}
+
+/* As fichas pequenas do fim da rodada: conta cheia para limpo, tracejada para o resto. */
+.ficha-operacao {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 2px solid var(--contorno);
+  border-radius: 10px;
+  background: var(--folha);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ficha-operacao[data-marca="vai-e-volta"],
+.ficha-operacao[data-marca="com-ajuda"],
+.ficha-operacao[data-marca="ainda-nao"] {
+  border-style: dashed;
+  border-color: var(--grafite);
+}
+
+/* A joia que lapida: a nova se desenha faceta por faceta (só opacidade e escala). */
+.gema-nova > g > * {
+  animation: esmaecer-entrar 260ms var(--curva-firme) both;
+}
+
+.gema-nova > g > *:nth-child(2) { animation-delay: 160ms; }
+.gema-nova > g > *:nth-child(3) { animation-delay: 300ms; }
+.gema-nova > g > *:nth-child(4) { animation-delay: 440ms; }
+.gema-nova > g > *:nth-child(5) { animation-delay: 560ms; }
+.gema-nova > g > *:nth-child(6) { animation-delay: 680ms; }
+.gema-nova > g > *:nth-child(7) { animation-delay: 780ms; }
+
+@keyframes gema-sai {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+}
+
+.gema-antes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gema-sai 700ms var(--curva-firme) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gema-antes {
+    animation: esmaecer-entrar 1ms both;
+    opacity: 0.35;
+  }
+  .gema-nova > g > * {
+    animation: esmaecer-entrar 400ms linear both;
+    animation-delay: 0ms !important;
+  }
+}
+
+/* Os pares abertos: o botão fica a caneta pálida enquanto o painel mostra os pares. */
+.botao-secundario[aria-pressed="true"] {
+  background: var(--caneta-palida);
+  color: var(--caneta-escura);
+}
+
+/* A nota à mão da primeira sombra, embaixo do soroban sem contas. */
+.nota-sombra {
+  flex: none;
+  padding: 0 12px;
+  font-size: 23px;
+  text-align: center;
+  transform: rotate(-1.5deg);
+}
+
+/* ---------- O Relicário vivo (v05.html, referência 1) ---------- */
+
+.tecnica-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 30px;
+  padding: 2px 0;
+  border-bottom: 1.5px dashed var(--pauta);
+}
+
+.tecnica-linha .selo {
+  flex: none;
+  padding: 1px 7px;
+  border-width: 0;
+  border-radius: 7px;
+  font-size: 12.5px;
+}
+
+.tecnica-linha .selo-caneta {
+  flex: none;
+}
+
+.selo-lapis {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  padding: 0 6px;
+  border: 1.5px dashed var(--grafite);
+  border-radius: 7px;
+  color: var(--tinta-suave);
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}

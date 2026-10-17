@@ -8,7 +8,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { concluida } from "@/nucleo/campanha/campanha";
-import { existeAtividade } from "@/componentes/estado/catalogo";
+import { portaDoLugar, rotaDe } from "@/componentes/estado/catalogo";
 import { useProgresso } from "@/componentes/estado/useProgresso";
 import { IconeJoia } from "@/componentes/icones/IconeJoia";
 import { IconeMenu } from "@/componentes/icones/IconeMenu";
@@ -33,14 +33,17 @@ interface ItemFila {
 function useFila(): ItemFila[] {
   const { progresso } = useProgresso();
   const transferencia = concluida(progresso, M4);
+  const feita = (id: string) => concluida(progresso, id);
+  const museu = portaDoLugar("exposicao", feita);
+  const rua = portaDoLugar("cena", feita);
   return [
     { id: "mapa", rotulo: "Mapa", href: "/mapa", fechado: null },
     { id: "caderno", rotulo: "Caderno", href: "/caderno", fechado: null },
     { id: "manual", rotulo: "Manual", href: "/manual", fechado: null },
     { id: "planta", rotulo: "Planta", href: "/planta", fechado: null },
     { id: "relicario", rotulo: "Joias", href: "/relicario", fechado: null },
-    { id: "museu", rotulo: "Museu", href: "/museu/paes-de-ahmes", fechado: transferencia && existeAtividade("museu.paes-de-ahmes") ? null : "O Museu abre depois da missão 4." },
-    { id: "rua", rotulo: "A Rua", href: "/rua/tres-pizzas", fechado: transferencia && existeAtividade("rua.tres-pizzas") ? null : "A Rua abre depois da missão 4." },
+    { id: "museu", rotulo: "Museu", href: museu ? rotaDe(museu) : "/mapa", fechado: transferencia && museu ? null : "O Museu abre depois da missão 4." },
+    { id: "rua", rotulo: "A Rua", href: rua ? rotaDe(rua) : "/mapa", fechado: transferencia && rua ? null : "A Rua abre depois da missão 4." },
   ];
 }
 
@@ -96,7 +99,10 @@ export function CabecalhoJogo({ atual }: { atual?: Lugar }) {
             </Link>
           )}
           <BotaoTema />
-          <BotaoTelaCheia />
+          {/* Com o contador de joias, a tela cheia sai do topo em telas estreitas (fica no Menu): senão a linha passa da tela. */}
+          <span className={joias > 0 ? "hidden min-[430px]:contents" : "contents"}>
+            <BotaoTelaCheia />
+          </span>
           <Link href="/menu" className="botao-icone" aria-label="Menu" aria-current={atual === "menu" ? "page" : undefined} data-nav="menu">
             <IconeMenu />
           </Link>
