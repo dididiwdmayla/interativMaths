@@ -5,6 +5,7 @@ const PAGINAS = [
   { href: "/lab/vitrine", titulo: "Vitrine", linha: "A identidade inteira: tokens, letra, receitas, kit de desenho, Nônio, joias, notação." },
   { href: "/lab/maquinas", titulo: "Máquinas", linha: "A bancada solta, com qualquer configuração e pele, e os validadores." },
   { href: "/lab/progresso", titulo: "Progresso", linha: "Zerar, saltar para pontos do arco, adiantar o relógio, ver evidências e estados." },
+  { href: "/lab/soroban", titulo: "Soroban", linha: "O soroban livre com o reconhecedor à vista (marcas, custo, distância) e o gerador de rodadas." },
 ];
 
 export default function PaginaLab() {
