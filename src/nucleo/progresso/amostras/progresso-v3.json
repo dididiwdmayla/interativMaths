@@ -1,0 +1,928 @@
+{
+ "versao": 3,
+ "criadoEm": 1760400000000,
+ "atualizadoEm": 1760400795000,
+ "preferencias": {
+  "postura": "presente",
+  "cotas": "visiveis",
+  "animacoes": "completas",
+  "conversa": "ligada",
+  "aparencia": "escuro"
+ },
+ "aberturaVista": true,
+ "calibragem": {
+  "feitaEm": 1760400000000,
+  "pulada": true,
+  "respostas": [],
+  "maiorDegrau": 0,
+  "provaveis": [],
+  "recomendacao": "partilha.arco1.carga-igual"
+ },
+ "campanha": {
+  "atividades": {
+   "partilha.arco1.carga-igual": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760400000000,
+    "concluidaEm": 1760400058000,
+    "conclusoes": 1
+   },
+   "partilha.arco1.quantas-carrocas": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760400118000,
+    "concluidaEm": 1760400176000,
+    "conclusoes": 1
+   },
+   "partilha.arco1.sobrou": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760400236000,
+    "concluidaEm": 1760400306000,
+    "conclusoes": 1
+   },
+   "partilha.arco1.pao-nao-e-saca": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760400366000,
+    "concluidaEm": 1760400452000,
+    "conclusoes": 1
+   },
+   "partilha.arco1.encomenda": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760400512000,
+    "concluidaEm": 1760400560000,
+    "conclusoes": 1
+   },
+   "museu.paes-de-ahmes": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760400620000,
+    "concluidaEm": 1760400658000,
+    "conclusoes": 1
+   },
+   "rua.tres-pizzas": {
+    "status": "concluida",
+    "via": "guiada",
+    "iniciadaEm": 1760400718000,
+    "concluidaEm": 1760400734000,
+    "conclusoes": 1
+   }
+  },
+  "execucoes": {},
+  "desvio": null,
+  "concluidas": [
+   {
+    "atividade": "partilha.arco1.carga-igual",
+    "momento": 1760400058000
+   },
+   {
+    "atividade": "partilha.arco1.quantas-carrocas",
+    "momento": 1760400176000
+   },
+   {
+    "atividade": "partilha.arco1.sobrou",
+    "momento": 1760400306000
+   },
+   {
+    "atividade": "partilha.arco1.pao-nao-e-saca",
+    "momento": 1760400452000
+   },
+   {
+    "atividade": "partilha.arco1.encomenda",
+    "momento": 1760400560000
+   },
+   {
+    "atividade": "museu.paes-de-ahmes",
+    "momento": 1760400658000
+   },
+   {
+    "atividade": "rua.tres-pizzas",
+    "momento": 1760400734000
+   }
+  ],
+  "marcas": [],
+  "palpites": [
+   {
+    "atividade": "partilha.arco1.carga-igual",
+    "passo": "palpite",
+    "valor": "5",
+    "certo": "6",
+    "momento": 1760400004000
+   },
+   {
+    "atividade": "partilha.arco1.quantas-carrocas",
+    "passo": "palpite",
+    "valor": "4",
+    "certo": "5",
+    "momento": 1760400122000
+   },
+   {
+    "atividade": "partilha.arco1.sobrou",
+    "passo": "palpite",
+    "valor": "6",
+    "certo": "6",
+    "momento": 1760400240000
+   }
+  ]
+ },
+ "evidencias": [
+  {
+   "conceito": "div.partilha",
+   "tipo": "experimento",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.carga-igual",
+   "momento": 1760400026000
+  },
+  {
+   "conceito": "div.partilha",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.carga-igual",
+   "momento": 1760400030000
+  },
+  {
+   "conceito": "div.medida",
+   "tipo": "experimento",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.quantas-carrocas",
+   "momento": 1760400140000
+  },
+  {
+   "conceito": "div.medida",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.quantas-carrocas",
+   "momento": 1760400148000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "experimento",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760400246000
+  },
+  {
+   "conceito": "div.partilha",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760400246000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760400250000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760400258000
+  },
+  {
+   "conceito": "div.medida",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760400276000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.sobrou",
+   "momento": 1760400276000
+  },
+  {
+   "conceito": "fra.parte",
+   "tipo": "experimento",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.pao-nao-e-saca",
+   "momento": 1760400388000
+  },
+  {
+   "conceito": "div.resto",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.pao-nao-e-saca",
+   "momento": 1760400388000
+  },
+  {
+   "conceito": "fra.quociente",
+   "tipo": "experimento",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.pao-nao-e-saca",
+   "momento": 1760400400000
+  },
+  {
+   "conceito": "fra.parte",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.pao-nao-e-saca",
+   "momento": 1760400414000
+  },
+  {
+   "conceito": "fra.quociente",
+   "tipo": "descoberta",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.pao-nao-e-saca",
+   "momento": 1760400418000
+  },
+  {
+   "conceito": "fra.parte",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.encomenda",
+   "momento": 1760400540000
+  },
+  {
+   "conceito": "fra.quociente",
+   "tipo": "aplicacao",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "partilha.arco1.encomenda",
+   "momento": 1760400554000
+  },
+  {
+   "conceito": "fra.quociente",
+   "tipo": "transferencia",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "museu.paes-de-ahmes",
+   "momento": 1760400632000
+  },
+  {
+   "conceito": "fra.parte",
+   "tipo": "transferencia",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "museu.paes-de-ahmes",
+   "momento": 1760400654000
+  },
+  {
+   "conceito": "fra.parte",
+   "tipo": "transferencia",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "rua.tres-pizzas",
+   "momento": 1760400726000
+  },
+  {
+   "conceito": "fra.quociente",
+   "tipo": "transferencia",
+   "resultado": "sucesso",
+   "ajuda": 0,
+   "contexto": "rua.tres-pizzas",
+   "momento": 1760400730000
+  }
+ ],
+ "caderno": [
+  {
+   "id": "partilha.arco1.carga-igual",
+   "atividade": "partilha.arco1.carga-igual",
+   "titulo": "Repartir igualmente",
+   "frase": "24 sacas repartidas entre 4 carroças dão 6 em cada.",
+   "notacao": [
+    "24 ÷ 4 = 6",
+    "4 × 6 = 24"
+   ],
+   "volta": "18 ÷ 3 = 6",
+   "notas": [
+    "Então o número rasgado era 6. Trinta anos fazendo de cor.",
+    "Dividir reparte. Multiplicar junta de volta."
+   ],
+   "maquina": {
+    "config": {
+     "pele": "sacas-carrocas",
+     "pecas": {
+      "quantidade": 10
+     },
+     "carga": {
+      "minimo": 1,
+      "maximo": 40
+     },
+     "bicas": {
+      "quantidade": 4,
+      "ajustavel": true,
+      "vagas": 8
+     }
+    },
+    "esteira": [],
+    "bicas": [
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 6
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 6
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 6
+       }
+      ]
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     }
+    ],
+    "bandeja": [],
+    "lote": 6,
+    "pilha": null,
+    "partes": 2,
+    "voltas": 1,
+    "cargaTravada": true,
+    "fechada": true,
+    "evento": {
+     "tipo": "fechou",
+     "sobra": []
+    },
+    "seq": 5
+   },
+   "registradaEm": 1760400058000
+  },
+  {
+   "id": "partilha.arco1.quantas-carrocas",
+   "atividade": "partilha.arco1.quantas-carrocas",
+   "titulo": "Quantos cabem",
+   "frase": "30 sacas em grupos de 6 dão 5 carroças.",
+   "notacao": [
+    "30 ÷ 6 = 5",
+    "30 ÷ 5 = 6",
+    "5 × 6 = 30"
+   ],
+   "volta": "28 ÷ 7 = 4",
+   "notas": [
+    "A tabela que faltava era isto: três contas da mesma família.",
+    "Dividir também pergunta quantos grupos cabem."
+   ],
+   "maquina": {
+    "config": {
+     "pele": "sacas-carrocas",
+     "pecas": {
+      "quantidade": 10
+     },
+     "carga": {
+      "minimo": 1,
+      "maximo": 40
+     },
+     "bicas": {
+      "quantidade": 4,
+      "ajustavel": true,
+      "vagas": 8
+     }
+    },
+    "esteira": [],
+    "bicas": [
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     }
+    ],
+    "bandeja": [],
+    "lote": 4,
+    "pilha": null,
+    "partes": 2,
+    "voltas": 1,
+    "cargaTravada": true,
+    "fechada": true,
+    "evento": {
+     "tipo": "fechou",
+     "sobra": []
+    },
+    "seq": 5
+   },
+   "registradaEm": 1760400176000
+  },
+  {
+   "id": "partilha.arco1.sobrou",
+   "atividade": "partilha.arco1.sobrou",
+   "titulo": "O que sobra",
+   "frase": "26 sacas entre 4 carroças dão 6 em cada, e sobram 2.",
+   "notacao": [
+    "26 ÷ 4 = 6, resto 2",
+    "26 = 4 × 6 + 2"
+   ],
+   "volta": "23 ÷ 5 = 4, resto 3",
+   "notas": [
+    "O resto nunca vai para o rio. Às vezes vira mais uma carroça.",
+    "Resto menor que o divisor. Sempre."
+   ],
+   "maquina": {
+    "config": {
+     "pele": "sacas-carrocas",
+     "pecas": {
+      "quantidade": 10
+     },
+     "carga": {
+      "minimo": 1,
+      "maximo": 40
+     },
+     "bicas": {
+      "quantidade": 4,
+      "ajustavel": true,
+      "vagas": 8
+     }
+    },
+    "esteira": [],
+    "bicas": [
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 1
+        },
+        "quantidade": 4
+       }
+      ]
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     }
+    ],
+    "bandeja": [
+     {
+      "tamanho": {
+       "n": 1,
+       "d": 1
+      },
+      "quantidade": 3
+     }
+    ],
+    "lote": 4,
+    "pilha": null,
+    "partes": 2,
+    "voltas": 1,
+    "cargaTravada": true,
+    "fechada": true,
+    "evento": {
+     "tipo": "fechou",
+     "sobra": [
+      {
+       "tamanho": {
+        "n": 1,
+        "d": 1
+       },
+       "quantidade": 3
+      }
+     ]
+    },
+    "seq": 5
+   },
+   "registradaEm": 1760400306000
+  },
+  {
+   "id": "partilha.arco1.pao-nao-e-saca",
+   "atividade": "partilha.arco1.pao-nao-e-saca",
+   "titulo": "O traço é uma divisão",
+   "frase": "Cada broa foi cortada em 4 partes iguais, e cada pedaço é 1/4 de broa. Cada mesa recebeu 3 pedaços: 3/4 de broa.",
+   "notacao": [
+    "3 ÷ 4 = 3/4",
+    "5 ÷ 4 = 1 1/4 = 5/4"
+   ],
+   "volta": "2 ÷ 5 = 2/5",
+   "notas": [
+    "Denominador: em quantas partes iguais. Numerador: quantos pedaços.",
+    "O seu Odilo dizia três quartos e eu achava que era o nome de um pão."
+   ],
+   "maquina": {
+    "config": {
+     "pele": "broas-mesas",
+     "pecas": {
+      "quantidade": 1
+     },
+     "carga": {
+      "minimo": 1,
+      "maximo": 8
+     },
+     "bicas": {
+      "quantidade": 4,
+      "ajustavel": true,
+      "vagas": 8
+     },
+     "fatiador": {
+      "partes": [
+       2,
+       3,
+       4,
+       5,
+       6,
+       8,
+       10
+      ],
+      "denominadorMaximo": 10
+     }
+    },
+    "esteira": [],
+    "bicas": [
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 5
+        },
+        "quantidade": 2
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 5
+        },
+        "quantidade": 2
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 5
+        },
+        "quantidade": 2
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 5
+        },
+        "quantidade": 2
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 5
+        },
+        "quantidade": 2
+       }
+      ]
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     },
+     {
+      "aberta": false,
+      "pecas": []
+     }
+    ],
+    "bandeja": [],
+    "lote": 2,
+    "pilha": null,
+    "partes": 5,
+    "voltas": 1,
+    "cargaTravada": true,
+    "fechada": true,
+    "evento": {
+     "tipo": "fechou",
+     "sobra": []
+    },
+    "seq": 7
+   },
+   "registradaEm": 1760400452000
+  },
+  {
+   "id": "partilha.arco1.encomenda",
+   "atividade": "partilha.arco1.encomenda",
+   "titulo": "Encomenda sem manual",
+   "frase": "Três broas para quatro mesas, de dois jeitos: medidores na mesma altura. Duas broas para três mesas dão dois terços.",
+   "notacao": [
+    "3 ÷ 4 = 3/4",
+    "2 ÷ 3 = 2/3"
+   ],
+   "volta": null,
+   "notas": [
+    "Quartos ou oitavos, a mesa come o mesmo. O Nônio diz que isso tem nome; fica para outro dia."
+   ],
+   "maquina": {
+    "config": {
+     "pele": "broas-mesas",
+     "pecas": {
+      "quantidade": 1
+     },
+     "carga": {
+      "minimo": 1,
+      "maximo": 6
+     },
+     "bicas": {
+      "quantidade": 3,
+      "ajustavel": false
+     },
+     "fatiador": {
+      "partes": [
+       2,
+       3,
+       4,
+       6
+      ],
+      "denominadorMaximo": 6
+     }
+    },
+    "esteira": [],
+    "bicas": [
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 3
+        },
+        "quantidade": 2
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 3
+        },
+        "quantidade": 2
+       }
+      ]
+     },
+     {
+      "aberta": true,
+      "pecas": [
+       {
+        "tamanho": {
+         "n": 1,
+         "d": 3
+        },
+        "quantidade": 2
+       }
+      ]
+     }
+    ],
+    "bandeja": [],
+    "lote": 2,
+    "pilha": null,
+    "partes": 3,
+    "voltas": 1,
+    "cargaTravada": true,
+    "fechada": true,
+    "evento": {
+     "tipo": "fechou",
+     "sobra": []
+    },
+    "seq": 6
+   },
+   "registradaEm": 1760400558000
+  }
+ ],
+ "joias": {
+  "abaco": {
+   "encontrada": true,
+   "encontradaEm": 1760400560000,
+   "estagio": 0,
+   "treinos": 0,
+   "tecnicas": []
+  }
+ },
+ "museu": {
+  "museu.paes-de-ahmes": 1760400658000
+ },
+ "cenas": {
+  "rua.tres-pizzas": 1760400734000
+ },
+ "revisitas": {
+  "geradas": 0,
+  "atual": null
+ },
+ "relogio": {
+  "deslocamentoMs": 794000
+ },
+ "apresentacoes": {
+  "bolha": 1760400795000,
+  "mao-livre": 1760400795000
+ }
+}

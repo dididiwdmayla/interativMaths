@@ -13,6 +13,9 @@ import {
   type EstadoAtividade,
   type EstadoJoia,
   type EstagioJoia,
+  type ItemFeito,
+  type RodadaSalva,
+  type TreinoTecnica,
   type PaginaCaderno,
   type Palpite,
   type Preferencias,
@@ -171,6 +174,56 @@ function normalizarPagina(v: unknown): PaginaCaderno | null {
   };
 }
 
+/** Rodadas que contam guardadas por técnica: a primeira e as mais recentes. */
+export const TETO_RODADAS_TECNICA = 4;
+
+function normalizarTreino(v: unknown): TreinoTecnica | null {
+  if (!ehObjeto(v)) return null;
+  const rodadas = lista(v.rodadas, (x) => {
+    if (!ehObjeto(x)) return null;
+    const momento = numOuNull(x.momento);
+    return momento === null ? null : { momento, nivel: texto(x.nivel, "") };
+  });
+  return {
+    limpos: Math.max(0, Math.floor(num(v.limpos, 0))),
+    apresentadaEm: numOuNull(v.apresentadaEm),
+    // A primeira fica sempre: o intervalo mínimo conta a partir dela.
+    rodadas: rodadas.length > TETO_RODADAS_TECNICA ? [rodadas[0], ...rodadas.slice(rodadas.length - TETO_RODADAS_TECNICA + 1)] : rodadas,
+    firmeEm: numOuNull(v.firmeEm),
+  };
+}
+
+function normalizarItemFeito(v: unknown): ItemFeito | null {
+  if (!ehObjeto(v)) return null;
+  return {
+    resumo: texto(v.resumo, ""),
+    marca: umDe(v.marca, ["limpo", "vai-e-volta", "com-ajuda", "ainda-nao"] as const, "com-ajuda"),
+    nivel: texto(v.nivel, ""),
+    evidencias: lista(v.evidencias, (x) => {
+      if (!ehObjeto(x)) return null;
+      const tecnica = textoOuNull(x.tecnica);
+      return tecnica ? { tecnica, conta: x.conta === true } : null;
+    }),
+  };
+}
+
+/** A parte genérica da rodada; os itens e o item aberto, a joia valida ao restaurar. */
+function normalizarRodada(v: unknown): RodadaSalva | null {
+  if (!ehObjeto(v) || !Array.isArray(v.itens) || v.itens.length === 0) return null;
+  const feitos = lista(v.feitos, normalizarItemFeito);
+  if (feitos.length > v.itens.length) return null;
+  return {
+    semente: Math.floor(num(v.semente, 1)),
+    tipo: umDe(v.tipo, ["tecnica", "revisao", "manutencao"] as const, "tecnica"),
+    foco: textoOuNull(v.foco),
+    nova: v.nova === true,
+    iniciadaEm: num(v.iniciadaEm, 0),
+    itens: v.itens,
+    feitos,
+    aberto: ehObjeto(v.aberto) ? v.aberto : null,
+  };
+}
+
 function normalizarJoia(v: unknown): EstadoJoia | null {
   if (!ehObjeto(v)) return null;
   const estagio = Math.max(0, Math.min(3, Math.floor(num(v.estagio, 0)))) as EstagioJoia;
@@ -179,7 +232,9 @@ function normalizarJoia(v: unknown): EstadoJoia | null {
     encontradaEm: numOuNull(v.encontradaEm),
     estagio,
     treinos: Math.max(0, Math.floor(num(v.treinos, 0))),
-    tecnicas: lista(v.tecnicas, (x) => (typeof x === "string" ? x : null)),
+    tecnicas: [...new Set(lista(v.tecnicas, (x) => (typeof x === "string" ? x : null)))],
+    treino: registro(v.treino, normalizarTreino),
+    rodada: normalizarRodada(v.rodada),
   };
 }
 

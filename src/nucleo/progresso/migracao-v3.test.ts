@@ -19,13 +19,12 @@ function abrir() {
 }
 
 describe("progresso v2 (v0.3) na v0.4", () => {
-  it("abre sem aviso, na versão 3, com a aparência automática e o resto intacto", () => {
+  it("abre sem aviso, na versão atual, com a aparência automática e o resto intacto", () => {
     const original = JSON.parse(AMOSTRA);
     expect(original.versao).toBe(2);
     const { progresso, aviso } = abrir();
     expect(aviso).toBeNull();
-    expect(VERSAO_PROGRESSO).toBe(3);
-    expect(progresso.versao).toBe(3);
+    expect(progresso.versao).toBe(VERSAO_PROGRESSO);
     expect(progresso.preferencias).toEqual({ ...original.preferencias, aparencia: "automatico" });
     expect(progresso.apresentacoes).toEqual(original.apresentacoes);
     expect(progresso.evidencias).toEqual(original.evidencias);

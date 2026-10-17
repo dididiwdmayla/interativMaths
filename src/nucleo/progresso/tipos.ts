@@ -6,7 +6,7 @@
 import type { IdConceito } from "../curriculo/curriculo";
 import type { Evidencia, ResultadoEvidencia } from "../dominio/evidencias";
 
-export const VERSAO_PROGRESSO = 3;
+export const VERSAO_PROGRESSO = 4;
 
 export type Postura = "quieto" | "disponivel" | "presente";
 export type Cotas = "visiveis" | "escondidas";
@@ -103,14 +103,69 @@ export interface PaginaCaderno {
 
 export type EstagioJoia = 0 | 1 | 2 | 3;
 
+/** Uma rodada que contou para uma técnica: quando terminou e em que nível de apoio. */
+export interface RodadaQueContou {
+  readonly momento: number;
+  readonly nivel: string;
+}
+
+/** O treino de uma técnica (v4). */
+export interface TreinoTecnica {
+  /** Lances limpos que contam: sem ajuda do degrau 2 em diante, sem os pares, num nível que conta. */
+  readonly limpos: number;
+  /** Quando a técnica foi apresentada (a abertura de "Técnica nova"); null: ainda a lápis. */
+  readonly apresentadaEm: number | null;
+  /** As rodadas que contaram: a primeira e as mais recentes, até quatro. */
+  readonly rodadas: readonly RodadaQueContou[];
+  readonly firmeEm: number | null;
+}
+
+export type TipoRodada = "tecnica" | "revisao" | "manutencao";
+
+/** Como um item da rodada terminou, para as fichas pequenas do fim. */
+export type MarcaItem = "limpo" | "vai-e-volta" | "com-ajuda" | "ainda-nao";
+
+/** O resultado de um item terminado: a evidência dele só entra aqui, quando ele termina. */
+export interface ItemFeito {
+  /** A expressão, para a ficha pequena do fim ("23 + 14"). */
+  readonly resumo: string;
+  readonly marca: MarcaItem;
+  readonly nivel: string;
+  /** Uma entrada por lance (ou por item, nas que não têm lance): a técnica e se conta. */
+  readonly evidencias: readonly { readonly tecnica: string; readonly conta: boolean }[];
+}
+
+/**
+ * A rodada em andamento, para fechar o navegador no meio e voltar no mesmo lance. Os itens e o
+ * item aberto são da joia (o soroban, os gestos do lance aberto): quem os valida é o registro dela.
+ */
+export interface RodadaSalva {
+  readonly semente: number;
+  readonly tipo: TipoRodada;
+  /** A técnica do foco (null na revisão e na manutenção). */
+  readonly foco: string | null;
+  /** A abertura foi a de "Técnica nova". */
+  readonly nova: boolean;
+  readonly iniciadaEm: number;
+  readonly itens: readonly unknown[];
+  readonly feitos: readonly ItemFeito[];
+  /** O item em curso (índice = feitos.length); null antes do primeiro gesto. */
+  readonly aberto: unknown;
+}
+
 export interface EstadoJoia {
   readonly encontrada: boolean;
   readonly encontradaEm: number | null;
-  /** 0 bruta, 1 talhada, 2 lapidada, 3 polida. */
+  /** 0 bruta, 1 talhada, 2 lapidada, 3 polida. Nunca volta. */
   readonly estagio: EstagioJoia;
-  /** Sessões de treino feitas (treino ainda em projeto). */
+  /** Rodadas de lapidação feitas até o fim. */
   readonly treinos: number;
+  /** As técnicas firmes, na ordem em que firmaram. */
   readonly tecnicas: readonly string[];
+  /** O treino de cada técnica (v4). */
+  readonly treino: Readonly<Record<string, TreinoTecnica>>;
+  /** A rodada em andamento (v4). */
+  readonly rodada: RodadaSalva | null;
 }
 
 export interface Progresso {
