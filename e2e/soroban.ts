@@ -64,6 +64,13 @@ export async function fazerOperacao(page: Page) {
     else if (modo === "leitura") await digitar(page, Number(await v(page, "[data-soroban]").getAttribute("data-valor")));
     else {
       const op = operacaoDoAtributo((await tela.getAttribute("data-operacao")) ?? "");
+      if (modo === "sombra" && (op.tipo === "somar" || op.tipo === "subtrair")) {
+        // Sem ver as contas, a mão deixa o resultado no soroban.
+        const valor = Number(await v(page, "[data-soroban]").getAttribute("data-valor"));
+        const agora = mostrar(5, valor);
+        const plano = planoDoLance(agora, { tipo: "mostrar", valor: op.tipo === "somar" ? op.a + op.b : op.a - op.b });
+        for (const g of gestosDosMovimentos(agora, plano?.movimentos ?? [])) await tocarGesto(page, g);
+      }
       if (op.tipo === "ditado") while (await v(page, "[data-acao=proximo-numero]").isVisible().catch(() => false)) await tocar(page, "[data-acao=proximo-numero]");
       const r = op.tipo === "somar" ? op.a + op.b : op.tipo === "subtrair" ? op.a - op.b : op.tipo === "ditado" ? op.numeros.reduce((t, n) => t + n, 0) : op.valor;
       await digitar(page, r);

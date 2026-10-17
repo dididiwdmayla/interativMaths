@@ -154,6 +154,34 @@ describe("o treino das joias, com relógio fixo", () => {
     expect(m.estado.treinos).toBe(e.treinos + 1);
   });
 
+  it("o imaginado não firma com a última rodada na sombra", () => {
+    const polidaQuase: EstadoJoia = {
+      ...NOVA,
+      estagio: 2,
+      treino: Object.fromEntries(
+        ABACO.tecnicas.map((t) => [
+          t.id,
+          t.id === T.imaginado
+            ? { limpos: 8, apresentadaEm: T0, rodadas: [{ momento: T0, nivel: "sombra" }], firmeEm: null }
+            : { limpos: 6, apresentadaEm: T0, rodadas: [], firmeEm: T0 },
+        ]),
+      ),
+    };
+    // Uma rodada na sombra (forçada), 30 horas depois: lances e rodadas bastam, mas não fecha.
+    let e = comecarRodadaDoAbaco(ABACO, polidaQuase, P, T0 + 30 * HORA);
+    const itens = (e.rodada?.itens ?? []) as { nivel: string }[];
+    expect(itens[0].nivel).toBe("de-cabeca");
+    const sombra = { ...e, rodada: e.rodada ? { ...e.rodada, feitos: itens.map(() => ({ resumo: "x", marca: "limpo" as const, nivel: "sombra", evidencias: [{ tecnica: T.imaginado, conta: true }] })) } : null };
+    const fim = encerrarRodada(ABACO, sombra, P, T0 + 30 * HORA);
+    expect(fim?.firmaram).toEqual([]);
+    expect(fim?.estado.estagio).toBe(2);
+    // A mesma rodada de cabeça firma.
+    e = { ...e, rodada: e.rodada ? { ...e.rodada, feitos: itens.map(() => ({ resumo: "x", marca: "limpo" as const, nivel: "de-cabeca", evidencias: [{ tecnica: T.imaginado, conta: true }] })) } : null };
+    const fim2 = encerrarRodada(ABACO, e, P, T0 + 30 * HORA);
+    expect(fim2?.firmaram).toEqual([T.imaginado]);
+    expect(fim2?.estado.estagio).toBe(3);
+  });
+
   it("a rodada só encerra com todos os itens feitos", () => {
     const e = comecarRodadaDoAbaco(ABACO, NOVA, P, T0);
     expect(e.rodada?.itens).toHaveLength(6);

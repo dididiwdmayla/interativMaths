@@ -171,6 +171,8 @@ function OperacaoDaRodada({
         setAindaNao(true);
       } else if (ev.tipo === "terminou") {
         oferecerFala(falaDoFim(passo, r.estado));
+        // A nota da primeira sombra aparece uma vez só.
+        if (modo === "sombra" && !("sombra" in progresso.apresentacoes)) atualizar((p, t) => marcarApresentacao(p, "sombra", t));
         setJanelaAberta(false);
         setCasoAberto(false);
         // No imaginado, o soroban mostra o caminho curto depois de conferir (de cabeça, sempre; na sombra, quando não bateu).
@@ -311,6 +313,11 @@ function OperacaoDaRodada({
           </div>
         )}
       </div>
+      {modo === "sombra" && !terminado && !e.verContas && !("sombra" in progresso.apresentacoes) && (
+        <p className="letra-mao nota-sombra m-0" data-nota-sombra="">
+          {TEXTOS_BANCADA.notaSombra}
+        </p>
+      )}
       <div className="lapidacao-canto" aria-hidden="true" />
     </div>
   );

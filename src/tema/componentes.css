@@ -2572,3 +2572,12 @@ a.manual-pag:active {
   background: var(--caneta-palida);
   color: var(--caneta-escura);
 }
+
+/* A nota à mão da primeira sombra, embaixo do soroban sem contas. */
+.nota-sombra {
+  flex: none;
+  padding: 0 12px;
+  font-size: 23px;
+  text-align: center;
+  transform: rotate(-1.5deg);
+}
