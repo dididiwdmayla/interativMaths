@@ -96,7 +96,10 @@ export function CabecalhoJogo({ atual }: { atual?: Lugar }) {
             </Link>
           )}
           <BotaoTema />
-          <BotaoTelaCheia />
+          {/* Com o contador de joias, a tela cheia sai do topo em telas estreitas (fica no Menu): senão a linha passa da tela. */}
+          <span className={joias > 0 ? "hidden min-[430px]:contents" : "contents"}>
+            <BotaoTelaCheia />
+          </span>
           <Link href="/menu" className="botao-icone" aria-label="Menu" aria-current={atual === "menu" ? "page" : undefined} data-nav="menu">
             <IconeMenu />
           </Link>

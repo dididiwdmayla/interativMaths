@@ -368,3 +368,37 @@ export const FIM_RODADA = {
   aMao: "{estagio}!",
   operacoes: "As seis operações",
 } as const;
+
+/* ---------- O Relicário vivo (referência 1) ---------- */
+
+export const RELICARIO_VIVO = {
+  emLapidacao: "em lapidação",
+  polida: "polida",
+  encontrada: "encontrada",
+  aindaNao: "ainda não encontrada",
+  paraFicar: "Para ficar {estagio}:",
+  lapidar: "Lapidar",
+  sorobanLivre: "Soroban livre",
+  rodada: "rodada: {tecnica}",
+  continuar: "continuar: {n} de {total}",
+  revisao: "revisão",
+  manutencao: "manutenção",
+  firme: "Firme",
+  firmando: "firmando",
+  esperando: "esperando",
+  faltaUmaRodada: "falta uma rodada, a partir de amanhã",
+  bancada: "Bancada de lapidação",
+  bancadaAberta: "Aberta para a Joia do Ábaco: rodadas curtas no soroban, um algarismo por vez. As outras joias ganham a bancada quando forem encontradas.",
+  explicacao: "Relógios usam rubis como mancais, para o mecanismo girar com menos atrito. As joias daqui são isso: habilidades reais que reduzem o atrito do seu raciocínio.",
+} as const;
+
+/* ---------- O soroban livre ---------- */
+
+export const SOROBAN_LIVRE = {
+  titulo: "Soroban livre",
+  linha: "Mexa à vontade: aqui nada conta.",
+  mostrando: "O soroban mostra",
+  algarismos: "Mostrar os algarismos",
+  zerar: "Zerar",
+  osPares: "Os pares",
+} as const;

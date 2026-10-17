@@ -1005,7 +1005,7 @@ function TelaFim({ a, fim, voltar, desvio }: { a: Atividade; fim: Fim; voltar: {
         )}
         {fim.joia && (
           <p className="m-0 max-w-sm text-[15px] font-semibold" data-joia-encontrada={fim.joia}>
-            A Joia do Ábaco foi para o primeiro engaste do Relicário. Ainda bruta.
+            A Joia do Ábaco foi para o primeiro engaste do Relicário. Ainda bruta. No Relicário, Lapidar abre o soroban.
           </p>
         )}
         <div className="mt-1 flex w-full flex-col gap-2.5">
